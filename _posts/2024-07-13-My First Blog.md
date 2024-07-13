@@ -17,12 +17,10 @@ Welcome~
 
 # About Share
 
-This is about to mainly record of my learning experience in ***SUTD***.
+This is about to mainly record my learning experience in ***SUTD*** as a research scholar in 2024.
 
 ***Welcome everyone to view my blog here.***
 
-Nice to meet you. 
-
-Wish you a good day~
+Nice to meet you. Wish you a good day😀~
 
 
