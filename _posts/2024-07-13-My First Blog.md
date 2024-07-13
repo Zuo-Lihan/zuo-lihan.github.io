@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      My First Blog~
-subtitle:   2024 欢迎浏览我的博客~ 
+title:      Welcome to My First Blog~
+subtitle:   欢迎浏览我的博客 
 date:       2024-07-13
 author:     ZLH
 header-img: img/post-bg-2015.jpg
@@ -13,7 +13,7 @@ tags:
 
 # Some to Say
 
-Welcome~
+Welcome!
 
 # About Share
 
