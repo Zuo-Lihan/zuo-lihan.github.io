@@ -75,9 +75,9 @@ gitalk:
   #repo: qiubaiying.github.io    #仓库名称
   #owner: qiubaiying    #github用户名
   #admin: qiubaiying
-  repo: zuolihanstudy.github.io
-  owner: zuolihanstudy
-  admin: zuolihanstudy
+  repo: zuo-lihan.github.io
+  owner: Zuo-Lihan
+  admin: Zuo-Lihan
   distractionFreeMode: true #是否启用类似FB的阴影遮罩
 
 
@@ -85,7 +85,7 @@ gitalk:
 
 # Analytics settings
 # Baidu Analytics
-ba_track_id: b50bf2b12b5338a1845e33832976fd68
+# ba_track_id: b50bf2b12b5338a1845e33832976fd68
 
 # Google Analytics
 ga_track_id: 'UA-90855596-1'            # Format: UA-xxxxxx-xx
@@ -108,18 +108,18 @@ service-worker: true
 
 
 # Friends
-friends: [
-    {
-        title: "WY",
-        href: "http://zhengwuyang.com"
-    },{
-        title: "简书·BY",
-        href: "http://www.jianshu.com/u/e71990ada2fd"
-    },{
-        title: "Apple",
-        href: "https://apple.com"
-    },{
-        title: "Apple Developer",
-        href: "https://developer.apple.com/"
-    }
-]
+# friends: [
+#     {
+#         title: "WY",
+#         href: "http://zhengwuyang.com"
+#     },{
+#         title: "简书·BY",
+#         href: "http://www.jianshu.com/u/e71990ada2fd"
+#     },{
+#         title: "Apple",
+#         href: "https://apple.com"
+#     },{
+#         title: "Apple Developer",
+#         href: "https://developer.apple.com/"
+#     }
+# ]
