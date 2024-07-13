@@ -63,8 +63,8 @@ kramdown:
 
 
 # 评论系统
-Disqus（https://disqus.com/）
-disqus_username: lihanzuo
+# Disqus（https://disqus.com/）
+# disqus_username: lihanzuo
 
 # Gitalk
 gitalk:
