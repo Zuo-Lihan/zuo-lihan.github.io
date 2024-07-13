@@ -1,13 +1,13 @@
 # Site settings
-title: BY Blog
-SEOTitle: Zuo Lihan's Blog | BY Blog
+title: Blog
+SEOTitle: Zuo Lihan's Blog | Blog
 header-img: img/AI 1.jpg
 #email: qiubaiying@gmail.com
 email: zuolihanstudy@gmail.com
 
 description: "Every failure is leading towards success."
 #keyword: "BY, BY Blog, 柏荧的博客, qiubaiying, 邱柏荧, iOS, Apple, iPhone"
-keyword: "BY, BY Blog, zzz的博客, zuolihanstudy, zuoLihan, AI, LLM, Medical Image Analysis"
+keyword: "Blog, zzz的博客, zuolihanstudy, zuoLihan, AI, LLM, Medical Image Analysis"
 
 #url: "http://qiubaiying.github.io"          # your host, for absolute URL
 url: "http://zuo-lihan.github.io"
