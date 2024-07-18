@@ -80,7 +80,9 @@ A TMUX session can have multiple Windows, and each window can be divided into mu
 
 -  `ctrl+b %`: split screen panes of vertical type;
 -  `ctrl+b "`: split screen panes of level type;
+  
 ---
+
 -  `ctrl+b o`: switch panes under the current window in turn;
 -  `ctrl+b <UP>|<Down>|<Left>|<Right>`: switch to a pane by selecting the arrow direction;
 -  `ctrl+b <Space>`: rearrange the layout of all panes under the current window, changing styles each time you enter this command;
