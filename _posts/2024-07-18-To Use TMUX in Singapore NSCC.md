@@ -5,6 +5,7 @@ subtitle:  About TMUX usages, to see from part-3 is better
 date:  2024-07-18
 author:  ZLH
 header-img:  img/_post-TMUX usages.jpg
+
 catalog:  true
 tags:
     -  NSCC
