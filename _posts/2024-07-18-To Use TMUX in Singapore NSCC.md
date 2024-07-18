@@ -1,7 +1,7 @@
 ---
 layout:  post
 title:  Use of TMUX on Singapore NSCC-aspire2a
-subtitle:  About TMUX usages, seen from #3
+subtitle:  About TMUX usages, to see from part-3 is better
 date:  2024-07-18
 author:  ZLH
 header-img:  img/_post-TMUX usages.jpg
