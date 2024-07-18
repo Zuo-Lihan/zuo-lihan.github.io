@@ -4,8 +4,7 @@ title:  Use of TMUX on Singapore NSCC-aspire2a
 subtitle:  About TMUX usages, to see from part-3 is better
 date:  2024-07-18
 author:  ZLH
-header-img:  img/_post-TMUX usages.jpg
-
+header-img:    img/post-TMUX usages.jpg
 catalog:  true
 tags:
     -  NSCC
@@ -18,15 +17,12 @@ tags:
    
 -       tmux -V
 
-    aspire2a output:
-    
   ![image](https://github.com/user-attachments/assets/fbe68606-fec0-4242-9565-fc447893cdb9)
 
 ## 2. To Enter the TMUX Session
 
 -      tmux
 
-    aspire2a output:
   ![image](https://github.com/user-attachments/assets/13299d6b-1dd3-45cf-ac20-f5dafe1a24ce)
 
 ## 3. Some Basic Usage for TMUX Use
@@ -43,7 +39,6 @@ tags:
 
 -      tmux ls
 
-   aspire2a output:
   ![image](https://github.com/user-attachments/assets/ba134036-d698-431c-987a-6b79c66d3ed2)
 
 ### ***3.4 to check TMUX session list while in one session window:***
