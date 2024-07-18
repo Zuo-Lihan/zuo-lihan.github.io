@@ -90,4 +90,13 @@ A TMUX session can have multiple Windows, and each window can be divided into mu
 
 ### 6. `ctrl+b x`: delete the pane currently in use.
 
+---
+
+# MY NSCC USE STEPS:
+
+- 1. `qsub -I -l select=1:ncpus=5:mem=50gb:ngpus=1,walltime=24:00:00 -q normal -P personal-lihanzuo`
+    
+- 2. `module load miniforge3`
+
+- 3. `conda activate [my_env]`
 
