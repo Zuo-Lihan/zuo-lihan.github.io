@@ -94,11 +94,11 @@ A TMUX session can have multiple Windows, and each window can be divided into mu
 
 # MY NSCC USE STEPS:
 
-- 1. `now TMUX first`
+- `now TMUX first`
      
-- 2. `qsub -I -l select=1:ncpus=5:mem=50gb:ngpus=1,walltime=24:00:00 -q normal -P personal-lihanzuo`
+- `qsub -I -l select=1:ncpus=5:mem=50gb:ngpus=1,walltime=24:00:00 -q normal -P personal-lihanzuo`
 
-- 3. `module load miniforge3`
+- `module load miniforge3`
 
-- 4. `conda activate [my_env]`
+- `conda activate [my_env]`
 
