@@ -25,7 +25,7 @@ tags:
 
 -      tmux
 
-  aspire2a output:
+    aspire2a output:
   ![image](https://github.com/user-attachments/assets/13299d6b-1dd3-45cf-ac20-f5dafe1a24ce)
 
 ## 3. Some Basic Usage for TMUX Use
@@ -42,7 +42,7 @@ tags:
 
 -      tmux ls
 
-  aspire2a output:
+   aspire2a output:
   ![image](https://github.com/user-attachments/assets/ba134036-d698-431c-987a-6b79c66d3ed2)
 
 ### ***3.4 to check TMUX session list while in one session window:***
