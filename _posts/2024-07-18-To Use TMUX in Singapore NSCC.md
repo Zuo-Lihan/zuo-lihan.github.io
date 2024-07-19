@@ -1,6 +1,6 @@
 ---
 layout:  post
-title:  Use of TMUX on Singapore NSCC-aspire2a
+title:  Use TMUX on Singapore NSCC-aspire2a
 subtitle:  About TMUX usages, to see from part-3 is better
 date:  2024-07-18
 author:  ZLH
