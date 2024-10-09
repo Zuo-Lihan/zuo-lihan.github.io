@@ -94,7 +94,9 @@ A TMUX session can have multiple Windows, and each window can be divided into mu
 
 # MY NSCC USE STEPS:
 
-- `now TMUX first`
+- `now TMUX first` (this means we create a 'TMUX session' first, by: `tmux new -s [session_name]`. )
+
+  (we use tmux because we want to prevent our running programs from being affected by a server remote connection drop & reconnection)
      
 - `qsub -I -l select=1:ncpus=5:mem=50gb:ngpus=1,walltime=36:00:00 -q normal -P personal-lihanzuo -N Alpaca_ATTN`
 
