@@ -105,4 +105,5 @@ A TMUX session can have multiple Windows, and each window can be divided into mu
 - `conda activate [my_env]`
 
 - `nohup bash [my_python.sh] > log/output_[my_python_name].log 2>&1 &`
+  (If you don't want to log to the logging_file, please use: `nohup bash [my_python.sh] > /dev/null 2>&1 &`)
 
