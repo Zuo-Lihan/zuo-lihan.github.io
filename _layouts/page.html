@@ -2,6 +2,13 @@
 layout: default
 ---
 
+{% if page.url == "/" %}
+<script>
+  // 当页面为首页时，立即重定向到 About.html
+  window.location.href = "{{ site.baseurl }}/About.html";
+</script>
+{% endif %}
+
 <!-- Page Header -->
 <header class="intro-header" style="background-image: url('{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}')">
     <div class="container">
