@@ -4,10 +4,15 @@ layout: default
 
 {% if page.url == "/" %}
 <script>
-  // 当页面为首页时，立即重定向到 About.html
-  window.location.href = "{{ site.baseurl }}/About.html";
+  // 检查 localStorage 中是否存在访问标记
+  if (!sessionStorage.getItem('visited')) {
+    // 第一次访问：设置标记并重定向
+    sessionStorage.setItem('visited', 'true');
+    window.location.href = "{{ site.baseurl }}/about/";
+  }
 </script>
 {% endif %}
+
 
 <!-- Page Header -->
 <header class="intro-header" style="background-image: url('{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}')">
