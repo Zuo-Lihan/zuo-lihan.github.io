@@ -4,7 +4,7 @@ title:      考研计划
 subtitle:   6月归国考研
 date:       2025-03-23
 author:     Lihan Zuo
-header-img: img/Kao Yan image 1.jpg
+header-img: img/Kao Yan image 1.png
 catalog: true
 tags:
     - 考研
