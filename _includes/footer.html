@@ -219,7 +219,20 @@
 </script>
 {% endif %}
 
+<!-- ClustrMaps Script at the Bottom -->
+<script type='text/javascript' id='clustrmaps' src='//cdn.clustrmaps.com/map_v2.js?cl=ffffff&w=a&t=n&d=qyNluTlmNiSUKmwsVUPfZdMa9z1eNjAMIYCV208JAJY'></script>
 
+<style>
+    /* 控制 ClustrMaps 地图的尺寸和位置 */
+    #clustrmaps {
+        position: fixed;           /* 固定定位 */
+        bottom: 10px;              /* 距离页面底部 10px */
+        left: 50%;                 /* 水平居中 */
+        transform: translateX(-50%);  /* 精确居中 */
+        width: 50px;               /* 设置地图宽度为 50px */
+        height: 50px;              /* 设置地图高度为 50px */
+    }
+</style>
 
 <!-- Side Catalog -->
 {% if page.catalog %}
