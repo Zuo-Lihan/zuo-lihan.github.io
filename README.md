@@ -25,6 +25,7 @@
 ```text
 preview/
 ├── build.js
+├── dev-server.js
 ├── index.html
 ├── assets/
 │   └── notion-profile.jpg
@@ -47,34 +48,38 @@ preview/
 - 改联系方式：编辑 `preview/sections/contact.html`
 - 改整体样式、背景、卡片 hover、轮播交互、弹窗逻辑：编辑 `preview/index.html`
 
-注意：`preview/sections/*.html` 是方便编辑的章节源文件；`preview/index.html` 是最终可打开的预览页面。修改任意章节文件后，需要运行一次：
+注意：`preview/sections/*.html` 是方便编辑的章节源文件。通过本地开发服务器打开 `preview/index.html` 时，页面会自动读取这些章节文件；保存章节文件后，开发服务器会用 Server-Sent Events 通知浏览器刷新，平时不会反复轮询文件。
+
+`preview/index.html` 里也保留了一份内联兜底内容，避免直接打开 HTML 或章节加载失败时页面空白。发布前建议运行一次：
 
 ```bash
 node preview/build.js
 ```
 
-这个命令会把 `preview/sections/*.html` 重新写入 `preview/index.html`，避免浏览器因为本地文件安全限制而无法加载章节内容。
+这个命令会把 `preview/sections/*.html` 同步写入 `preview/index.html` 的兜底内容。
 
 ## 上线前必须确认
 
 1. 在本地预览完整检查页面：
 
-   修改章节后先同步生成预览页：
+   启动本地开发服务器：
 
    ```bash
-   node preview/build.js
-   ```
-
-   然后启动本地服务：
-
-   ```bash
-   python3 -m http.server 4173 --bind 127.0.0.1
+   node preview/dev-server.js
    ```
 
    打开：
 
    ```text
    http://127.0.0.1:4173/preview/index.html
+   ```
+
+   之后直接修改 `preview/sections/*.html` 并保存，浏览器里的预览页会自动刷新。
+
+   如果 `4173` 端口已被占用，可以换一个端口：
+
+   ```bash
+   PORT=4174 node preview/dev-server.js
    ```
 
 2. 逐项确认以下内容：
@@ -87,7 +92,13 @@ node preview/build.js
    - `CV` 时间线内容完整，时间、单位、角色和项目描述无误。
    - 页面背景、卡片 hover、章节间距、移动端布局都已经确认。
 
-3. 确认没有敏感信息被发布。GitHub Pages 页面是公开网页，邮箱、照片、CV 链接、论文信息都会被互联网上的访问者看到。
+3. 发布或提交前同步一次内联兜底内容：
+
+   ```bash
+   node preview/build.js
+   ```
+
+4. 确认没有敏感信息被发布。GitHub Pages 页面是公开网页，邮箱、照片、CV 链接、论文信息都会被互联网上的访问者看到。
 
 ## 先推送到 develop
 
@@ -96,7 +107,7 @@ node preview/build.js
 ```bash
 git switch develop
 git status
-git add README.md preview/build.js preview/index.html preview/assets/notion-profile.jpg preview/sections
+git add README.md preview/build.js preview/dev-server.js preview/index.html preview/assets/notion-profile.jpg preview/sections
 git commit -m "Add academic CV homepage preview"
 git push -u origin develop
 ```
@@ -105,6 +116,7 @@ git push -u origin develop
 
 - `preview/index.html`
 - `preview/build.js`
+- `preview/dev-server.js`
 - `preview/assets/notion-profile.jpg`
 - `preview/sections/*.html`
 - `README.md`
@@ -142,7 +154,7 @@ http://127.0.0.1:4173/index.html
 如果正式路径检查无误，再提交：
 
 ```bash
-git add index.html assets/notion-profile.jpg sections README.md preview/build.js preview/index.html preview/assets/notion-profile.jpg preview/sections
+git add index.html assets/notion-profile.jpg sections README.md preview/build.js preview/dev-server.js preview/index.html preview/assets/notion-profile.jpg preview/sections
 git commit -m "Promote academic CV homepage"
 git push origin develop
 ```
@@ -225,8 +237,8 @@ git push origin master
 以后更新 CV 内容时，仍然使用同样流程：
 
 1. 在 `develop` 修改对应的 `preview/sections/*.html`；如果是整体样式或交互，再修改 `preview/index.html`。
-2. 运行 `node preview/build.js`，把章节源文件同步进 `preview/index.html`。
-3. 本地预览确认。
+2. 本地 HTTP 预览会自动刷新，确认页面显示无误。
+3. 发布或提交前运行 `node preview/build.js`，把章节源文件同步进 `preview/index.html` 的兜底内容。
 4. 把确认后的内容同步到根目录 `index.html` 和 `sections/`。
 5. 推送 `develop`。
 6. PR 合并到 `master`。
