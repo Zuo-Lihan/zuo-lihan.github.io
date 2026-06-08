@@ -1,0 +1,2210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lihan Zuo | Academic Interface Preview</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #ecf9ff;
+      --panel: rgba(255, 255, 255, 0.58);
+      --panel-strong: rgba(255, 255, 255, 0.78);
+      --line: rgba(18, 57, 82, 0.16);
+      --line-strong: rgba(18, 57, 82, 0.3);
+      --text: #102237;
+      --muted: #587187;
+      --soft: #263f56;
+      --cyan: #009cc6;
+      --magenta: #c451a6;
+      --green: #008f6b;
+      --gold: #9a6a00;
+      --paper: #eef3f7;
+      --ink: #161a20;
+      --shadow: 0 24px 90px rgba(38, 91, 124, 0.18);
+      --radius: 8px;
+      --nav-h: 74px;
+      --context-h: 42px;
+      --ease: cubic-bezier(.2, .8, .2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      height: 100%;
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      min-height: 100%;
+      margin: 0;
+      color: var(--text);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      letter-spacing: 0;
+      background:
+        linear-gradient(90deg, rgba(0, 156, 198, 0.1) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(196, 81, 166, 0.075) 1px, transparent 1px),
+        #ecf9ff;
+      background-size: 68px 68px;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      content: "";
+      background:
+        linear-gradient(118deg, rgba(255, 255, 255, 0.9) 0%, rgba(215, 247, 255, 0.78) 26%, rgba(241, 235, 255, 0.74) 55%, rgba(255, 248, 224, 0.7) 100%),
+        linear-gradient(64deg, transparent 0 16%, rgba(0, 156, 198, 0.25) 18%, transparent 28% 46%, rgba(196, 81, 166, 0.2) 49%, transparent 60%),
+        linear-gradient(152deg, transparent 0 42%, rgba(0, 143, 107, 0.2) 46%, transparent 56% 100%);
+      filter: saturate(1.08) contrast(1);
+    }
+
+    body::after {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      content: "";
+      background:
+        repeating-linear-gradient(
+          180deg,
+          rgba(16, 34, 55, 0.04) 0,
+          rgba(16, 34, 55, 0.04) 1px,
+          transparent 1px,
+          transparent 7px
+        );
+      mix-blend-mode: multiply;
+      opacity: 0.26;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      color: inherit;
+      font: inherit;
+    }
+
+    .shell {
+      position: relative;
+      min-height: 100svh;
+    }
+
+    .energy-field {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 1;
+      mix-blend-mode: multiply;
+    }
+
+    .energy-field::before,
+    .energy-field::after {
+      position: absolute;
+      inset: -20%;
+      content: "";
+      will-change: transform, opacity;
+    }
+
+    .energy-field::before {
+      background:
+        linear-gradient(112deg, transparent 0 30%, rgba(0, 156, 198, 0.18) 35%, transparent 40% 56%, rgba(196, 81, 166, 0.14) 61%, transparent 66%),
+        linear-gradient(72deg, transparent 0 48%, rgba(255, 209, 102, 0.18) 50%, transparent 53%);
+      background-size: 180% 100%, 160% 100%;
+      animation: field-drift 14s var(--ease) infinite alternate;
+    }
+
+    .energy-field::after {
+      background:
+        repeating-linear-gradient(90deg, transparent 0 120px, rgba(0, 143, 107, 0.09) 121px, transparent 124px),
+        repeating-linear-gradient(180deg, transparent 0 150px, rgba(0, 156, 198, 0.08) 151px, transparent 154px);
+      transform: rotate(-8deg) scale(1.12);
+      animation: field-scan 18s linear infinite;
+      opacity: 0.58;
+    }
+
+    @keyframes field-drift {
+      from {
+        transform: translate3d(-5%, -1%, 0);
+      }
+      to {
+        transform: translate3d(5%, 2%, 0);
+      }
+    }
+
+    @keyframes field-scan {
+      from {
+        transform: rotate(-8deg) translate3d(-3%, -2%, 0) scale(1.12);
+      }
+      to {
+        transform: rotate(-8deg) translate3d(3%, 2%, 0) scale(1.12);
+      }
+    }
+
+    .topbar {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 22px;
+      align-items: center;
+      min-height: var(--nav-h);
+      padding: 14px clamp(18px, 4vw, 54px);
+      border-bottom: 1px solid rgba(18, 57, 82, 0.12);
+      background: rgba(255, 255, 255, 0.66);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: grid;
+      gap: 2px;
+      min-width: 180px;
+    }
+
+    .brand strong {
+      font-size: 0.92rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .nav-link {
+      position: relative;
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 12px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      transition: color 160ms var(--ease), background 160ms var(--ease);
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .nav-link.active::after {
+      position: absolute;
+      inset: auto 12px 5px 12px;
+      height: 1px;
+      content: "";
+      background: linear-gradient(90deg, var(--cyan), var(--magenta));
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .context-bar {
+      position: fixed;
+      z-index: 29;
+      top: var(--nav-h);
+      left: clamp(18px, 4vw, 54px);
+      right: clamp(18px, 4vw, 54px);
+      display: grid;
+      grid-template-columns: auto auto minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      min-height: var(--context-h);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-top: 0;
+      border-radius: 0 0 8px 8px;
+      padding: 8px 13px;
+      background: rgba(255, 255, 255, 0.62);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(18px) saturate(1.22);
+    }
+
+    .context-step {
+      color: var(--cyan);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .context-title {
+      color: var(--text);
+      font-size: 0.78rem;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .context-desc {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .icon-button,
+    .lang-button,
+    .ghost-button,
+    .solid-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.52);
+      color: var(--soft);
+      cursor: pointer;
+      transition:
+        border-color 160ms var(--ease),
+        background 160ms var(--ease),
+        color 160ms var(--ease),
+        transform 160ms var(--ease);
+    }
+
+    .icon-button {
+      width: 38px;
+      padding: 0;
+    }
+
+    .lang-button,
+    .ghost-button,
+    .solid-button {
+      padding: 0 14px;
+      font-size: 0.78rem;
+      font-weight: 750;
+      text-transform: uppercase;
+    }
+
+    .solid-button {
+      border-color: rgba(54, 230, 255, 0.46);
+      background: linear-gradient(135deg, rgba(0, 156, 198, 0.16), rgba(196, 81, 166, 0.12));
+      color: var(--text);
+    }
+
+    .icon-button:hover,
+    .lang-button:hover,
+    .ghost-button:hover,
+    .solid-button:hover {
+      border-color: var(--line-strong);
+      background: rgba(255, 255, 255, 0.72);
+      transform: translateY(-1px);
+    }
+
+    .menu-button {
+      display: none;
+    }
+
+    .progress-rail {
+      position: fixed;
+      z-index: 20;
+      top: 50%;
+      right: clamp(16px, 3vw, 42px);
+      display: grid;
+      gap: 11px;
+      transform: translateY(-50%);
+    }
+
+    .rail-dot {
+      width: 12px;
+      height: 12px;
+      border: 1px solid rgba(18, 57, 82, 0.28);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      transition: border-color 160ms var(--ease), background 160ms var(--ease), transform 160ms var(--ease);
+    }
+
+    .rail-dot.active {
+      border-color: var(--cyan);
+      background: var(--cyan);
+      box-shadow: 0 0 18px rgba(54, 230, 255, 0.5);
+      transform: scale(1.14);
+    }
+
+    .section {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      min-height: auto;
+      padding: calc(var(--nav-h) + var(--context-h) + 18px) clamp(18px, 6vw, 86px) 24px;
+      scroll-snap-align: start;
+    }
+
+    #hero {
+      min-height: 100svh;
+    }
+
+    .snap {
+      scroll-snap-type: y proximity;
+    }
+
+    .section-inner {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+      gap: clamp(24px, 4vw, 54px);
+      align-items: center;
+    }
+
+    .section-head {
+      display: grid;
+      gap: 16px;
+      max-width: 720px;
+      margin-bottom: 14px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--green);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 34px;
+      height: 1px;
+      content: "";
+      background: linear-gradient(90deg, var(--green), transparent);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      max-width: 760px;
+      font-size: clamp(3rem, 8vw, 7.2rem);
+      line-height: 0.9;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 4.8vw, 4.7rem);
+      line-height: 0.96;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      font-size: 1.02rem;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .lead {
+      max-width: 680px;
+      color: var(--soft);
+      font-size: clamp(1rem, 1.7vw, 1.25rem);
+      line-height: 1.7;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      border: 1px solid rgba(18, 57, 82, 0.12);
+      border-radius: 999px;
+      padding: 0 11px;
+      background: rgba(255, 255, 255, 0.46);
+      color: var(--soft);
+      font-size: 0.74rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .tag.cyan {
+      border-color: rgba(54, 230, 255, 0.38);
+      color: #006d8d;
+    }
+
+    .tag.magenta {
+      border-color: rgba(255, 77, 216, 0.36);
+      color: #99407f;
+    }
+
+    .tag.gold {
+      border-color: rgba(255, 209, 102, 0.38);
+      color: #805900;
+    }
+
+    .profile-card {
+      position: relative;
+      display: grid;
+      gap: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius);
+      padding: clamp(18px, 2.5vw, 28px);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.74), rgba(231, 248, 255, 0.54));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .profile-card::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      border-top: 2px solid rgba(54, 230, 255, 0.82);
+      border-right: 2px solid rgba(255, 77, 216, 0.5);
+      pointer-events: none;
+    }
+
+    .portrait-wrap {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+    }
+
+    .portrait-button {
+      position: relative;
+      width: 120px;
+      aspect-ratio: 1;
+      border: 0;
+      border-radius: 8px;
+      padding: 0;
+      background: transparent;
+      cursor: zoom-in;
+      transition: transform 160ms var(--ease), box-shadow 160ms var(--ease);
+    }
+
+    .portrait-button::after {
+      display: none;
+      content: none;
+    }
+
+    .portrait-button:hover,
+    .portrait-button:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 34px rgba(0, 156, 198, 0.13);
+      outline: none;
+    }
+
+    .portrait {
+      width: 120px;
+      aspect-ratio: 1;
+      border: 1px solid rgba(54, 230, 255, 0.42);
+      border-radius: 8px;
+      object-fit: cover;
+      filter: saturate(0.82) contrast(1.05);
+    }
+
+    .signal-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .signal {
+      display: grid;
+      grid-template-columns: 104px minmax(0, 1fr);
+      gap: 12px;
+      align-items: baseline;
+      border-bottom: 1px solid rgba(18, 57, 82, 0.1);
+      padding-bottom: 8px;
+    }
+
+    .signal b {
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+    }
+
+    .signal span {
+      color: var(--text);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .signal-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .signal-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border: 1px solid rgba(0, 156, 198, 0.24);
+      border-radius: 999px;
+      padding: 0 10px;
+      background: rgba(255, 255, 255, 0.58);
+      color: #07566e;
+      font-size: 0.76rem;
+      font-weight: 800;
+      transition: transform 160ms var(--ease), background 160ms var(--ease), border-color 160ms var(--ease);
+    }
+
+    .signal-links a:hover {
+      border-color: rgba(196, 81, 166, 0.35);
+      background: rgba(255, 255, 255, 0.82);
+      transform: translateY(-1px);
+    }
+
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .metric {
+      border: 1px solid rgba(18, 57, 82, 0.12);
+      border-radius: 7px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.42);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+    }
+
+    .research-card,
+    .paper-card,
+    .project-card,
+    .contact-card {
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 16px 46px rgba(44, 93, 122, 0.12);
+      backdrop-filter: blur(16px);
+    }
+
+    .research-card {
+      position: relative;
+      min-height: 280px;
+      padding: 20px;
+      overflow: hidden;
+      transition: border-color 160ms var(--ease), background 160ms var(--ease), transform 160ms var(--ease);
+    }
+
+    .card-grid .research-card:hover {
+      border-color: rgba(54, 230, 255, 0.5);
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 14px 42px rgba(0, 156, 198, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .card-kicker {
+      color: var(--cyan);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .research-card h3,
+    .project-card h3 {
+      margin-top: 18px;
+      font-size: 1.14rem;
+    }
+
+    .research-card p,
+    .project-card p,
+    .paper-card p {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.65;
+    }
+
+    .card-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .carousel-shell {
+      position: relative;
+      border: 1px solid rgba(18, 57, 82, 0.14);
+      border-radius: var(--radius);
+      padding: clamp(14px, 2vw, 20px);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(224, 248, 255, 0.48)),
+        rgba(255, 255, 255, 0.5);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+
+    .carousel-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .carousel-counter {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      color: var(--soft);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 850;
+    }
+
+    .carousel-counter strong {
+      color: var(--cyan);
+      font-size: 1.25rem;
+    }
+
+    .carousel-stage {
+      position: relative;
+      min-height: 336px;
+      perspective: 1200px;
+    }
+
+    .carousel-nav {
+      position: absolute;
+      z-index: 8;
+      top: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(18, 57, 82, 0.18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.62);
+      color: transparent;
+      cursor: pointer;
+      font-size: 0;
+      opacity: 0;
+      outline: none;
+      transform: translateY(-50%);
+      transition: opacity 180ms var(--ease), border-color 180ms var(--ease), background 180ms var(--ease), transform 180ms var(--ease);
+      backdrop-filter: blur(14px) saturate(1.2);
+    }
+
+    .carousel-nav:hover {
+      border-color: rgba(54, 230, 255, 0.52);
+      background: rgba(255, 255, 255, 0.78);
+      transform: translateY(-50%) scale(1.04);
+    }
+
+    .carousel-nav:focus-visible {
+      opacity: 1;
+      box-shadow: 0 0 0 2px rgba(54, 230, 255, 0.25);
+    }
+
+    .carousel-nav::before {
+      width: 16px;
+      height: 16px;
+      border-top: 2px solid rgba(16, 34, 55, 0.7);
+      border-right: 2px solid rgba(16, 34, 55, 0.7);
+      content: "";
+      filter: drop-shadow(0 0 10px rgba(54, 230, 255, 0.45));
+    }
+
+    .carousel-nav.prev {
+      left: 18px;
+    }
+
+    .carousel-nav.prev::before {
+      transform: rotate(225deg);
+    }
+
+    .carousel-nav.next {
+      right: 18px;
+    }
+
+    .carousel-nav.next:hover {
+      border-color: rgba(255, 77, 216, 0.48);
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .carousel-nav.next::before {
+      transform: rotate(45deg);
+    }
+
+    .carousel-shell:hover .carousel-nav,
+    .carousel-shell:focus-within .carousel-nav {
+      opacity: 1;
+    }
+
+    .glass-card {
+      position: absolute;
+      inset: 0 auto auto 50%;
+      width: min(430px, calc(100% - 22px));
+      min-height: 300px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) scale(0.82);
+      transform-origin: top center;
+      transition:
+        opacity 360ms var(--ease),
+        transform 420ms var(--ease),
+        border-color 220ms var(--ease),
+        filter 220ms var(--ease);
+      will-change: transform, opacity;
+    }
+
+    .glass-card::before,
+    .glass-card::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      pointer-events: none;
+    }
+
+    .glass-card::before {
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 36%),
+        linear-gradient(315deg, rgba(54, 230, 255, 0.13), transparent 34%);
+      opacity: 0.82;
+    }
+
+    .glass-card::after {
+      background:
+        repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 12px);
+      opacity: 0.2;
+      mix-blend-mode: screen;
+    }
+
+    .glass-card.active {
+      z-index: 4;
+      border-color: rgba(54, 230, 255, 0.58);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(224, 245, 255, 0.68)),
+        rgba(255, 255, 255, 0.54);
+      box-shadow: 0 26px 80px rgba(0, 156, 198, 0.16), 0 18px 60px rgba(47, 82, 110, 0.16);
+      opacity: 1;
+      pointer-events: auto;
+      cursor: pointer;
+      transform: translateX(-50%) translateZ(60px) scale(1);
+      backdrop-filter: blur(24px) saturate(1.28);
+      filter: saturate(1.12);
+    }
+
+    .glass-card.prev {
+      z-index: 2;
+      opacity: 0.62;
+      pointer-events: auto;
+      cursor: pointer;
+      transform: translateX(-110%) rotateY(12deg) scale(0.86);
+    }
+
+    .glass-card.next {
+      z-index: 2;
+      opacity: 0.62;
+      pointer-events: auto;
+      cursor: pointer;
+      transform: translateX(10%) rotateY(-12deg) scale(0.86);
+    }
+
+    .glass-card.far {
+      z-index: 1;
+      opacity: 0.22;
+      transform: translateX(-50%) translateY(24px) scale(0.74);
+    }
+
+    .glass-media {
+      position: relative;
+      height: 96px;
+      margin: -2px -2px 14px;
+      border-radius: 7px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .glass-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.78;
+      filter: saturate(1.08) contrast(1.02);
+      transform: scale(1.04);
+    }
+
+    .glass-media::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      background:
+        linear-gradient(90deg, rgba(0, 156, 198, 0.18), transparent 36%, rgba(196, 81, 166, 0.14)),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.22), transparent 52%);
+    }
+
+    .papers-layout {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .papers-layout.publications-only {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 920px;
+    }
+
+    .filter-panel {
+      position: sticky;
+      top: calc(var(--nav-h) + 22px);
+      display: grid;
+      gap: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: var(--radius);
+      padding: 14px;
+      background: var(--panel);
+      backdrop-filter: blur(16px);
+    }
+
+    .filter-button {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 0 12px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 760;
+      text-transform: uppercase;
+    }
+
+    .filter-button.active {
+      border-color: rgba(54, 230, 255, 0.55);
+      color: var(--text);
+      background: rgba(54, 230, 255, 0.12);
+    }
+
+    .paper-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .paper-card {
+      padding: 18px;
+      transition: border-color 160ms var(--ease), background 160ms var(--ease);
+    }
+
+    .paper-card.featured-publication {
+      order: -1;
+      border-color: rgba(54, 230, 255, 0.34);
+    }
+
+    .paper-card.is-hidden {
+      display: none;
+    }
+
+    .paper-card:hover {
+      border-color: rgba(255, 77, 216, 0.44);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: 0 14px 42px rgba(196, 81, 166, 0.09);
+    }
+
+    .paper-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .paper-title {
+      font-size: 1.03rem;
+      line-height: 1.38;
+      font-weight: 850;
+    }
+
+    .paper-meta {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    .paper-venue {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border: 1px solid rgba(255, 209, 102, 0.34);
+      border-radius: 6px;
+      padding: 0 10px;
+      color: #ffe5a1;
+      font-size: 0.74rem;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .paper-detail {
+      display: none;
+      margin-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 16px;
+    }
+
+    .paper-card.open .paper-detail {
+      display: grid;
+      gap: 14px;
+    }
+
+    .code-line {
+      overflow: auto;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.26);
+      color: #e3eef7;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.76rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .projects-layout {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .project-card {
+      display: grid;
+      align-content: space-between;
+      min-height: 276px;
+      padding: 18px;
+      cursor: pointer;
+      transition: border-color 160ms var(--ease), background 160ms var(--ease), transform 160ms var(--ease);
+    }
+
+    .project-card:hover {
+      border-color: rgba(133, 255, 188, 0.45);
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 14px 42px rgba(0, 143, 107, 0.09);
+      transform: translateY(-2px);
+    }
+
+    .project-index {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+    }
+
+    .project-thumb {
+      position: relative;
+      min-height: 112px;
+      margin-top: 16px;
+      border: 1px solid rgba(18, 57, 82, 0.12);
+      border-radius: 7px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    .project-thumb img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.82;
+      filter: saturate(1.04) contrast(1.04);
+      transform: scale(1.03);
+      transition: transform 360ms var(--ease), opacity 360ms var(--ease);
+    }
+
+    .project-card:hover .project-thumb img {
+      opacity: 0.96;
+      transform: scale(1.08);
+    }
+
+    .project-thumb::before {
+      position: absolute;
+      inset: 0;
+      content: "";
+      z-index: 1;
+      background:
+        linear-gradient(135deg, rgba(54, 230, 255, 0.22), transparent 42%),
+        linear-gradient(225deg, rgba(255, 77, 216, 0.2), transparent 46%),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.18), transparent 58%);
+    }
+
+    .project-thumb::after {
+      position: absolute;
+      z-index: 2;
+      inset: auto 14px 14px;
+      height: 2px;
+      content: "";
+      background: linear-gradient(90deg, var(--cyan), var(--green), var(--magenta));
+      box-shadow: 0 -18px 0 rgba(255, 255, 255, 0.16), 0 -36px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 0;
+      max-width: 880px;
+      padding-left: 34px;
+    }
+
+    .timeline::before {
+      position: absolute;
+      top: 10px;
+      bottom: 10px;
+      left: 8px;
+      width: 1px;
+      content: "";
+      background: linear-gradient(180deg, rgba(54, 230, 255, 0.72), rgba(255, 255, 255, 0.24), rgba(255, 77, 216, 0.56));
+    }
+
+    .timeline-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 128px minmax(0, 1fr);
+      gap: 22px;
+      padding: 0 0 28px;
+    }
+
+    .timeline-item::before {
+      position: absolute;
+      top: 4px;
+      left: -31px;
+      width: 13px;
+      height: 13px;
+      border: 2px solid rgba(54, 230, 255, 0.76);
+      border-radius: 999px;
+      background: rgba(242, 249, 255, 0.9);
+      box-shadow: 0 0 22px rgba(54, 230, 255, 0.38);
+      content: "";
+    }
+
+    .timeline-time {
+      color: var(--cyan);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.76rem;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .timeline-role {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.55;
+    }
+
+    .timeline-item p {
+      margin-top: 8px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .writing-grid,
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .contact-card {
+      min-height: 220px;
+      padding: 20px;
+    }
+
+    .contact-card h3 {
+      margin-bottom: 12px;
+    }
+
+    .contact-card p {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .contact-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 20px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      place-items: center;
+      padding: 22px;
+      background: rgba(224, 244, 252, 0.68);
+      backdrop-filter: blur(16px);
+    }
+
+    .modal.open {
+      display: grid;
+    }
+
+    .modal-panel {
+      width: min(720px, 100%);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius);
+      padding: clamp(20px, 4vw, 34px);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-panel h2 {
+      font-size: clamp(1.65rem, 5vw, 2.8rem);
+      line-height: 1.05;
+    }
+
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .modal-body {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .modal.portrait-modal .modal-panel {
+      width: min(760px, 100%);
+      padding: clamp(16px, 3vw, 24px);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(224, 248, 255, 0.78)),
+        rgba(255, 255, 255, 0.86);
+    }
+
+    .modal.portrait-modal .modal-body {
+      margin-top: 16px;
+    }
+
+    .portrait-full {
+      display: block;
+      width: min(520px, 82vw);
+      max-height: min(70vh, 720px);
+      margin: 0 auto;
+      border: 1px solid rgba(54, 230, 255, 0.36);
+      border-radius: 12px;
+      object-fit: contain;
+      background: rgba(255, 255, 255, 0.64);
+      box-shadow: 0 22px 58px rgba(44, 93, 122, 0.16);
+    }
+
+    .screen-reader {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 1040px) {
+      .section-grid,
+      .papers-layout,
+      .projects-layout,
+      .writing-grid,
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-panel {
+        position: static;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .progress-rail {
+        display: none;
+      }
+    }
+
+    @media (max-width: 760px) {
+      :root {
+        --nav-h: 64px;
+        --context-h: 38px;
+      }
+
+      body {
+        background-size: 42px 42px;
+      }
+
+      .topbar {
+        grid-template-columns: auto auto auto;
+        padding: 12px 16px;
+      }
+
+      .brand {
+        min-width: 0;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: var(--nav-h);
+        right: 12px;
+        left: 12px;
+        display: none;
+        grid-template-columns: repeat(2, 1fr);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: var(--shadow);
+      }
+
+      .nav-links.open {
+        display: grid;
+      }
+
+      .toolbar {
+        justify-content: end;
+      }
+
+      .menu-button {
+        display: inline-flex;
+      }
+
+      .lang-button {
+        padding: 0 10px;
+      }
+
+      .section {
+        min-height: auto;
+        padding: calc(var(--nav-h) + var(--context-h) + 16px) 16px 22px;
+      }
+
+      .context-bar {
+        left: 12px;
+        right: 12px;
+        grid-template-columns: auto auto;
+      }
+
+      .context-desc {
+        display: none;
+      }
+
+      .modal-panel h2 {
+        font-size: clamp(1.5rem, 8.5vw, 2.25rem);
+      }
+
+      .snap {
+        scroll-snap-type: y proximity;
+      }
+
+      h1 {
+        font-size: clamp(2.8rem, 15vw, 4.6rem);
+      }
+
+      h2 {
+        font-size: clamp(2rem, 12vw, 3.2rem);
+      }
+
+      .portrait-wrap,
+      .timeline-item,
+      .paper-top {
+        grid-template-columns: 1fr;
+      }
+
+      .portrait-button,
+      .portrait {
+        width: 100%;
+        max-width: 220px;
+      }
+
+      .metric-strip,
+      .filter-panel {
+        grid-template-columns: 1fr;
+      }
+
+    }
+  </style>
+</head>
+<body class="snap" data-lang="en">
+  <div class="shell">
+    <div class="energy-field" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#hero" data-target="hero" aria-label="Lihan Zuo home">
+        <strong data-i18n-en="Lihan Zuo" data-i18n-zh="左力晗">Lihan Zuo</strong>
+        <span data-i18n-en="Academic interface" data-i18n-zh="学术主页界面">Academic interface</span>
+      </a>
+
+      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
+        <button class="nav-link active" data-target="hero" data-i18n-en="Home" data-i18n-zh="首页">Home</button>
+        <button class="nav-link" data-target="research" data-i18n-en="Research" data-i18n-zh="研究">Research</button>
+        <button class="nav-link" data-target="publications" data-i18n-en="Publications" data-i18n-zh="论文">Publications</button>
+        <button class="nav-link" data-target="projects" data-i18n-en="Projects" data-i18n-zh="项目">Projects</button>
+        <button class="nav-link" data-target="profile" data-i18n-en="CV" data-i18n-zh="简历">CV</button>
+        <button class="nav-link" data-target="contact" data-i18n-en="Contact" data-i18n-zh="联系">Contact</button>
+      </nav>
+
+      <div class="toolbar">
+        <button class="lang-button" id="langToggle" type="button" aria-label="Switch language">中文</button>
+        <button class="icon-button menu-button" id="menuToggle" type="button" aria-label="Open navigation">
+          <span aria-hidden="true">||</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="context-bar" id="contextBar" aria-live="polite">
+      <span class="context-step" id="contextStep">01</span>
+      <strong class="context-title" id="contextTitle">Home</strong>
+      <span class="context-desc" id="contextDesc">Academic profile and research identity</span>
+    </div>
+
+    <aside class="progress-rail" aria-label="Section progress">
+      <button class="rail-dot active" data-target="hero" aria-label="Home"></button>
+      <button class="rail-dot" data-target="research" aria-label="Research"></button>
+      <button class="rail-dot" data-target="publications" aria-label="Publications"></button>
+      <button class="rail-dot" data-target="projects" aria-label="Projects"></button>
+      <button class="rail-dot" data-target="profile" aria-label="Profile"></button>
+      <button class="rail-dot" data-target="contact" aria-label="Contact"></button>
+    </aside>
+
+    <main id="sectionMount">
+      <!-- Generated from preview/sections/*.html. Run `node preview/build.js` after editing section files. -->
+      <section class="section" id="hero" data-section="hero">
+        <div class="section-inner section-grid">
+          <div>
+            <div class="eyebrow" data-i18n-en="Medical AI, multimodal learning, LLM reliability" data-i18n-zh="医学人工智能、多模态学习、大模型可靠性">Medical AI, multimodal learning, LLM reliability</div>
+            <h1 data-i18n-en="Lihan Zuo" data-i18n-zh="左力晗">Lihan Zuo</h1>
+            <p class="lead" data-i18n-en="I earned my B.Eng. in Artificial Intelligence from Southwest Jiaotong University in 2023, previously worked as a Visiting Researcher at ISTD, SUTD, and now work as an Algorithm Engineer at LexinFintech in Shenzhen. I am actively pursuing PhD opportunities." data-i18n-zh="我于 2023 年获得西南交通大学人工智能专业工学学士学位，曾在 SUTD ISTD 担任访问研究员，目前在深圳 LexinFintech 担任算法工程师，并正在积极寻求 PhD 机会。">
+              I earned my B.Eng. in Artificial Intelligence from Southwest Jiaotong University in 2023, previously worked as a Visiting Researcher at ISTD, SUTD, and now work as an Algorithm Engineer at LexinFintech in Shenzhen. I am actively pursuing PhD opportunities.
+            </p>
+            <div class="hero-actions">
+              <button class="solid-button" data-target="publications" data-i18n-en="Publication" data-i18n-zh="代表论文">Publication</button>
+              <button class="ghost-button" data-target="projects" data-i18n-en="Projects" data-i18n-zh="项目作品">Projects</button>
+              <a class="ghost-button" href="https://github.com/Zuo-Lihan" target="_blank" rel="noreferrer" data-i18n-en="GitHub" data-i18n-zh="GitHub">GitHub</a>
+            </div>
+            <div class="hero-meta" aria-label="Research tags">
+              <span class="tag cyan" data-i18n-en="Artificial Intelligence in Medicine" data-i18n-zh="医学人工智能">Artificial Intelligence in Medicine</span>
+              <span class="tag magenta" data-i18n-en="Multimodal Fusion" data-i18n-zh="多模态融合">Multimodal Fusion</span>
+              <span class="tag gold" data-i18n-en="LLM Reliability" data-i18n-zh="大模型可靠性">LLM Reliability</span>
+            </div>
+          </div>
+
+          <article class="profile-card" aria-label="Profile summary">
+            <div class="portrait-wrap">
+              <button class="portrait-button" id="portraitButton" type="button" aria-label="View portrait of Lihan Zuo">
+                <img class="portrait" src="assets/notion-profile.jpg" alt="Portrait of Lihan Zuo">
+              </button>
+              <div>
+                <div class="eyebrow" data-i18n-en="Research profile" data-i18n-zh="个人研究档案">Research profile</div>
+                <h3 data-i18n-en="AI researcher focused on medical multimodal systems." data-i18n-zh="关注医学多模态系统的 AI 研究者。">AI researcher focused on medical multimodal systems.</h3>
+                <p class="muted" data-i18n-en="Published in Artificial Intelligence in Medicine, with research experience across A*STAR collaboration, SUTD, medical image analysis, and LLM systems." data-i18n-zh="已在 Artificial Intelligence in Medicine 发表论文，研究经历涵盖 A*STAR 合作、SUTD、医学影像分析与大语言模型系统。">
+                  Published in Artificial Intelligence in Medicine, with research experience across A*STAR collaboration, SUTD, medical image analysis, and LLM systems.
+                </p>
+              </div>
+            </div>
+            <div class="signal-list">
+              <div class="signal">
+                <b data-i18n-en="Email" data-i18n-zh="邮箱">Email</b>
+                <span>zuolihanstudy@gmail.com</span>
+              </div>
+              <div class="signal">
+                <b data-i18n-en="Field" data-i18n-zh="领域">Field</b>
+                <span data-i18n-en="Medical AI, multimodal learning, LLM reliability" data-i18n-zh="医学 AI、多模态学习、大模型可靠性">Medical AI, multimodal learning, LLM reliability</span>
+              </div>
+              <div class="signal">
+                <b data-i18n-en="Links" data-i18n-zh="链接">Links</b>
+                <span class="signal-links">
+                  <a href="https://github.com/Zuo-Lihan" target="_blank" rel="noreferrer">GitHub</a>
+                  <a href="https://orcid.org/0009-0004-0745-4846" target="_blank" rel="noreferrer">ORCID</a>
+                  <a href="https://fluttering-deposit-822.notion.site/e93ec25a84654308af35d828aca3db44?v=28c0f5da65a54effadf57de325a07005" target="_blank" rel="noreferrer">CV</a>
+                </span>
+              </div>
+            </div>
+            <div class="metric-strip">
+              <div class="metric">
+                <strong>2025</strong>
+                <span data-i18n-en="AIIM paper" data-i18n-zh="AIIM 论文">AIIM paper</span>
+              </div>
+              <div class="metric">
+                <strong>27</strong>
+                <span data-i18n-en="GitHub repos" data-i18n-zh="GitHub 仓库">GitHub repos</span>
+              </div>
+              <div class="metric">
+                <strong>ORCID</strong>
+                <span data-i18n-en="Research ID" data-i18n-zh="研究身份">Research ID</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="research" data-section="research">
+        <div class="section-inner">
+          <div class="section-head">
+            <div class="eyebrow" data-i18n-en="Research Focus" data-i18n-zh="研究方向">Research Focus</div>
+            <h2 data-i18n-en="Research centered on robust multimodal intelligence." data-i18n-zh="围绕稳健多模态智能展开研究。">Research centered on robust multimodal intelligence.</h2>
+            <p class="lead" data-i18n-en="The homepage organizes research into three durable tracks: medical multimodal learning, LLM reliability, and reproducible research infrastructure." data-i18n-zh="主页将研究内容组织为三个长期方向：医学多模态学习、大模型可靠性，以及可复现科研基础设施。">
+              The homepage organizes research into three durable tracks: medical multimodal learning, LLM reliability, and reproducible research infrastructure.
+            </p>
+          </div>
+
+          <div class="carousel-shell" aria-label="Research carousel">
+            <div class="carousel-top">
+              <div class="carousel-counter" aria-live="polite">
+                <strong id="carouselIndex">01</strong>
+                <span>/ 03</span>
+              </div>
+            </div>
+
+            <button class="carousel-nav prev" id="carouselPrev" type="button" aria-label="Previous research card">&lt;</button>
+            <button class="carousel-nav next" id="carouselNext" type="button" aria-label="Next research card">&gt;</button>
+
+            <div class="carousel-stage" id="researchCarousel">
+              <article class="research-card glass-card" data-carousel-card data-research="medical-ai" tabindex="0" role="button">
+                <div class="glass-media">
+                  <img src="../img/AI 1.jpg" alt="Abstract AI research visual">
+                </div>
+              <div class="card-kicker">01 / Medical AI</div>
+              <h3 data-i18n-en="Adaptive multimodal fusion for skin lesion classification" data-i18n-zh="面向皮肤病灶分类的自适应多模态融合">Adaptive multimodal fusion for skin lesion classification</h3>
+              <p data-i18n-en="Published work in Artificial Intelligence in Medicine on combining clinical images, dermoscopy images, and metadata for multi-label skin lesion classification." data-i18n-zh="已在 Artificial Intelligence in Medicine 发表相关工作，研究如何融合临床图像、皮肤镜图像与元数据用于多标签皮肤病灶分类。">
+                Published work in Artificial Intelligence in Medicine on combining clinical images, dermoscopy images, and metadata for multi-label skin lesion classification.
+              </p>
+              <div class="card-footer">
+                <span class="tag cyan">AIIM 2025</span>
+                <span class="tag">CosCatNet</span>
+                <span class="tag magenta">Medical Imaging</span>
+              </div>
+            </article>
+
+              <article class="research-card glass-card" data-carousel-card data-research="llm" tabindex="0" role="button">
+                <div class="glass-media">
+                  <img src="../img/Singapore Raining.jpg" alt="City light visual sample">
+                </div>
+              <div class="card-kicker">02 / LLM</div>
+              <h3 data-i18n-en="Hallucination mitigation and reliable LLM workflows" data-i18n-zh="幻觉缓解与可靠大模型工作流">Hallucination mitigation and reliable LLM workflows</h3>
+              <p data-i18n-en="Open-source exploration around full-loop LLM workflows, model behavior analysis, and methods for reducing hallucination in practical systems." data-i18n-zh="围绕 full-loop 大模型工作流、模型行为分析，以及实际系统中的幻觉缓解方法进行开源探索。">
+                Open-source exploration around full-loop LLM workflows, model behavior analysis, and methods for reducing hallucination in practical systems.
+              </p>
+              <div class="card-footer">
+                <span class="tag gold">LLM-Full-Loop</span>
+                <span class="tag">Reliability</span>
+                <span class="tag cyan">Evaluation</span>
+              </div>
+            </article>
+
+              <article class="research-card glass-card" data-carousel-card data-research="infra" tabindex="0" role="button">
+                <div class="glass-media">
+                  <img src="../img/post-TMUX_usages.jpg" alt="Research computing workflow visual">
+                </div>
+              <div class="card-kicker">03 / Research Engineering</div>
+              <h3 data-i18n-en="Reproducible research infrastructure and HPC practice" data-i18n-zh="可复现科研基础设施与 HPC 实践">Reproducible research infrastructure and HPC practice</h3>
+              <p data-i18n-en="Technical writing and tooling habits around NSCC, TMUX, experiment logging, and long-running computational research workflows." data-i18n-zh="围绕 NSCC、TMUX、实验日志和长周期计算任务形成技术写作与工具化实践。">
+                Technical writing and tooling habits around NSCC, TMUX, experiment logging, and long-running computational research workflows.
+              </p>
+              <div class="card-footer">
+                <span class="tag magenta">HPC</span>
+                <span class="tag">Docs</span>
+                <span class="tag gold">Workflow</span>
+              </div>
+            </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="publications" data-section="publications">
+        <div class="section-inner">
+          <div class="section-head">
+            <div class="eyebrow" data-i18n-en="Publications" data-i18n-zh="论文">Publications</div>
+            <h2 data-i18n-en="Peer-reviewed research papers." data-i18n-zh="同行评审研究论文。">Peer-reviewed research papers.</h2>
+          </div>
+
+          <div class="papers-layout publications-only">
+            <div class="paper-list">
+              <article class="paper-card featured-publication" data-topic="vision">
+                <div class="paper-top">
+                  <div>
+                    <div class="paper-title" data-i18n-en="A multi-stage multi-modal learning algorithm with adaptive multimodal fusion for improving multi-label skin lesion classification" data-i18n-zh="一种用于提升多标签皮肤病灶分类的多阶段多模态自适应融合算法">A multi-stage multi-modal learning algorithm with adaptive multimodal fusion for improving multi-label skin lesion classification</div>
+                    <div class="paper-meta" data-i18n-en="Lihan Zuo, Zizhou Wang, Yan Wang. Artificial Intelligence in Medicine 162:103091, 2025." data-i18n-zh="Lihan Zuo, Zizhou Wang, Yan Wang. Artificial Intelligence in Medicine 162:103091, 2025.">Lihan Zuo, Zizhou Wang, Yan Wang. Artificial Intelligence in Medicine 162:103091, 2025.</div>
+                  </div>
+                  <span class="paper-venue">AIIM</span>
+                </div>
+                <p data-i18n-en="Peer-reviewed medical AI paper on multimodal skin lesion classification using clinical images, dermoscopy images, and metadata." data-i18n-zh="同行评审医学 AI 论文，研究临床图像、皮肤镜图像与元数据在多标签皮肤病灶分类中的融合。">
+                  Peer-reviewed medical AI paper on multimodal skin lesion classification using clinical images, dermoscopy images, and metadata.
+                </p>
+                <div class="card-footer">
+                  <button class="ghost-button paper-toggle" type="button" data-i18n-en="Abstract" data-i18n-zh="摘要">Abstract</button>
+                  <a class="ghost-button" href="https://pubmed.ncbi.nlm.nih.gov/40015211/" target="_blank" rel="noreferrer">PubMed</a>
+                  <a class="ghost-button" href="https://doi.org/10.1016/j.artmed.2025.103091" target="_blank" rel="noreferrer">DOI</a>
+                  <a class="ghost-button" href="https://github.com/Zuo-Lihan/CosCatNet-Adaptive_Fusion_Algorithm" target="_blank" rel="noreferrer">Code</a>
+                </div>
+                <div class="paper-detail">
+                  <p data-i18n-en="The work proposes an uncertainty-based hybrid fusion strategy for multimodal skin cancer diagnosis, combining image-level and metadata-level information for more adaptive classification." data-i18n-zh="该工作提出基于不确定性的混合融合策略，用于多模态皮肤癌诊断，将图像层面与元数据层面的信息结合，以实现更自适应的分类。">
+                    The work proposes an uncertainty-based hybrid fusion strategy for multimodal skin cancer diagnosis, combining image-level and metadata-level information for more adaptive classification.
+                  </p>
+                  <pre class="code-line">@article{zuo2025multistage,
+        title = {A multi-stage multi-modal learning algorithm with adaptive multimodal fusion for improving multi-label skin lesion classification},
+        author = {Zuo, Lihan and Wang, Zizhou and Wang, Yan},
+        journal = {Artificial Intelligence in Medicine},
+        volume = {162},
+        pages = {103091},
+        year = {2025},
+        doi = {10.1016/j.artmed.2025.103091}
+      }</pre>
+                </div>
+              </article>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="projects" data-section="projects">
+        <div class="section-inner">
+          <div class="section-head">
+            <div class="eyebrow" data-i18n-en="Projects" data-i18n-zh="项目">Projects</div>
+            <h2 data-i18n-en="Research systems as inspectable artifacts." data-i18n-zh="把研究系统做成可审查的作品。">Research systems as inspectable artifacts.</h2>
+          </div>
+
+          <div class="projects-layout">
+            <article class="project-card" tabindex="0" role="button" data-project="llm-lab">
+              <div>
+                <div class="project-index"><span>01</span><span>Medical AI</span></div>
+                <div class="project-thumb">
+                  <img src="../img/AI 1.jpg" alt="LLM evaluation project sample">
+                </div>
+                <h3 data-i18n-en="CosCatNet adaptive fusion algorithm" data-i18n-zh="CosCatNet 自适应融合算法">CosCatNet adaptive fusion algorithm</h3>
+                <p data-i18n-en="Experiment code for the AIIM 2025 paper on multi-stage multimodal skin lesion classification." data-i18n-zh="AIIM 2025 论文的实验代码，面向多阶段多模态皮肤病灶分类。">
+                  Experiment code for the AIIM 2025 paper on multi-stage multimodal skin lesion classification.
+                </p>
+              </div>
+              <div class="card-footer">
+                <span class="tag cyan">AIIM 2025</span>
+                <span class="tag">Python</span>
+              </div>
+            </article>
+
+            <article class="project-card" tabindex="0" role="button" data-project="vision">
+              <div>
+                <div class="project-index"><span>02</span><span>LLM</span></div>
+                <div class="project-thumb">
+                  <img src="../img/post-bg-universe.jpg" alt="Medical vision project sample">
+                </div>
+                <h3 data-i18n-en="LLM-Full-Loop" data-i18n-zh="LLM-Full-Loop">LLM-Full-Loop</h3>
+                <p data-i18n-en="Open-source exploration of hallucination mitigation and full-loop reliability for large language models." data-i18n-zh="围绕大语言模型幻觉缓解与 full-loop 可靠性的开源探索。">
+                  Open-source exploration of hallucination mitigation and full-loop reliability for large language models.
+                </p>
+              </div>
+              <div class="card-footer">
+                <span class="tag magenta">Reliability</span>
+                <span class="tag">LLM</span>
+              </div>
+            </article>
+
+            <article class="project-card" tabindex="0" role="button" data-project="hpc">
+              <div>
+                <div class="project-index"><span>03</span><span>HPC</span></div>
+                <div class="project-thumb">
+                  <img src="../img/post-TMUX_usages.jpg" alt="HPC workflow project sample">
+                </div>
+                <h3 data-i18n-en="NSCC/HPC workflow archive" data-i18n-zh="NSCC/HPC 工作流档案">NSCC/HPC workflow archive</h3>
+                <p data-i18n-en="Technical writing on TMUX, remote research computing, job sessions, and reproducible experiment operation." data-i18n-zh="关于 TMUX、远程科研计算、任务会话与可复现实验操作的技术写作。">
+                  Technical writing on TMUX, remote research computing, job sessions, and reproducible experiment operation.
+                </p>
+              </div>
+              <div class="card-footer">
+                <span class="tag gold">NSCC</span>
+                <span class="tag">TMUX</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="profile" data-section="profile">
+        <div class="section-inner section-grid">
+          <div class="section-head">
+            <div class="eyebrow" data-i18n-en="CV" data-i18n-zh="简历">CV</div>
+            <h2 data-i18n-en="Academic CV, stitched as a living timeline." data-i18n-zh="用时间线串起完整学术简历。">Academic CV, stitched as a living timeline.</h2>
+            <p class="lead" data-i18n-en="A Notion-like timeline from the public CV: education, research experience, current industry role, projects, and publication record." data-i18n-zh="基于公开 Notion 简历整理：教育经历、科研经历、当前工作、项目与论文记录。">
+              A Notion-like timeline from the public CV: education, research experience, current industry role, projects, and publication record.
+            </p>
+          </div>
+
+          <div class="timeline">
+            <article class="timeline-item">
+              <div class="timeline-time">2025.06 - Now</div>
+              <div>
+                <h3 data-i18n-en="Algorithm Engineer, LexinFintech Holdings Ltd." data-i18n-zh="算法工程师，LexinFintech Holdings Ltd.">Algorithm Engineer, LexinFintech Holdings Ltd.</h3>
+                <div class="timeline-role" data-i18n-en="Shenzhen, China" data-i18n-zh="中国深圳">Shenzhen, China</div>
+                <p data-i18n-en="Current industry role from the public Notion CV, focused on algorithm engineering practice." data-i18n-zh="公开 Notion 简历中的当前工作经历，聚焦算法工程实践。">Current industry role from the public Notion CV, focused on algorithm engineering practice.</p>
+              </div>
+            </article>
+            <article class="timeline-item">
+              <div class="timeline-time">2025</div>
+              <div>
+                <h3 data-i18n-en="Artificial Intelligence in Medicine publication" data-i18n-zh="Artificial Intelligence in Medicine 论文发表">Artificial Intelligence in Medicine publication</h3>
+                <div class="timeline-role" data-i18n-en="Lihan Zuo, Zizhou Wang, Yan Wang" data-i18n-zh="Lihan Zuo, Zizhou Wang, Yan Wang">Lihan Zuo, Zizhou Wang, Yan Wang</div>
+                <p data-i18n-en="First-author paper: A multi-stage multi-modal learning algorithm with adaptive multimodal fusion for improving multi-label skin lesion classification." data-i18n-zh="第一作者论文：一种用于提升多标签皮肤病灶分类的多阶段多模态自适应融合算法。">First-author paper: A multi-stage multi-modal learning algorithm with adaptive multimodal fusion for improving multi-label skin lesion classification.</p>
+              </div>
+            </article>
+            <article class="timeline-item">
+              <div class="timeline-time">2024.05 - 2025.05</div>
+              <div>
+                <h3 data-i18n-en="LLM research at SUTD with A*STAR collaboration" data-i18n-zh="SUTD 大语言模型研究与 A*STAR 合作">LLM research at SUTD with A*STAR collaboration</h3>
+                <div class="timeline-role" data-i18n-en="Research experience, Singapore" data-i18n-zh="科研经历，新加坡">Research experience, Singapore</div>
+                <p data-i18n-en="Worked on large language models at SUTD and collaborated with scientists from A*STAR." data-i18n-zh="在 SUTD 从事大语言模型相关研究，并与 A*STAR 科学家合作。">Worked on large language models at SUTD and collaborated with scientists from A*STAR.</p>
+              </div>
+            </article>
+            <article class="timeline-item">
+              <div class="timeline-time">2024.05 - 2025.05</div>
+              <div>
+                <h3 data-i18n-en="Multi-Modality Dementia Detection Model" data-i18n-zh="多模态痴呆检测模型">Multi-Modality Dementia Detection Model</h3>
+                <div class="timeline-role" data-i18n-en="Project with members from SUTD and IceKredit" data-i18n-zh="与 SUTD 和 IceKredit 成员合作的项目">Project with members from SUTD and IceKredit</div>
+                <p data-i18n-en="Project experience from the public Notion CV, positioned under applied multimodal AI." data-i18n-zh="公开 Notion 简历中的项目经历，归入应用多模态 AI 方向。">Project experience from the public Notion CV, positioned under applied multimodal AI.</p>
+              </div>
+            </article>
+            <article class="timeline-item">
+              <div class="timeline-time">2023.09 - 2024.12</div>
+              <div>
+                <h3 data-i18n-en="Medical image analysis with A*STAR scientists" data-i18n-zh="与 A*STAR 科学家合作医学影像分析">Medical image analysis with A*STAR scientists</h3>
+                <div class="timeline-role" data-i18n-en="Research experience, Singapore" data-i18n-zh="科研经历，新加坡">Research experience, Singapore</div>
+                <p data-i18n-en="Worked on medical image analysis, leading into the multimodal skin lesion classification publication." data-i18n-zh="从事医学影像分析研究，并延伸至多模态皮肤病灶分类论文。">Worked on medical image analysis, leading into the multimodal skin lesion classification publication.</p>
+              </div>
+            </article>
+            <article class="timeline-item">
+              <div class="timeline-time">2019.09 - 2023.06</div>
+              <div>
+                <h3 data-i18n-en="B.Eng. in Artificial Intelligence, Southwest Jiaotong University" data-i18n-zh="西南交通大学人工智能专业工学学士">B.Eng. in Artificial Intelligence, Southwest Jiaotong University</h3>
+                <div class="timeline-role" data-i18n-en="SWJTU, China" data-i18n-zh="西南交通大学，中国">SWJTU, China</div>
+                <p data-i18n-en="Undergraduate education recorded in the public Notion CV and GitHub profile." data-i18n-zh="公开 Notion 简历和 GitHub 主页中记录的本科教育经历。">Undergraduate education recorded in the public Notion CV and GitHub profile.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="contact" data-section="contact">
+        <div class="section-inner">
+          <div class="section-head">
+            <div class="eyebrow" data-i18n-en="Contact" data-i18n-zh="联系">Contact</div>
+            <h2 data-i18n-en="Clear exits for collaborators and readers." data-i18n-zh="为合作者和读者提供清晰入口。">Clear exits for collaborators and readers.</h2>
+          </div>
+
+          <div class="contact-grid">
+            <article class="contact-card">
+              <h3>Email</h3>
+              <p>zuolihanstudy@gmail.com</p>
+              <div class="contact-actions">
+                <button class="solid-button" id="copyEmail" type="button" data-i18n-en="Copy Email" data-i18n-zh="复制邮箱">Copy Email</button>
+              </div>
+            </article>
+
+            <article class="contact-card">
+              <h3>GitHub</h3>
+              <p data-i18n-en="Code, notes, repositories, and technical work." data-i18n-zh="代码、笔记、仓库与技术工作。">Code, notes, repositories, and technical work.</p>
+              <div class="contact-actions">
+                <a class="ghost-button" href="https://github.com/Zuo-Lihan" target="_blank" rel="noreferrer">Zuo-Lihan</a>
+              </div>
+            </article>
+
+            <article class="contact-card">
+              <h3>ORCID</h3>
+              <p data-i18n-en="Persistent research identifier for publication records." data-i18n-zh="用于论文与研究身份记录的持久标识。">Persistent research identifier for publication records.</p>
+              <div class="contact-actions">
+                <a class="ghost-button" href="https://orcid.org/0009-0004-0745-4846" target="_blank" rel="noreferrer">0009-0004</a>
+              </div>
+            </article>
+
+            <article class="contact-card">
+              <h3>CV</h3>
+              <p data-i18n-en="The existing Notion CV link can remain as an external academic record." data-i18n-zh="现有 Notion 简历链接可以继续作为外部学术记录。">The existing Notion CV link can remain as an external academic record.</p>
+              <div class="contact-actions">
+                <a class="ghost-button" href="https://fluttering-deposit-822.notion.site/e93ec25a84654308af35d828aca3db44?v=28c0f5da65a54effadf57de325a07005" target="_blank" rel="noreferrer" data-i18n-en="Open CV" data-i18n-zh="打开简历">Open CV</a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="projectModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-panel">
+      <div class="modal-top">
+        <div>
+          <div class="eyebrow" id="modalKicker">Project</div>
+          <h2 id="modalTitle">Project title</h2>
+        </div>
+        <button class="icon-button" id="modalClose" type="button" aria-label="Close project detail">x</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <span class="screen-reader" id="status" aria-live="polite"></span>
+
+  <script>
+    const sections = Array.from(document.querySelectorAll("[data-section]"));
+    const navLinks = Array.from(document.querySelectorAll(".nav-link"));
+    const railDots = Array.from(document.querySelectorAll(".rail-dot"));
+    const navLinksWrap = document.getElementById("navLinks");
+    const menuToggle = document.getElementById("menuToggle");
+    const langToggle = document.getElementById("langToggle");
+    const statusNode = document.getElementById("status");
+    const copyEmail = document.getElementById("copyEmail");
+    const modal = document.getElementById("projectModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalKicker = document.getElementById("modalKicker");
+    const modalBody = document.getElementById("modalBody");
+    const modalClose = document.getElementById("modalClose");
+    const portraitButton = document.getElementById("portraitButton");
+    const contextStep = document.getElementById("contextStep");
+    const contextTitle = document.getElementById("contextTitle");
+    const contextDesc = document.getElementById("contextDesc");
+    const carouselCards = Array.from(document.querySelectorAll("[data-carousel-card]"));
+    const carouselIndexNode = document.getElementById("carouselIndex");
+    const carouselPrev = document.getElementById("carouselPrev");
+    const carouselNext = document.getElementById("carouselNext");
+    let activeCarouselIndex = 0;
+    let lastCarouselTouch = Date.now();
+
+    const sectionMeta = {
+      hero: {
+        en: ["Home", "Academic profile and research identity"],
+        zh: ["首页", "学术身份与研究定位"]
+      },
+      research: {
+        en: ["Research", "Research interests, methods, and technical direction"],
+        zh: ["研究方向", "研究兴趣、方法与技术路线"]
+      },
+      publications: {
+        en: ["Publications", "Peer-reviewed papers only"],
+        zh: ["论文", "仅包含同行评审论文"]
+      },
+      projects: {
+        en: ["Projects", "Research artifacts, code, and visual samples"],
+        zh: ["项目作品", "研究作品、代码与视觉样例"]
+      },
+      profile: {
+        en: ["CV", "Education, research experience, work, and projects"],
+        zh: ["简历", "教育、科研经历、工作与项目"]
+      },
+      contact: {
+        en: ["Contact", "Email, GitHub, ORCID, and CV links"],
+        zh: ["联系", "邮箱、GitHub、ORCID 与简历链接"]
+      }
+    };
+
+    const projectData = {
+      "llm-lab": {
+        kicker: "Project / Medical AI",
+        title: "CosCatNet adaptive fusion algorithm",
+        zhTitle: "CosCatNet 自适应融合算法",
+        body: [
+          "Experiment code for the Artificial Intelligence in Medicine 2025 paper on multi-stage multimodal learning for multi-label skin lesion classification.",
+          "The project page should link the repository, paper DOI, PubMed record, model structure image, and BibTeX in one compact academic record."
+        ],
+        zhBody: [
+          "Artificial Intelligence in Medicine 2025 论文的实验代码，研究多阶段多模态学习在多标签皮肤病灶分类中的应用。",
+          "最终项目页应把代码仓库、论文 DOI、PubMed 记录、模型结构图与 BibTeX 放在一条紧凑的学术记录中。"
+        ]
+      },
+      vision: {
+        kicker: "Project / LLM",
+        title: "LLM-Full-Loop",
+        zhTitle: "LLM-Full-Loop",
+        body: [
+          "Open-source work around hallucination mitigation and full-loop reliability for large language models.",
+          "The homepage presents it as project work rather than a publication, keeping the academic record precise while still showing the research direction."
+        ],
+        zhBody: [
+          "围绕大语言模型幻觉缓解与 full-loop 可靠性的开源工作。",
+          "主页将其作为项目工作而非论文展示，既保持学术记录准确，也呈现研究方向。"
+        ]
+      },
+      hpc: {
+        kicker: "Project / HPC",
+        title: "NSCC/HPC workflow archive",
+        zhTitle: "NSCC/HPC 工作流档案",
+        body: [
+          "A reusable archive for NSCC, TMUX, remote sessions, experiment logs, and server-side research workflows.",
+          "This turns technical blog notes into infrastructure knowledge that collaborators can inspect quickly."
+        ],
+        zhBody: [
+          "面向 NSCC、TMUX、远程会话、实验日志和服务器科研流程的可复用档案。",
+          "它把技术博客笔记转化成合作者可以快速审查的基础设施知识。"
+        ]
+      }
+    };
+
+    const researchData = {
+      "medical-ai": {
+        kicker: "Research / Medical AI",
+        title: "Adaptive multimodal fusion for skin lesion classification",
+        zhTitle: "面向皮肤病灶分类的自适应多模态融合",
+        body: [
+          "This track centers on multimodal medical AI: clinical images, dermoscopy images, and metadata for automated multi-label skin lesion classification.",
+          "The representative publication is the 2025 Artificial Intelligence in Medicine paper, with code released in the CosCatNet adaptive fusion repository.",
+          "Keywords: multi-modal learning, multi-label classification, skin lesion classification, uncertainty-based fusion."
+        ],
+        zhBody: [
+          "该方向聚焦多模态医学 AI：融合临床图像、皮肤镜图像与元数据，用于自动化多标签皮肤病灶分类。",
+          "代表性成果是 2025 年 Artificial Intelligence in Medicine 论文，并在 CosCatNet 自适应融合仓库中开源代码。",
+          "关键词：多模态学习、多标签分类、皮肤病灶分类、基于不确定性的融合。"
+        ]
+      },
+      llm: {
+        kicker: "Research / LLM",
+        title: "Hallucination mitigation and reliable LLM workflows",
+        zhTitle: "幻觉缓解与可靠大模型工作流",
+        body: [
+          "This track follows the public CV research interest in large language models and open-source work around LLM-Full-Loop.",
+          "The focus is practical reliability: model behavior analysis, hallucination mitigation, evaluation, and full-loop workflow design.",
+          "This is presented as ongoing research and engineering work rather than as a peer-reviewed publication."
+        ],
+        zhBody: [
+          "该方向对应公开简历中的大语言模型研究兴趣，以及 LLM-Full-Loop 相关开源工作。",
+          "重点是实际可靠性：模型行为分析、幻觉缓解、评测与 full-loop 工作流设计。",
+          "该部分作为进行中的研究与工程工作呈现，而不是标注为同行评审论文。"
+        ]
+      },
+      infra: {
+        kicker: "Research / Infrastructure",
+        title: "Reproducible research infrastructure and HPC practice",
+        zhTitle: "可复现科研基础设施与 HPC 实践",
+        body: [
+          "This track collects research engineering habits around NSCC, TMUX, remote sessions, logging, and long-running experiments.",
+          "It supports the academic work by making experiments easier to reproduce, inspect, and maintain.",
+          "The existing technical blog posts can live under Projects or Writing, while Publications remains reserved for papers."
+        ],
+        zhBody: [
+          "该方向整理 NSCC、TMUX、远程会话、日志与长周期实验相关的科研工程实践。",
+          "它服务于学术研究，使实验更容易复现、审查和维护。",
+          "现有技术博客可以归入 Projects 或 Writing，而 Publications 只保留论文。"
+        ]
+      }
+    };
+
+    function currentLang() {
+      return document.body.dataset.lang || "en";
+    }
+
+    function goToSection(id) {
+      const target = document.getElementById(id);
+      if (!target) return;
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.setTimeout(updateActiveFromViewport, 260);
+      window.setTimeout(updateActiveFromViewport, 720);
+      navLinksWrap.classList.remove("open");
+    }
+
+    function setActive(id) {
+      navLinks.forEach((link) => link.classList.toggle("active", link.dataset.target === id));
+      railDots.forEach((dot) => dot.classList.toggle("active", dot.dataset.target === id));
+      const index = Math.max(0, sections.findIndex((section) => section.id === id));
+      const lang = currentLang();
+      const meta = sectionMeta[id]?.[lang] || sectionMeta[id]?.en;
+      if (meta) {
+        contextStep.textContent = String(index + 1).padStart(2, "0");
+        contextTitle.textContent = meta[0];
+        contextDesc.textContent = meta[1];
+      }
+    }
+
+    function renderCarousel() {
+      const total = carouselCards.length;
+      carouselCards.forEach((card, index) => {
+        card.classList.remove("active", "prev", "next", "far");
+        const offset = (index - activeCarouselIndex + total) % total;
+        if (offset === 0) {
+          card.classList.add("active");
+        } else if (offset === 1) {
+          card.classList.add("next");
+        } else if (offset === total - 1) {
+          card.classList.add("prev");
+        } else {
+          card.classList.add("far");
+        }
+      });
+      if (carouselIndexNode) {
+        carouselIndexNode.textContent = String(activeCarouselIndex + 1).padStart(2, "0");
+      }
+    }
+
+    function moveCarousel(direction) {
+      const total = carouselCards.length;
+      activeCarouselIndex = (activeCarouselIndex + direction + total) % total;
+      lastCarouselTouch = Date.now();
+      renderCarousel();
+    }
+
+    carouselPrev.addEventListener("click", () => moveCarousel(-1));
+    carouselNext.addEventListener("click", () => moveCarousel(1));
+
+    carouselCards.forEach((card, index) => {
+      card.addEventListener("click", () => {
+        if (index !== activeCarouselIndex) {
+          activeCarouselIndex = index;
+          lastCarouselTouch = Date.now();
+          renderCarousel();
+        } else {
+          openDetail(researchData[card.dataset.research]);
+        }
+      });
+      card.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          if (index !== activeCarouselIndex) {
+            activeCarouselIndex = index;
+            lastCarouselTouch = Date.now();
+            renderCarousel();
+          } else {
+            openDetail(researchData[card.dataset.research]);
+          }
+        }
+      });
+    });
+
+    renderCarousel();
+
+    window.setInterval(() => {
+      if (Date.now() - lastCarouselTouch > 8000 && !modal.classList.contains("open")) {
+        moveCarousel(1);
+        lastCarouselTouch = Date.now() - 3000;
+      }
+    }, 5200);
+
+    document.querySelectorAll("[data-target]").forEach((control) => {
+      control.addEventListener("click", (event) => {
+        event.preventDefault();
+        goToSection(control.dataset.target);
+      });
+    });
+
+    function updateActiveFromViewport() {
+      const targetY = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) + parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--context-h")) + 120;
+      let activeSection = sections[0];
+      let bestDistance = Number.POSITIVE_INFINITY;
+      sections.forEach((section) => {
+        const rect = section.getBoundingClientRect();
+        if (rect.bottom < targetY || rect.top > window.innerHeight) return;
+        const distance = Math.abs(rect.top - targetY);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          activeSection = section;
+        }
+      });
+      if (activeSection) setActive(activeSection.dataset.section);
+    }
+
+    window.addEventListener("scroll", updateActiveFromViewport, { passive: true });
+    window.addEventListener("resize", updateActiveFromViewport);
+    updateActiveFromViewport();
+
+    menuToggle.addEventListener("click", () => {
+      navLinksWrap.classList.toggle("open");
+    });
+
+    langToggle.addEventListener("click", () => {
+      const next = currentLang() === "en" ? "zh" : "en";
+      document.body.dataset.lang = next;
+      document.documentElement.lang = next === "zh" ? "zh-CN" : "en";
+      langToggle.textContent = next === "zh" ? "EN" : "中文";
+      document.querySelectorAll("[data-i18n-en]").forEach((node) => {
+        const value = node.dataset[next === "zh" ? "i18nZh" : "i18nEn"];
+        if (value) node.textContent = value;
+      });
+      const activeId = document.querySelector(".nav-link.active")?.dataset.target || "hero";
+      setActive(activeId);
+    });
+
+    document.querySelectorAll(".filter-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const filter = button.dataset.filter;
+        document.querySelectorAll(".filter-button").forEach((item) => item.classList.toggle("active", item === button));
+        document.querySelectorAll(".paper-card").forEach((card) => {
+          card.classList.toggle("is-hidden", filter !== "all" && card.dataset.topic !== filter);
+        });
+      });
+    });
+
+    document.querySelectorAll(".paper-toggle").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".paper-card");
+        const isOpen = card.classList.toggle("open");
+        button.setAttribute("aria-expanded", String(isOpen));
+      });
+    });
+
+    function openDetail(data) {
+      if (!data) return;
+      const zh = currentLang() === "zh";
+      modal.classList.remove("portrait-modal");
+      modalKicker.textContent = data.kicker;
+      modalTitle.textContent = zh ? data.zhTitle : data.title;
+      modalBody.innerHTML = "";
+      (zh ? data.zhBody : data.body).forEach((paragraph) => {
+        const p = document.createElement("p");
+        p.textContent = paragraph;
+        modalBody.appendChild(p);
+      });
+      modal.classList.add("open");
+      modalClose.focus();
+    }
+
+    function openPortrait() {
+      const zh = currentLang() === "zh";
+      modal.classList.add("portrait-modal");
+      modalKicker.textContent = zh ? "头像照片" : "Portrait";
+      modalTitle.textContent = zh ? "左力晗" : "Lihan Zuo";
+      modalBody.innerHTML = "";
+      const image = document.createElement("img");
+      image.className = "portrait-full";
+      image.src = "assets/notion-profile.jpg";
+      image.alt = zh ? "左力晗头像照片" : "Portrait of Lihan Zuo";
+      modalBody.appendChild(image);
+      modal.classList.add("open");
+      modalClose.focus();
+    }
+
+    function openProject(projectId) {
+      openDetail(projectData[projectId]);
+    }
+
+    document.querySelectorAll(".project-card").forEach((card) => {
+      card.addEventListener("click", () => openProject(card.dataset.project));
+      card.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openProject(card.dataset.project);
+        }
+      });
+    });
+
+    portraitButton.addEventListener("click", openPortrait);
+
+    function closeModal() {
+      modal.classList.remove("open");
+      modal.classList.remove("portrait-modal");
+    }
+
+    modalClose.addEventListener("click", closeModal);
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) closeModal();
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && modal.classList.contains("open")) {
+        closeModal();
+        return;
+      }
+      if (event.target.closest("button, a")) return;
+      const currentIndex = sections.findIndex((section) => section.id === document.querySelector(".nav-link.active")?.dataset.target);
+      if (event.key === "ArrowDown" && currentIndex < sections.length - 1) {
+        goToSection(sections[currentIndex + 1].id);
+      }
+      if (event.key === "ArrowUp" && currentIndex > 0) {
+        goToSection(sections[currentIndex - 1].id);
+      }
+    });
+
+    copyEmail.addEventListener("click", async () => {
+      const email = "zuolihanstudy@gmail.com";
+      const zh = currentLang() === "zh";
+      const resetLabel = zh ? "复制邮箱" : "Copy Email";
+      copyEmail.textContent = zh ? "已复制" : "Copied";
+      statusNode.textContent = email;
+      try {
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(email);
+        } else {
+          throw new Error("Clipboard API unavailable");
+        }
+      } catch (error) {
+        const fallback = document.createElement("textarea");
+        fallback.value = email;
+        fallback.setAttribute("readonly", "");
+        fallback.style.position = "fixed";
+        fallback.style.opacity = "0";
+        document.body.appendChild(fallback);
+        fallback.select();
+        try {
+          document.execCommand("copy");
+        } catch (copyError) {
+          window.location.href = "mailto:" + email;
+        }
+        fallback.remove();
+      }
+      window.setTimeout(() => {
+        copyEmail.textContent = resetLabel;
+      }, 1500);
+    });
+  </script>
+</body>
+</html>
