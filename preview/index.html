@@ -1741,12 +1741,12 @@
         top: 0;
         z-index: 10000;
         display: block;
-        width: 38px;
-        height: 38px;
+        width: 36px;
+        height: 36px;
         pointer-events: none;
         opacity: 0;
         transform: translate3d(-80px, -80px, 0);
-        transform-origin: 14px 12px;
+        transform-origin: 10px 5px;
         transition: opacity 120ms var(--ease), filter 120ms var(--ease);
         filter: drop-shadow(0 7px 14px rgba(0, 156, 198, 0.16));
         will-change: transform;
@@ -1767,15 +1767,6 @@
         overflow: visible;
       }
 
-      .robot-cursor .robot-cable {
-        fill: none;
-        stroke: rgba(0, 156, 198, 0.3);
-        stroke-width: 1.5;
-        stroke-linecap: round;
-        stroke-dasharray: 3 6;
-        animation: cursor-trail 1.8s linear infinite;
-      }
-
       .robot-cursor .robot-servo {
         fill: rgba(255, 255, 255, 0.82);
         stroke: rgba(16, 34, 55, 0.58);
@@ -1793,6 +1784,7 @@
 
       .robot-cursor .robot-link,
       .robot-cursor .robot-palm,
+      .robot-cursor .finger-tip,
       .robot-cursor .finger-bone,
       .robot-cursor .robot-thumb,
       .robot-cursor .robot-panel {
@@ -1809,6 +1801,7 @@
         fill: rgba(255, 255, 255, 0.54);
       }
 
+      .robot-cursor .finger-tip,
       .robot-cursor .finger-bone,
       .robot-cursor .robot-thumb {
         fill: url(#cursorMetal);
@@ -1874,15 +1867,6 @@
         }
       }
 
-      @keyframes cursor-trail {
-        from {
-          stroke-dashoffset: 0;
-        }
-        to {
-          stroke-dashoffset: -26;
-        }
-      }
-
       @keyframes servo-spin {
         from {
           rotate: 0deg;
@@ -1916,7 +1900,7 @@
         background-position: 0% 50%;
       }
 
-      .robot-cursor .robot-trail,
+      .robot-cursor .robot-servo,
       .robot-cursor .robot-finger,
       .robot-cursor .robot-thumb {
         animation: none;
@@ -2472,7 +2456,7 @@
   </div>
 
   <div class="robot-cursor" id="robotCursor" aria-hidden="true">
-    <svg viewBox="0 0 72 72" focusable="false">
+    <svg viewBox="0 0 64 64" focusable="false">
       <defs>
         <linearGradient id="cursorMetal" x1="0" x2="1" y1="0" y2="1">
           <stop offset="0" stop-color="#ffffff"/>
@@ -2480,32 +2464,33 @@
           <stop offset="1" stop-color="#f7e9fb"/>
         </linearGradient>
       </defs>
-      <path class="robot-cable" d="M10 58 C19 48 24 44 32 41"/>
       <g class="robot-arm">
-        <rect class="robot-link" x="8" y="51" width="24" height="9" rx="4.5" transform="rotate(-28 20 55.5)"/>
-        <circle class="robot-servo" cx="31" cy="43" r="6.5"/>
-        <rect class="robot-link" x="31" y="37" width="18" height="8" rx="4" transform="rotate(-18 40 41)"/>
+        <rect class="robot-link" x="37" y="49" width="19" height="8" rx="4" transform="rotate(20 46.5 53)"/>
+        <circle class="robot-servo" cx="37" cy="48" r="5.6"/>
       </g>
       <g class="robot-hand">
         <g class="robot-finger finger-one">
-          <rect class="finger-bone" x="42" y="10" width="6.5" height="22" rx="3.25"/>
-          <circle class="robot-joint" cx="45.25" cy="25" r="1.45"/>
+          <rect class="finger-tip" x="15" y="5" width="7" height="9" rx="3.5"/>
+          <rect class="finger-bone" x="15" y="13" width="7" height="18" rx="3.5"/>
+          <circle class="robot-joint" cx="18.5" cy="22" r="1.35"/>
         </g>
         <g class="robot-finger finger-two">
-          <rect class="finger-bone" x="50" y="12" width="6.5" height="21" rx="3.25"/>
-          <circle class="robot-joint" cx="53.25" cy="26" r="1.45"/>
+          <rect class="finger-tip" x="24" y="8" width="7" height="8" rx="3.5"/>
+          <rect class="finger-bone" x="24" y="15" width="7" height="17" rx="3.5"/>
+          <circle class="robot-joint" cx="27.5" cy="24" r="1.35"/>
         </g>
         <g class="robot-finger finger-three">
-          <rect class="finger-bone" x="57" y="18" width="6" height="17" rx="3"/>
-          <circle class="robot-joint" cx="60" cy="29" r="1.3"/>
+          <rect class="finger-tip" x="33" y="13" width="6.5" height="7" rx="3.25"/>
+          <rect class="finger-bone" x="33" y="19" width="6.5" height="14" rx="3.25"/>
+          <circle class="robot-joint" cx="36.25" cy="27" r="1.25"/>
         </g>
         <g class="robot-thumb-wrap">
-          <rect class="robot-thumb" x="29" y="34" width="22" height="7" rx="3.5" transform="rotate(-34 40 37.5)"/>
+          <rect class="robot-thumb" x="11" y="32" width="20" height="6.5" rx="3.25" transform="rotate(-34 21 35.25)"/>
         </g>
-        <path class="robot-palm" d="M36 31h21c4 0 7 3 7 6.8v7.6C64 51 59.2 55 53.6 55H43.4C37.8 55 33 50.4 33 44.8V37c0-3.2 1-5.2 3-6z"/>
-        <path class="robot-panel" d="M40 38h14.8c1.8 0 3.2 1.3 3.2 3v3.4c0 1.8-1.4 3.1-3.2 3.1H41.2c-1.6 0-2.8-1.2-2.8-2.8V41c0-1.8 0.6-2.7 1.6-3z"/>
-        <circle class="robot-led" cx="43.2" cy="42.5" r="1.4"/>
-        <circle class="robot-joint" cx="52.5" cy="42.5" r="1.55"/>
+        <path class="robot-palm" d="M16 30h26c4 0 7 3 7 6.8v7.6C49 50.6 44.2 55 38.2 55H27.4C21.6 55 16.5 50.4 16.5 44.6V36.8c0-3.6 1.1-5.8 3-6.8z"/>
+        <path class="robot-panel" d="M22 38h16.6c1.9 0 3.4 1.4 3.4 3.2v3.6c0 1.9-1.5 3.2-3.4 3.2H23.4c-1.8 0-3.1-1.3-3.1-3.1V41c0-1.8 0.7-2.8 1.7-3z"/>
+        <circle class="robot-led" cx="25.2" cy="43" r="1.35"/>
+        <circle class="robot-joint" cx="35.4" cy="43" r="1.5"/>
       </g>
     </svg>
   </div>
@@ -2586,7 +2571,7 @@
         state.previousX = state.x;
         state.angle += (Math.max(-10, Math.min(10, dx * 0.42)) - state.angle) * 0.36;
         const scale = state.hovering ? 1.04 : 1;
-        cursor.style.transform = `translate3d(${(state.x - 13).toFixed(2)}px, ${(state.y - 12).toFixed(2)}px, 0) rotate(${state.angle.toFixed(2)}deg) scale(${scale})`;
+        cursor.style.transform = `translate3d(${(state.x - 10).toFixed(2)}px, ${(state.y - 4).toFixed(2)}px, 0) rotate(${state.angle.toFixed(2)}deg) scale(${scale})`;
         if (Math.abs(state.targetX - state.x) > 0.1 || Math.abs(state.targetY - state.y) > 0.1) {
           state.frame = window.requestAnimationFrame(renderCursor);
         } else {
