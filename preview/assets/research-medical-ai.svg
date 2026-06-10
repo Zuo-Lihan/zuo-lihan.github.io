@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Multimodal medical AI research visual</title>
+  <desc id="desc">Clinical image, dermoscopy image, and metadata streams are fused into an adaptive classifier.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fdff"/>
+      <stop offset=".48" stop-color="#e4f8ff"/>
+      <stop offset="1" stop-color="#fff5fb"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2fe2ff"/>
+      <stop offset="1" stop-color="#087d9f"/>
+    </linearGradient>
+    <linearGradient id="rose" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd6df"/>
+      <stop offset="1" stop-color="#b6528b"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#4a8ca9" flood-opacity=".18"/>
+    </filter>
+    <pattern id="matrix" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M0 14h28M14 0v28" stroke="#78c8d8" stroke-opacity=".22" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="680" rx="44" fill="url(#bg)"/>
+  <circle cx="966" cy="110" r="220" fill="#b8efff" opacity=".24"/>
+  <circle cx="155" cy="575" r="250" fill="#ffd4ef" opacity=".2"/>
+  <g fill="none" stroke="#0c5e78" stroke-opacity=".14">
+    <path d="M80 118c190 44 312 42 498-18 162-52 300-56 540 18"/>
+    <path d="M42 556c238-64 388-54 556 8 170 63 318 70 548-4"/>
+  </g>
+
+  <g filter="url(#soft)">
+    <rect x="64" y="92" width="248" height="414" rx="30" fill="#ffffff" fill-opacity=".78" stroke="#87ddeb" stroke-opacity=".7"/>
+    <rect x="344" y="92" width="248" height="414" rx="30" fill="#ffffff" fill-opacity=".78" stroke="#87ddeb" stroke-opacity=".7"/>
+    <rect x="624" y="92" width="248" height="414" rx="30" fill="#ffffff" fill-opacity=".78" stroke="#87ddeb" stroke-opacity=".7"/>
+    <rect x="910" y="146" width="224" height="306" rx="34" fill="#ffffff" fill-opacity=".82" stroke="#3ccfe7" stroke-opacity=".72"/>
+  </g>
+
+  <g transform="translate(64 92)">
+    <text x="28" y="48" fill="#0d2d44" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="800">Clinical image</text>
+    <rect x="28" y="82" width="192" height="170" rx="22" fill="#e7fbff"/>
+    <circle cx="124" cy="167" r="67" fill="#f5c7b1"/>
+    <path d="M94 162c20-38 76-30 88 8 9 29-13 56-48 57-39 2-59-31-40-65z" fill="#9b5e55" opacity=".9"/>
+    <path d="M98 180c34 13 62 10 84-10" stroke="#743c3e" stroke-width="7" stroke-linecap="round" opacity=".5"/>
+    <g fill="#1e7891" opacity=".78">
+      <circle cx="74" cy="304" r="6"/>
+      <circle cx="104" cy="304" r="6"/>
+      <circle cx="134" cy="304" r="6"/>
+      <circle cx="164" cy="304" r="6"/>
+    </g>
+    <path d="M36 348h172M36 386h132" stroke="#6eaec0" stroke-width="12" stroke-linecap="round" opacity=".38"/>
+  </g>
+
+  <g transform="translate(344 92)">
+    <text x="28" y="48" fill="#0d2d44" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="800">Dermoscopy</text>
+    <rect x="28" y="82" width="192" height="170" rx="22" fill="#fff2f6"/>
+    <circle cx="124" cy="167" r="72" fill="#f6d3c9"/>
+    <circle cx="124" cy="167" r="47" fill="#744544"/>
+    <path d="M92 142c39-22 82-3 99 33M83 177c38 23 79 21 121-9" stroke="#f2b7a2" stroke-width="7" stroke-linecap="round" opacity=".68"/>
+    <g stroke="#754242" stroke-opacity=".58" stroke-width="4" stroke-linecap="round">
+      <path d="M79 108l32 34M173 110l-22 36M74 224l34-38M184 224l-38-36"/>
+    </g>
+    <rect x="33" y="288" width="170" height="92" rx="18" fill="url(#matrix)"/>
+    <path d="M50 350c30-44 60-42 92-6 18 20 37 24 56 2" fill="none" stroke="url(#cyan)" stroke-width="9" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(624 92)">
+    <text x="28" y="48" fill="#0d2d44" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="800">Metadata</text>
+    <rect x="30" y="86" width="184" height="284" rx="22" fill="#f8feff" stroke="#a2dbe8"/>
+    <g fill="#0a6f8a">
+      <rect x="58" y="124" width="130" height="14" rx="7" opacity=".55"/>
+      <rect x="58" y="162" width="96" height="14" rx="7" opacity=".38"/>
+      <rect x="58" y="200" width="152" height="14" rx="7" opacity=".48"/>
+      <rect x="58" y="238" width="82" height="14" rx="7" opacity=".34"/>
+      <rect x="58" y="276" width="142" height="14" rx="7" opacity=".52"/>
+    </g>
+    <g transform="translate(58 330)" fill="none" stroke-width="8" stroke-linecap="round">
+      <path d="M0 36h34v-20h36v-10h36v-26h40" stroke="#2fe2ff"/>
+      <path d="M0 58h46v-12h34v30h66" stroke="#c451a6"/>
+    </g>
+  </g>
+
+  <g stroke-width="6" stroke-linecap="round" fill="none" opacity=".74">
+    <path d="M312 286h64" stroke="#24cce7"/>
+    <path d="M592 286h64" stroke="#24cce7"/>
+    <path d="M872 286h70" stroke="#24cce7"/>
+  </g>
+  <g transform="translate(910 146)">
+    <text x="34" y="50" fill="#0d2d44" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800">Adaptive fusion</text>
+    <circle cx="112" cy="132" r="70" fill="none" stroke="#39d9f4" stroke-width="13" opacity=".8"/>
+    <circle cx="112" cy="132" r="42" fill="url(#cyan)" opacity=".88"/>
+    <g fill="#ffffff">
+      <circle cx="112" cy="92" r="7"/>
+      <circle cx="78" cy="152" r="7"/>
+      <circle cx="147" cy="152" r="7"/>
+    </g>
+    <g stroke="#14364b" stroke-opacity=".64" stroke-width="5" stroke-linecap="round">
+      <path d="M112 92v80"/>
+      <path d="M78 152l69 0"/>
+    </g>
+    <rect x="34" y="234" width="156" height="18" rx="9" fill="#0b7893" opacity=".7"/>
+    <rect x="34" y="270" width="118" height="18" rx="9" fill="#c451a6" opacity=".56"/>
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif">
+    <text x="74" y="594" fill="#0d2d44" font-size="30" font-weight="900">Multimodal skin lesion classification</text>
+    <text x="76" y="632" fill="#496c80" font-size="22" font-weight="650">clinical images + dermoscopy + metadata -> uncertainty-aware fusion</text>
+  </g>
+</svg>

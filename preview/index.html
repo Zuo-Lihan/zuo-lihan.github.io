@@ -1303,7 +1303,12 @@
 
     .papers-layout.publications-only {
       grid-template-columns: minmax(0, 1fr);
-      max-width: 920px;
+      width: 100%;
+      max-width: none;
+    }
+
+    #publications .section-inner {
+      width: min(1320px, 100%);
     }
 
     .filter-panel {
@@ -1438,10 +1443,28 @@
     }
 
     .paper-meta {
+      display: grid;
+      gap: 4px;
       margin-top: 8px;
       color: var(--muted);
       font-size: 0.82rem;
       line-height: 1.6;
+    }
+
+    .paper-authors {
+      color: #557385;
+      font-weight: 680;
+    }
+
+    .paper-journal {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      border-left: 3px solid rgba(54, 230, 255, 0.7);
+      padding-left: 10px;
+      color: #0b6b87;
+      font-weight: 780;
+      letter-spacing: 0;
     }
 
     .paper-venue {
@@ -2377,7 +2400,7 @@
             <div class="eyebrow" data-i18n-en="Medical AI, multimodal learning, LLM reliability" data-i18n-zh="医学人工智能、多模态学习、大模型可靠性">Medical AI, multimodal learning, LLM reliability</div>
             <h1 class="hero-title" data-i18n-en="Lihan Zuo" data-i18n-zh="左力晗">Lihan Zuo</h1>
             <p class="lead hero-lead" data-wave-text data-i18n-en="I earned my B.Eng. in Artificial Intelligence from Southwest Jiaotong University (SWJTU) in 2023, previously worked as a Visiting Researcher at ISTD, SUTD, and now work as an Algorithm Engineer at LexinFintech in Shenzhen." data-i18n-zh="我于 2023 年获得西南交通大学(SWJTU)人工智能专业工学学士学位，曾在 SUTD ISTD 担任访问研究员，目前在深圳 LexinFintech 担任算法工程师。">
-              I earned my B.Eng. in Artificial Intelligence from Southwest Jiaotong University (SWJTU) in 2023, previously worked as a Visiting Researcher at ISTD, SUTD, and now work as an Algorithm Engineer at LexinFintech in Shenzhen.
+              I earned my B.Eng. in Artificial Intelligence from Southwest Jiaotong University (SWJTU) in 2023, previously worked as a Visiting Researcher at ISTD, SUTD, and now work as an Algorithm Engineer at LexinFintech in Shenzhen. 
             </p>
             <div class="hero-actions">
               <button class="solid-button" data-target="publications" data-i18n-en="Publication" data-i18n-zh="代表论文">Publication</button>
@@ -2464,7 +2487,7 @@
             <div class="carousel-stage" id="researchCarousel">
               <article class="research-card glass-card" data-carousel-card data-research="medical-ai" tabindex="0" role="button">
                 <div class="glass-media">
-                  <img src="../img/AI 1.jpg" alt="Abstract AI research visual" loading="lazy" decoding="async">
+                  <img src="assets/research-medical-ai.svg" alt="Multimodal medical AI fusion research visual" loading="lazy" decoding="async">
                 </div>
               <div class="card-kicker">01 / Medical AI</div>
               <h3 data-i18n-en="Adaptive multimodal fusion for skin lesion classification" data-i18n-zh="面向皮肤病灶分类的自适应多模态融合">Adaptive multimodal fusion for skin lesion classification</h3>
@@ -2480,7 +2503,7 @@
 
               <article class="research-card glass-card" data-carousel-card data-research="llm" tabindex="0" role="button">
                 <div class="glass-media">
-                  <img src="../img/Singapore Raining.jpg" alt="City light visual sample" loading="lazy" decoding="async">
+                  <img src="assets/research-llm-reliability.svg" alt="Reliable LLM workflow research visual" loading="lazy" decoding="async">
                 </div>
               <div class="card-kicker">02 / LLM</div>
               <h3 data-i18n-en="Hallucination mitigation and reliable LLM workflows" data-i18n-zh="幻觉缓解与可靠大模型工作流">Hallucination mitigation and reliable LLM workflows</h3>
@@ -2496,7 +2519,7 @@
 
               <article class="research-card glass-card" data-carousel-card data-research="llm-memory" tabindex="0" role="button">
                 <div class="glass-media">
-                  <img src="../img/post-bg-universe.jpg" alt="Neural memory and long-context language model visual" loading="lazy" decoding="async">
+                  <img src="assets/research-llm-memory.svg" alt="Memory-aware language model research visual" loading="lazy" decoding="async">
                 </div>
               <div class="card-kicker">03 / LLM Memory</div>
               <h3 data-i18n-en="Memory-aware language models and long-context reasoning" data-i18n-zh="具备记忆能力的大模型与长上下文推理">Memory-aware language models and long-context reasoning</h3>
@@ -2527,7 +2550,10 @@
                 <div class="paper-top">
                   <div>
                     <div class="paper-title" data-i18n-en="A multi-stage multi-modal learning algorithm with adaptive multimodal fusion for improving multi-label skin lesion classification" data-i18n-zh="一种用于提升多标签皮肤病灶分类的多阶段多模态自适应融合算法">A multi-stage multi-modal learning algorithm with adaptive multimodal fusion for improving multi-label skin lesion classification</div>
-                    <div class="paper-meta" data-i18n-en="Lihan Zuo, Zizhou Wang, Yan Wang. Artificial Intelligence in Medicine 162:103091, 2025." data-i18n-zh="Lihan Zuo, Zizhou Wang, Yan Wang. Artificial Intelligence in Medicine 162:103091, 2025.">Lihan Zuo, Zizhou Wang, Yan Wang. Artificial Intelligence in Medicine 162:103091, 2025.</div>
+                    <div class="paper-meta">
+                      <div class="paper-authors" data-i18n-en="Lihan Zuo, Zizhou Wang, Yan Wang" data-i18n-zh="Lihan Zuo, Zizhou Wang, Yan Wang">Lihan Zuo, Zizhou Wang, Yan Wang</div>
+                      <div class="paper-journal" data-i18n-en="Artificial Intelligence in Medicine, 162, 103091, 2025." data-i18n-zh="Artificial Intelligence in Medicine, 162, 103091, 2025.">Artificial Intelligence in Medicine, 162, 103091, 2025.</div>
+                    </div>
                   </div>
                   <span class="paper-venue">AIIM</span>
                 </div>

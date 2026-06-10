@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Reliable LLM workflow research visual</title>
+  <desc id="desc">A language model workflow with evidence retrieval, verification, evaluation, and hallucination risk control.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbfeff"/>
+      <stop offset=".52" stop-color="#eaf9ff"/>
+      <stop offset="1" stop-color="#f9f4ff"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#35dcff"/>
+      <stop offset="1" stop-color="#2454d6"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8ff4c9"/>
+      <stop offset="1" stop-color="#087d68"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#37658c" flood-opacity=".16"/>
+    </filter>
+    <pattern id="dots" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="1.8" fill="#2a91ad" fill-opacity=".28"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="680" rx="44" fill="url(#bg)"/>
+  <rect width="1200" height="680" rx="44" fill="url(#dots)" opacity=".42"/>
+  <circle cx="1030" cy="150" r="220" fill="#d4d9ff" opacity=".34"/>
+  <circle cx="130" cy="560" r="250" fill="#c6fff0" opacity=".22"/>
+
+  <g filter="url(#shadow)" font-family="Inter, Arial, sans-serif">
+    <rect x="70" y="116" width="220" height="136" rx="28" fill="#fff" fill-opacity=".82" stroke="#9cddea"/>
+    <rect x="358" y="92" width="278" height="184" rx="34" fill="#fff" fill-opacity=".84" stroke="#89dae9"/>
+    <rect x="704" y="116" width="220" height="136" rx="28" fill="#fff" fill-opacity=".82" stroke="#9cddea"/>
+    <rect x="940" y="114" width="188" height="378" rx="32" fill="#fff" fill-opacity=".84" stroke="#a8dce8"/>
+
+    <text x="104" y="162" fill="#0d2d44" font-size="25" font-weight="900">Prompt</text>
+    <text x="104" y="200" fill="#557385" font-size="19" font-weight="650">task + context</text>
+    <rect x="104" y="220" width="132" height="12" rx="6" fill="#3fcde6" opacity=".48"/>
+
+    <text x="398" y="146" fill="#0d2d44" font-size="26" font-weight="900">LLM workflow</text>
+    <g transform="translate(396 176)">
+      <circle cx="44" cy="34" r="24" fill="url(#blue)" opacity=".86"/>
+      <circle cx="122" cy="34" r="24" fill="#bfeeff"/>
+      <circle cx="200" cy="34" r="24" fill="#f4c7e7"/>
+      <path d="M68 34h30M146 34h30" stroke="#246f87" stroke-width="6" stroke-linecap="round"/>
+      <path d="M44 34c42-64 112-64 156 0" fill="none" stroke="#0e6e8b" stroke-width="5" stroke-linecap="round" opacity=".45"/>
+    </g>
+    <text x="744" y="162" fill="#0d2d44" font-size="25" font-weight="900">Verifier</text>
+    <text x="744" y="200" fill="#557385" font-size="19" font-weight="650">evidence check</text>
+    <path d="M746 226l28 24 58-68" fill="none" stroke="url(#green)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <text x="980" y="160" fill="#0d2d44" font-size="24" font-weight="900">Evaluation</text>
+    <g transform="translate(982 202)">
+      <rect x="0" y="0" width="34" height="214" rx="17" fill="#e9f7fb"/>
+      <rect x="56" y="0" width="34" height="214" rx="17" fill="#e9f7fb"/>
+      <rect x="112" y="0" width="34" height="214" rx="17" fill="#e9f7fb"/>
+      <rect x="0" y="82" width="34" height="132" rx="17" fill="url(#blue)"/>
+      <rect x="56" y="46" width="34" height="168" rx="17" fill="url(#green)"/>
+      <rect x="112" y="118" width="34" height="96" rx="17" fill="#c451a6" opacity=".76"/>
+    </g>
+    <text x="982" y="464" fill="#557385" font-size="18" font-weight="700">faithfulness</text>
+  </g>
+
+  <g fill="none" stroke-width="7" stroke-linecap="round">
+    <path d="M292 184h62" stroke="#34d7ef"/>
+    <path d="M636 184h64" stroke="#34d7ef"/>
+    <path d="M924 184h46" stroke="#34d7ef"/>
+    <path d="M496 276c-14 72-84 98-170 116" stroke="#9061cb" stroke-opacity=".5"/>
+    <path d="M764 252c-2 90-72 132-182 154" stroke="#0b8f79" stroke-opacity=".45"/>
+  </g>
+
+  <g transform="translate(88 360)" filter="url(#shadow)" font-family="Inter, Arial, sans-serif">
+    <rect x="0" y="0" width="790" height="172" rx="30" fill="#fff" fill-opacity=".76" stroke="#a2dbe8"/>
+    <text x="34" y="48" fill="#0d2d44" font-size="25" font-weight="900">Evidence-grounded loop</text>
+    <g transform="translate(34 78)">
+      <rect x="0" y="0" width="180" height="54" rx="18" fill="#e8f9ff" stroke="#9edce8"/>
+      <rect x="210" y="0" width="180" height="54" rx="18" fill="#eefdf8" stroke="#9edecb"/>
+      <rect x="420" y="0" width="180" height="54" rx="18" fill="#f8f1ff" stroke="#d6c3ec"/>
+      <text x="26" y="35" fill="#16445a" font-size="18" font-weight="800">retrieve</text>
+      <text x="252" y="35" fill="#16445a" font-size="18" font-weight="800">reason</text>
+      <text x="456" y="35" fill="#16445a" font-size="18" font-weight="800">calibrate</text>
+      <path d="M184 27h22M394 27h22" stroke="#2a9bb6" stroke-width="6" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif">
+    <text x="74" y="594" fill="#0d2d44" font-size="30" font-weight="900">Hallucination mitigation and reliable LLM workflows</text>
+    <text x="76" y="632" fill="#496c80" font-size="22" font-weight="650">retrieval + verification + evaluation for practical model behavior</text>
+  </g>
+</svg>
