@@ -2966,6 +2966,9 @@
         let carouselFrame = 0;
         let profileFrame = 0;
         let scrollCorrectionTimers = [];
+        let activeSectionId = "";
+        let activeUpdateFrame = 0;
+        let viewportTargetY = 0;
 
         const sectionMeta = {
           hero: {
@@ -3279,7 +3282,7 @@
           });
           scrollCorrectionTimers.push(window.setTimeout(() => {
             document.body.classList.remove("is-programmatic-scroll");
-            updateActiveFromViewport();
+            scheduleActiveUpdate();
           }, 1380));
         }
 
@@ -3290,8 +3293,8 @@
             return;
           }
           scheduleSectionAlignment(id);
-          window.setTimeout(updateActiveFromViewport, 260);
-          window.setTimeout(updateActiveFromViewport, 720);
+          window.setTimeout(scheduleActiveUpdate, 260);
+          window.setTimeout(scheduleActiveUpdate, 720);
           navLinksWrap.classList.remove("open");
         }
 
@@ -3325,7 +3328,9 @@
           window.setTimeout(cleanSectionUrl, 1420);
         }
 
-        function setActive(id) {
+        function setActive(id, force = false) {
+          if (!force && activeSectionId === id) return;
+          activeSectionId = id;
           navLinks.forEach((link) => link.classList.toggle("active", link.dataset.target === id));
           railDots.forEach((dot) => dot.classList.toggle("active", dot.dataset.target === id));
           const index = Math.max(0, sections.findIndex((section) => section.id === id));
@@ -3658,8 +3663,14 @@
           });
         });
 
+        function readViewportTargetY() {
+          const rootStyle = getComputedStyle(document.documentElement);
+          return parseFloat(rootStyle.getPropertyValue("--nav-h")) + parseFloat(rootStyle.getPropertyValue("--context-h")) + 120;
+        }
+
         function updateActiveFromViewport() {
-          const targetY = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) + parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--context-h")) + 120;
+          activeUpdateFrame = 0;
+          const targetY = viewportTargetY || (viewportTargetY = readViewportTargetY());
           let activeSection = sections[0];
           let bestDistance = Number.POSITIVE_INFINITY;
           sections.forEach((section) => {
@@ -3674,13 +3685,19 @@
           if (activeSection) setActive(activeSection.dataset.section);
         }
 
-        window.addEventListener("scroll", updateActiveFromViewport, { passive: true });
+        function scheduleActiveUpdate() {
+          if (activeUpdateFrame) return;
+          activeUpdateFrame = window.requestAnimationFrame(updateActiveFromViewport);
+        }
+
+        window.addEventListener("scroll", scheduleActiveUpdate, { passive: true });
         window.addEventListener("resize", () => {
-          updateActiveFromViewport();
+          viewportTargetY = 0;
+          scheduleActiveUpdate();
           refreshHeroLeadMetrics(document.querySelector("[data-wave-text]"));
         });
         initHeroLeadWave();
-        updateActiveFromViewport();
+        scheduleActiveUpdate();
 
         menuToggle.addEventListener("click", () => {
           navLinksWrap.classList.toggle("open");
@@ -3697,7 +3714,7 @@
           });
           initHeroLeadWave();
           const activeId = document.querySelector(".nav-link.active")?.dataset.target || "hero";
-          setActive(activeId);
+          setActive(activeId, true);
         });
 
         document.querySelectorAll(".filter-button").forEach((button) => {
