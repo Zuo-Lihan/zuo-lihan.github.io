@@ -2023,26 +2023,18 @@
       overflow: hidden;
       border: 1px solid rgba(18, 57, 82, 0.12);
       border-radius: 18px;
-      background:
-        radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.84), transparent 34%),
-        radial-gradient(circle at 50% 50%, rgba(54, 230, 255, 0.2), transparent 50%),
-        linear-gradient(145deg, rgba(255, 255, 255, 0.56), rgba(226, 248, 255, 0.36));
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(226, 248, 255, 0.42));
     }
 
     .visitor-globe-card::before {
       position: absolute;
-      width: min(260px, 68%);
-      aspect-ratio: 1;
-      border: 1px solid rgba(0, 156, 198, 0.16);
-      border-radius: 999px;
+      inset: 16px;
+      border: 1px solid rgba(0, 156, 198, 0.08);
+      border-radius: 16px;
       content: "";
-      background:
-        linear-gradient(90deg, transparent 48%, rgba(0, 156, 198, 0.12) 49% 51%, transparent 52%),
-        linear-gradient(0deg, transparent 48%, rgba(0, 156, 198, 0.1) 49% 51%, transparent 52%),
-        radial-gradient(circle at 42% 34%, rgba(126, 221, 189, 0.18), transparent 18%),
-        radial-gradient(circle at 64% 62%, rgba(196, 81, 166, 0.12), transparent 20%);
-      box-shadow: inset 0 0 40px rgba(0, 156, 198, 0.09), 0 18px 42px rgba(38, 91, 124, 0.12);
-      opacity: 0.88;
+      background: rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 0 42px rgba(0, 156, 198, 0.06);
+      opacity: 0.72;
     }
 
     .visitor-widget-shell {
@@ -2062,6 +2054,15 @@
     .visitor-widget-shell #LTF_Cont {
       max-width: 100% !important;
       color: var(--muted);
+    }
+
+    .visitor-widget-shell #LTF_Cont,
+    .visitor-widget-shell #LTF_Cont > div {
+      cursor: grab !important;
+    }
+
+    .visitor-widget-shell a {
+      pointer-events: none;
     }
 
     .visitor-widget-shell #LTF_Cont table {
@@ -2090,6 +2091,14 @@
     .visitor-widget-shell canvas,
     .visitor-widget-shell iframe {
       max-width: 100%;
+    }
+
+    .visitor-widget-shell canvas {
+      cursor: grab !important;
+    }
+
+    .visitor-widget-shell canvas:active {
+      cursor: grabbing !important;
     }
 
     .modal {
@@ -3197,6 +3206,32 @@
         let activeUpdateFrame = 0;
         let viewportTargetY = 0;
 
+        function initVisitorGlobeGuard() {
+          const shell = document.querySelector(".visitor-widget-shell");
+          if (!shell) return;
+
+          const blockNavigationClick = (event) => {
+            if (!event.target.closest(".visitor-widget-shell")) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          };
+
+          ["click", "dblclick", "auxclick"].forEach((type) => {
+            document.addEventListener(type, blockNavigationClick, true);
+          });
+
+          const neutralizeInjectedNavigation = () => {
+            shell.querySelectorAll("*").forEach((node) => {
+              if (typeof node.onclick === "function") node.onclick = null;
+              node.removeAttribute("onclick");
+            });
+          };
+
+          neutralizeInjectedNavigation();
+          const observer = new MutationObserver(neutralizeInjectedNavigation);
+          observer.observe(shell, { attributeFilter: ["onclick"], attributes: true, childList: true, subtree: true });
+        }
+
         const sectionMeta = {
           hero: {
             en: ["Home", "Academic profile and research identity"],
@@ -3924,6 +3959,7 @@
           refreshHeroLeadMetrics(document.querySelector("[data-wave-text]"));
         });
         initHeroLeadWave();
+        initVisitorGlobeGuard();
         scheduleActiveUpdate();
 
         menuToggle.addEventListener("click", () => {
