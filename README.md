@@ -21,6 +21,8 @@
   - `preview/docs/docs-manifest.json`
   - `preview/docs/docs-data.js`
 - 头像资源：`preview/assets/notion-profile.jpg`
+- 访客地球统计：位于 `preview/index.html` 底部 `visitor-footer`，使用 LiveTrafficFeed 3D visitor map 脚本按域名记录国家级访客来源。
+- 旧 Service Worker 清理脚本：`preview/sw.js`
 - 当前工作分支：`develop`
 - 当前线上主页分支应保持为：`master`
 - 本地预览地址：`http://127.0.0.1:4173/preview/index.html`
@@ -65,6 +67,7 @@ preview/
 - 改 CV 时间线：编辑 `preview/sections/profile.html`
 - 改 Docs 入口卡片兜底内容：编辑 `preview/sections/docs.html`
 - 改联系方式：编辑 `preview/sections/contact.html`
+- 改页面底部访客地球样式或统计脚本：编辑 `preview/index.html` 中的 `visitor-footer`
 - 改整体样式、背景、卡片 hover、轮播交互、弹窗逻辑：编辑 `preview/index.html`
 - 改或新增 Docs 正文：编辑或新增 `preview/docs/markdown/*.md`
 
@@ -285,6 +288,21 @@ echo $! > .run/preview-server.pid
    ```
 
 4. 确认没有敏感信息被发布。GitHub Pages 页面是公开网页，邮箱、照片、CV 链接、论文信息都会被互联网上的访问者看到。
+
+## Visitor Globe / 访客来源地图
+
+页面底部的访客地球使用 LiveTrafficFeed 的 3D visitor map widget：
+
+```html
+https://cdn.livetrafficfeed.com/static/3d-maps/live.v2.js?o=eaf9ff&l=7eddbd&b=0b6b87&c=2fe2ff&n=c451a6&root=1&s=310
+```
+
+说明：
+
+- 这是静态 GitHub Pages 可用的第三方统计组件；访客来源记录保存在第三方服务端，不保存在本仓库里。
+- `root=1` 表示按根域名记录，后续调整页面布局、移动章节位置或重构 CSS，不会重置该域名下的历史访问来源。
+- 不要把 `visitor-footer` 加入顶部导航或右侧进度点；它只是页面最底部的独立统计区。
+- 如果未来更换统计服务或更换 widget URL，服务端历史记录可能从新服务重新开始。
 
 ## 先推送到 develop
 
