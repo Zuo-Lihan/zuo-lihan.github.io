@@ -10,8 +10,8 @@
       "Window and Pane Control",
       "Experiment Logging"
     ],
-    "sourceLabel": "Original TMUX source post",
-    "sourceHref": "_posts/2024-07-18-To Use TMUX in Singapore NSCC.md",
+    "sourceLabel": "",
+    "sourceHref": "",
     "markdown": "markdown/tmux-nscc.md",
     "url": "docs/view.html?doc=tmux-nscc"
   }
