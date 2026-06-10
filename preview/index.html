@@ -387,6 +387,10 @@
       scroll-snap-type: y proximity;
     }
 
+    .snap.is-programmatic-scroll {
+      scroll-snap-type: none;
+    }
+
     .section-inner {
       width: min(1180px, 100%);
       margin: 0 auto;
@@ -404,6 +408,24 @@
       gap: 12px;
       max-width: 720px;
       margin-bottom: 10px;
+    }
+
+    #research .section-head {
+      gap: 8px;
+      max-width: 650px;
+      margin-bottom: 8px;
+    }
+
+    #research .section-head h2 {
+      max-width: 620px;
+      font-size: clamp(1.85rem, 3.4vw, 3.35rem);
+      line-height: 0.98;
+    }
+
+    #research .section-head .lead {
+      max-width: 620px;
+      font-size: clamp(0.92rem, 1.22vw, 1.03rem);
+      line-height: 1.45;
     }
 
     .eyebrow {
@@ -546,9 +568,27 @@
       position: relative;
       display: inline-block;
       color: color-mix(in srgb, var(--soft) calc(96% - var(--wave, 0) * 18%), #007fa3);
+      text-decoration: none;
       transform: translate3d(0, calc(var(--lift, 0) * -5px), 0) scale(calc(1 + var(--wave, 0) * 0.018));
       transition: color 130ms var(--ease), text-shadow 130ms var(--ease), transform 170ms var(--spring);
       will-change: transform;
+    }
+
+    .wave-link {
+      color: #1e647b;
+      text-underline-offset: 4px;
+    }
+
+    .wave-link::before {
+      position: absolute;
+      inset: auto 0 0;
+      height: 1px;
+      content: "";
+      background: linear-gradient(90deg, rgba(0, 156, 198, 0.36), rgba(196, 81, 166, 0.16));
+      opacity: 0.46;
+      transform: translateY(5px) scaleX(0.72);
+      transform-origin: left center;
+      transition: opacity 160ms var(--ease), transform 180ms var(--spring);
     }
 
     .wave-token::after {
@@ -566,6 +606,11 @@
     .wave-token:hover {
       color: #23495c;
       text-shadow: 0 0 12px rgba(126, 210, 207, 0.16);
+    }
+
+    .wave-link:hover::before {
+      opacity: 0.86;
+      transform: translateY(5px) scaleX(1);
     }
 
     .wave-token:hover::after {
@@ -833,6 +878,7 @@
     .research-card,
     .paper-card,
     .project-card,
+    .doc-card,
     .contact-card {
       border: 1px solid rgba(255, 255, 255, 0.13);
       border-radius: var(--radius);
@@ -968,6 +1014,59 @@
       perspective: 1500px;
       transform-style: preserve-3d;
       contain: layout paint;
+    }
+
+    #research .carousel-shell {
+      padding: 12px 16px 14px;
+    }
+
+    #research .carousel-top {
+      margin-bottom: 8px;
+    }
+
+    #research .carousel-stage {
+      min-height: 300px;
+    }
+
+    #research .glass-card {
+      min-height: 268px;
+      padding: 16px;
+    }
+
+    #research .glass-media {
+      height: 82px;
+      margin-bottom: 10px;
+    }
+
+    #research .research-card h3 {
+      margin-top: 12px;
+      font-size: 1.02rem;
+      line-height: 1.32;
+    }
+
+    #research .research-card p {
+      margin-top: 8px;
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    #research .card-footer {
+      margin-top: 10px;
+      gap: 6px;
+    }
+
+    #docs {
+      padding-top: calc(var(--nav-h) + var(--context-h) + 4px);
+    }
+
+    #docs .section-head {
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    #docs .section-head h2 {
+      max-width: 760px;
+      font-size: clamp(1.75rem, 3.6vw, 3.5rem);
     }
 
     .carousel-nav {
@@ -1401,7 +1500,7 @@
 
     .projects-layout {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 14px;
     }
 
@@ -1519,6 +1618,162 @@
       transform: scale(var(--project-image-scale, 1.08));
     }
 
+    .docs-layout {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .doc-card {
+      position: relative;
+      display: grid;
+      align-content: space-between;
+      min-height: 218px;
+      padding: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      --project-glow-x: 50%;
+      --project-glow-y: 42%;
+      --project-tilt-x: 0deg;
+      --project-tilt-y: 0deg;
+      --project-corner-x: 0px;
+      --project-corner-y: 0px;
+      --project-shine-x: 0px;
+      --project-shine-y: 0px;
+      border-radius: calc(var(--radius) + 8px);
+      background:
+        radial-gradient(circle at var(--project-glow-x) var(--project-glow-y), rgba(255, 209, 102, 0.24), transparent 34%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(232, 249, 246, 0.54) 48%, rgba(255, 244, 226, 0.44)),
+        rgba(255, 255, 255, 0.6);
+      box-shadow: 0 18px 54px rgba(44, 93, 122, 0.12);
+      transform: perspective(1200px) rotateX(var(--project-tilt-y)) rotateY(var(--project-tilt-x));
+      transform-style: preserve-3d;
+      transition: transform 520ms var(--spring), border-color 180ms var(--ease), background 180ms var(--ease), box-shadow 180ms var(--ease);
+      will-change: transform;
+      isolation: isolate;
+    }
+
+    .doc-card::before,
+    .doc-card::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      pointer-events: none;
+    }
+
+    .doc-card::before {
+      z-index: 0;
+      background:
+        radial-gradient(circle at 0 0, rgba(255, 209, 102, 0.26), transparent 24%),
+        radial-gradient(circle at 100% 0, rgba(0, 156, 198, 0.18), transparent 24%),
+        radial-gradient(circle at 0 100%, rgba(196, 81, 166, 0.12), transparent 24%),
+        radial-gradient(circle at 100% 100%, rgba(0, 143, 107, 0.18), transparent 24%);
+      opacity: 0.46;
+      transform: translate3d(var(--project-corner-x), var(--project-corner-y), 0) scale(1.03);
+      transition: opacity 180ms var(--ease);
+    }
+
+    .doc-card::after {
+      z-index: 0;
+      background:
+        radial-gradient(circle at var(--project-glow-x) var(--project-glow-y), rgba(255, 255, 255, 0.5), transparent 24%),
+        linear-gradient(112deg, transparent 0 34%, rgba(255, 255, 255, 0.34) 44%, transparent 55%);
+      opacity: 0.32;
+      transform: translate3d(var(--project-shine-x), var(--project-shine-y), 0);
+    }
+
+    .doc-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .doc-card:hover {
+      border-color: rgba(255, 209, 102, 0.44);
+      background:
+        radial-gradient(circle at var(--project-glow-x) var(--project-glow-y), rgba(255, 209, 102, 0.3), transparent 34%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(232, 249, 246, 0.64) 48%, rgba(255, 244, 226, 0.52)),
+        rgba(255, 255, 255, 0.72);
+      box-shadow: 0 30px 78px rgba(154, 106, 0, 0.11), 0 16px 44px rgba(44, 93, 122, 0.1);
+    }
+
+    .doc-card:hover::before {
+      opacity: 0.76;
+    }
+
+    .doc-index {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+    }
+
+    .doc-index span:last-child {
+      max-width: 70%;
+      overflow: hidden;
+      text-align: right;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .doc-thumb {
+      position: relative;
+      min-height: 92px;
+      margin-top: 12px;
+      border: 1px solid rgba(18, 57, 82, 0.12);
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.45);
+      transform: translateZ(34px);
+    }
+
+    .doc-thumb img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.86;
+      filter: saturate(1.04) contrast(1.02);
+      transform: scale(var(--project-image-scale, 1.03));
+      transition: transform 360ms var(--ease), opacity 360ms var(--ease);
+    }
+
+    .doc-card:hover .doc-thumb img {
+      opacity: 0.98;
+      transform: scale(var(--project-image-scale, 1.08));
+    }
+
+    .doc-thumb::before {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      content: "";
+      background:
+        linear-gradient(135deg, rgba(255, 209, 102, 0.22), transparent 42%),
+        linear-gradient(225deg, rgba(0, 156, 198, 0.18), transparent 46%),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.2), transparent 58%);
+    }
+
+    .doc-card h3 {
+      margin-top: 14px;
+      font-size: 1.02rem;
+      line-height: 1.32;
+    }
+
+    .doc-card p {
+      display: -webkit-box;
+      margin-top: 8px;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
     .project-thumb::before {
       position: absolute;
       inset: 0;
@@ -1531,13 +1786,7 @@
     }
 
     .project-thumb::after {
-      position: absolute;
-      z-index: 2;
-      inset: auto 14px 14px;
-      height: 2px;
-      content: "";
-      background: linear-gradient(90deg, var(--cyan), var(--green), var(--magenta));
-      box-shadow: 0 -18px 0 rgba(255, 255, 255, 0.16), 0 -36px 0 rgba(255, 255, 255, 0.1);
+      content: none;
     }
 
     .timeline {
@@ -1690,6 +1939,42 @@
       margin-top: 18px;
       color: var(--muted);
       line-height: 1.7;
+    }
+
+    .detail-links {
+      display: grid;
+      gap: 9px;
+      margin-top: 4px;
+      border-top: 1px solid rgba(18, 57, 82, 0.12);
+      padding-top: 14px;
+    }
+
+    .detail-link {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      border: 1px solid rgba(0, 156, 198, 0.18);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.66);
+      color: #07566e;
+      font-size: 0.86rem;
+      font-weight: 820;
+      transition: transform 160ms var(--ease), border-color 160ms var(--ease), background 160ms var(--ease);
+    }
+
+    .detail-link:hover {
+      border-color: rgba(196, 81, 166, 0.28);
+      background: rgba(255, 255, 255, 0.88);
+      transform: translateY(-1px);
+    }
+
+    .detail-link span {
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
     }
 
     .modal.portrait-modal .modal-panel {
@@ -1910,7 +2195,8 @@
         transform: none;
       }
 
-      .project-card {
+      .project-card,
+      .doc-card {
         transform: none;
       }
 
@@ -1923,6 +2209,7 @@
       .section-grid,
       .papers-layout,
       .projects-layout,
+      .docs-layout,
       .writing-grid,
       .contact-grid {
         grid-template-columns: 1fr;
@@ -2054,6 +2341,7 @@
         <button class="nav-link" data-target="publications" data-i18n-en="Publications" data-i18n-zh="论文">Publications</button>
         <button class="nav-link" data-target="projects" data-i18n-en="Projects" data-i18n-zh="项目">Projects</button>
         <button class="nav-link" data-target="profile" data-i18n-en="CV" data-i18n-zh="简历">CV</button>
+        <button class="nav-link" data-target="docs" data-i18n-en="Docs" data-i18n-zh="文档">Docs</button>
         <button class="nav-link" data-target="contact" data-i18n-en="Contact" data-i18n-zh="联系">Contact</button>
       </nav>
 
@@ -2077,6 +2365,7 @@
       <button class="rail-dot" data-target="publications" aria-label="Publications"></button>
       <button class="rail-dot" data-target="projects" aria-label="Projects"></button>
       <button class="rail-dot" data-target="profile" aria-label="Profile"></button>
+      <button class="rail-dot" data-target="docs" aria-label="Docs"></button>
       <button class="rail-dot" data-target="contact" aria-label="Contact"></button>
     </aside>
 
@@ -2087,8 +2376,8 @@
           <div>
             <div class="eyebrow" data-i18n-en="Medical AI, multimodal learning, LLM reliability" data-i18n-zh="医学人工智能、多模态学习、大模型可靠性">Medical AI, multimodal learning, LLM reliability</div>
             <h1 class="hero-title" data-i18n-en="Lihan Zuo" data-i18n-zh="左力晗">Lihan Zuo</h1>
-            <p class="lead hero-lead" data-wave-text data-i18n-en="I earned my B.Eng. in Artificial Intelligence from Southwest Jiaotong University in 2023, previously worked as a Visiting Researcher at ISTD, SUTD, and now work as an Algorithm Engineer at LexinFintech in Shenzhen. I am actively pursuing PhD opportunities." data-i18n-zh="我于 2023 年获得西南交通大学人工智能专业工学学士学位，曾在 SUTD ISTD 担任访问研究员，目前在深圳 LexinFintech 担任算法工程师，并正在积极寻求 PhD 机会。">
-              I earned my B.Eng. in Artificial Intelligence from Southwest Jiaotong University in 2023, previously worked as a Visiting Researcher at ISTD, SUTD, and now work as an Algorithm Engineer at LexinFintech in Shenzhen. I am actively pursuing PhD opportunities.
+            <p class="lead hero-lead" data-wave-text data-i18n-en="I earned my B.Eng. in Artificial Intelligence from Southwest Jiaotong University (SWJTU) in 2023, previously worked as a Visiting Researcher at ISTD, SUTD, and now work as an Algorithm Engineer at LexinFintech in Shenzhen. I am actively pursuing PhD opportunities." data-i18n-zh="我于 2023 年获得西南交通大学(SWJTU)人工智能专业工学学士学位，曾在 SUTD ISTD 担任访问研究员，目前在深圳 LexinFintech 担任算法工程师，并正在积极寻求 PhD 机会。">
+              I earned my B.Eng. in Artificial Intelligence from Southwest Jiaotong University (SWJTU) in 2023, previously worked as a Visiting Researcher at ISTD, SUTD, and now work as an Algorithm Engineer at LexinFintech in Shenzhen. I am actively pursuing PhD opportunities.
             </p>
             <div class="hero-actions">
               <button class="solid-button" data-target="publications" data-i18n-en="Publication" data-i18n-zh="代表论文">Publication</button>
@@ -2155,9 +2444,9 @@
         <div class="section-inner">
           <div class="section-head">
             <div class="eyebrow" data-i18n-en="Research Focus" data-i18n-zh="研究方向">Research Focus</div>
-            <h2 data-i18n-en="Research centered on robust multimodal intelligence." data-i18n-zh="围绕稳健多模态智能展开研究。">Research centered on robust multimodal intelligence.</h2>
-            <p class="lead" data-i18n-en="The homepage organizes research into three durable tracks: medical multimodal learning, LLM reliability, and reproducible research infrastructure." data-i18n-zh="主页将研究内容组织为三个长期方向：医学多模态学习、大模型可靠性，以及可复现科研基础设施。">
-              The homepage organizes research into three durable tracks: medical multimodal learning, LLM reliability, and reproducible research infrastructure.
+            <h2 data-i18n-en="Robust multimodal intelligence." data-i18n-zh="稳健多模态智能。">Robust multimodal intelligence.</h2>
+            <p class="lead" data-i18n-en="Three research tracks: medical multimodal learning, reliable LLM workflows, and memory-aware language models." data-i18n-zh="三个研究方向：医学多模态学习、可靠大模型工作流与具备记忆能力的语言模型。">
+              Three research tracks: medical multimodal learning, reliable LLM workflows, and memory-aware language models.
             </p>
           </div>
 
@@ -2199,25 +2488,25 @@
                 Open-source exploration around full-loop LLM workflows, model behavior analysis, and methods for reducing hallucination in practical systems.
               </p>
               <div class="card-footer">
-                <span class="tag gold">LLM-Full-Loop</span>
-                <span class="tag">Reliability</span>
-                <span class="tag cyan">Evaluation</span>
+                <span class="tag gold">Reliability</span>
+                <span class="tag">Evaluation</span>
+                <span class="tag cyan">Workflow</span>
               </div>
             </article>
 
-              <article class="research-card glass-card" data-carousel-card data-research="infra" tabindex="0" role="button">
+              <article class="research-card glass-card" data-carousel-card data-research="llm-memory" tabindex="0" role="button">
                 <div class="glass-media">
-                  <img src="../img/post-TMUX_usages.jpg" alt="Research computing workflow visual" loading="lazy" decoding="async">
+                  <img src="../img/post-bg-universe.jpg" alt="Neural memory and long-context language model visual" loading="lazy" decoding="async">
                 </div>
-              <div class="card-kicker">03 / Research Engineering</div>
-              <h3 data-i18n-en="Reproducible research infrastructure and HPC practice" data-i18n-zh="可复现科研基础设施与 HPC 实践">Reproducible research infrastructure and HPC practice</h3>
-              <p data-i18n-en="Technical writing and tooling habits around NSCC, TMUX, experiment logging, and long-running computational research workflows." data-i18n-zh="围绕 NSCC、TMUX、实验日志和长周期计算任务形成技术写作与工具化实践。">
-                Technical writing and tooling habits around NSCC, TMUX, experiment logging, and long-running computational research workflows.
+              <div class="card-kicker">03 / LLM Memory</div>
+              <h3 data-i18n-en="Memory-aware language models and long-context reasoning" data-i18n-zh="具备记忆能力的大模型与长上下文推理">Memory-aware language models and long-context reasoning</h3>
+              <p data-i18n-en="Research interest in how large language models store, retrieve, revise, and use memory across long interactions and knowledge-intensive workflows." data-i18n-zh="关注大语言模型如何在长交互和知识密集工作流中存储、检索、修正并使用记忆。">
+                Research interest in how large language models store, retrieve, revise, and use memory across long interactions and knowledge-intensive workflows.
               </p>
               <div class="card-footer">
-                <span class="tag magenta">HPC</span>
-                <span class="tag">Docs</span>
-                <span class="tag gold">Workflow</span>
+                <span class="tag magenta">Memory</span>
+                <span class="tag">Long Context</span>
+                <span class="tag cyan">Agents</span>
               </div>
             </article>
             </div>
@@ -2280,11 +2569,11 @@
           </div>
 
           <div class="projects-layout">
-            <article class="project-card" tabindex="0" role="button" data-project="llm-lab">
+            <article class="project-card" tabindex="0" role="button" data-project="coscatnet" aria-label="View CosCatNet adaptive fusion algorithm">
               <div>
                 <div class="project-index"><span>01</span><span>Medical AI</span></div>
                 <div class="project-thumb">
-                  <img src="../img/AI 1.jpg" alt="LLM evaluation project sample" loading="lazy" decoding="async">
+                  <img src="../img/AI 1.jpg" alt="Medical AI project sample" loading="lazy" decoding="async">
                 </div>
                 <h3 data-i18n-en="CosCatNet adaptive fusion algorithm" data-i18n-zh="CosCatNet 自适应融合算法">CosCatNet adaptive fusion algorithm</h3>
                 <p data-i18n-en="Experiment code for the AIIM 2025 paper on multi-stage multimodal skin lesion classification." data-i18n-zh="AIIM 2025 论文的实验代码，面向多阶段多模态皮肤病灶分类。">
@@ -2297,37 +2586,21 @@
               </div>
             </article>
 
-            <article class="project-card" tabindex="0" role="button" data-project="vision">
+            <article class="project-card" tabindex="0" role="button" data-project="dementia" aria-label="View multimodal dementia detection model">
               <div>
-                <div class="project-index"><span>02</span><span>LLM</span></div>
+                <div class="project-index"><span>02</span><span>Dementia AI</span></div>
                 <div class="project-thumb">
-                  <img src="../img/post-bg-universe.jpg" alt="Medical vision project sample" loading="lazy" decoding="async">
+                  <img src="../img/Singapore Raining.jpg" alt="Singapore medical AI collaboration sample" loading="lazy" decoding="async">
                 </div>
-                <h3 data-i18n-en="LLM-Full-Loop" data-i18n-zh="LLM-Full-Loop">LLM-Full-Loop</h3>
-                <p data-i18n-en="Open-source exploration of hallucination mitigation and full-loop reliability for large language models." data-i18n-zh="围绕大语言模型幻觉缓解与 full-loop 可靠性的开源探索。">
-                  Open-source exploration of hallucination mitigation and full-loop reliability for large language models.
+                <h3 data-i18n-en="Multi-Modality Dementia Detection Model" data-i18n-zh="多模态痴呆检测模型">Multi-Modality Dementia Detection Model</h3>
+                <p data-i18n-en="Working on the Multi-Modality Dementia Detection Model with members from SUTD and Icekredit. 🇸🇬" data-i18n-zh="与 SUTD 和 Icekredit 成员共同推进多模态痴呆检测模型。🇸🇬">
+                  Working on the Multi-Modality Dementia Detection Model with members from SUTD and Icekredit. 🇸🇬
                 </p>
               </div>
               <div class="card-footer">
-                <span class="tag magenta">Reliability</span>
-                <span class="tag">LLM</span>
-              </div>
-            </article>
-
-            <article class="project-card" tabindex="0" role="button" data-project="hpc">
-              <div>
-                <div class="project-index"><span>03</span><span>HPC</span></div>
-                <div class="project-thumb">
-                  <img src="../img/post-TMUX_usages.jpg" alt="HPC workflow project sample" loading="lazy" decoding="async">
-                </div>
-                <h3 data-i18n-en="NSCC/HPC workflow archive" data-i18n-zh="NSCC/HPC 工作流档案">NSCC/HPC workflow archive</h3>
-                <p data-i18n-en="Technical writing on TMUX, remote research computing, job sessions, and reproducible experiment operation." data-i18n-zh="关于 TMUX、远程科研计算、任务会话与可复现实验操作的技术写作。">
-                  Technical writing on TMUX, remote research computing, job sessions, and reproducible experiment operation.
-                </p>
-              </div>
-              <div class="card-footer">
-                <span class="tag gold">NSCC</span>
-                <span class="tag">TMUX</span>
+                <span class="tag magenta">OUP</span>
+                <span class="tag">SUTD</span>
+                <span class="tag cyan">Icekredit</span>
               </div>
             </article>
           </div>
@@ -2339,8 +2612,8 @@
           <div class="section-head">
             <div class="eyebrow" data-i18n-en="CV" data-i18n-zh="简历">CV</div>
             <h2 data-i18n-en="Academic CV, stitched as a living timeline." data-i18n-zh="用时间线串起完整学术简历。">Academic CV, stitched as a living timeline.</h2>
-            <p class="lead" data-i18n-en="A Notion-like timeline from the public CV: education, research experience, current industry role, projects, and publication record." data-i18n-zh="基于公开 Notion 简历整理：教育经历、科研经历、当前工作、项目与论文记录。">
-              A Notion-like timeline from the public CV: education, research experience, current industry role, projects, and publication record.
+            <p class="lead" data-i18n-en="A structured academic timeline covering education, research experience, professional work, projects, and publication record." data-i18n-zh="结构化呈现教育经历、科研经历、职业经历、项目与论文记录。">
+              A structured academic timeline covering education, research experience, professional work, projects, and publication record.
             </p>
           </div>
 
@@ -2350,7 +2623,7 @@
               <div>
                 <h3 data-i18n-en="Algorithm Engineer, LexinFintech Holdings Ltd." data-i18n-zh="算法工程师，LexinFintech Holdings Ltd.">Algorithm Engineer, LexinFintech Holdings Ltd.</h3>
                 <div class="timeline-role" data-i18n-en="Shenzhen, China" data-i18n-zh="中国深圳">Shenzhen, China</div>
-                <p data-i18n-en="Current industry role from the public Notion CV, focused on algorithm engineering practice." data-i18n-zh="公开 Notion 简历中的当前工作经历，聚焦算法工程实践。">Current industry role from the public Notion CV, focused on algorithm engineering practice.</p>
+                <p data-i18n-en="Professional role focused on algorithm engineering, model development, and applied AI systems." data-i18n-zh="职业经历聚焦算法工程、模型开发与应用 AI 系统。">Professional role focused on algorithm engineering, model development, and applied AI systems.</p>
               </div>
             </article>
             <article class="timeline-item">
@@ -2374,7 +2647,7 @@
               <div>
                 <h3 data-i18n-en="Multi-Modality Dementia Detection Model" data-i18n-zh="多模态痴呆检测模型">Multi-Modality Dementia Detection Model</h3>
                 <div class="timeline-role" data-i18n-en="Project with members from SUTD and IceKredit" data-i18n-zh="与 SUTD 和 IceKredit 成员合作的项目">Project with members from SUTD and IceKredit</div>
-                <p data-i18n-en="Project experience from the public Notion CV, positioned under applied multimodal AI." data-i18n-zh="公开 Notion 简历中的项目经历，归入应用多模态 AI 方向。">Project experience from the public Notion CV, positioned under applied multimodal AI.</p>
+                <p data-i18n-en="Applied multimodal AI project focused on dementia detection with cross-institution collaboration." data-i18n-zh="应用多模态 AI 项目，聚焦痴呆检测与跨机构合作研究。">Applied multimodal AI project focused on dementia detection with cross-institution collaboration.</p>
               </div>
             </article>
             <article class="timeline-item">
@@ -2388,11 +2661,37 @@
             <article class="timeline-item">
               <div class="timeline-time">2019.09 - 2023.06</div>
               <div>
-                <h3 data-i18n-en="B.Eng. in Artificial Intelligence, Southwest Jiaotong University" data-i18n-zh="西南交通大学人工智能专业工学学士">B.Eng. in Artificial Intelligence, Southwest Jiaotong University</h3>
+                <h3 data-i18n-en="B.Eng. in Artificial Intelligence, Southwest Jiaotong University (SWJTU)" data-i18n-zh="西南交通大学(SWJTU)人工智能专业工学学士">B.Eng. in Artificial Intelligence, Southwest Jiaotong University (SWJTU)</h3>
                 <div class="timeline-role" data-i18n-en="SWJTU, China" data-i18n-zh="西南交通大学，中国">SWJTU, China</div>
-                <p data-i18n-en="Undergraduate education recorded in the public Notion CV and GitHub profile." data-i18n-zh="公开 Notion 简历和 GitHub 主页中记录的本科教育经历。">Undergraduate education recorded in the public Notion CV and GitHub profile.</p>
+                <p data-i18n-en="Undergraduate training in artificial intelligence, with foundations in machine learning, programming, and intelligent systems." data-i18n-zh="人工智能方向本科培养，奠定机器学习、程序设计与智能系统基础。">Undergraduate training in artificial intelligence, with foundations in machine learning, programming, and intelligent systems.</p>
               </div>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="docs" data-section="docs">
+        <div class="section-inner">
+          <div class="section-head">
+            <div class="eyebrow" data-i18n-en="Docs" data-i18n-zh="文档">Docs</div>
+            <h2 data-i18n-en="Operational notes for reproducible research." data-i18n-zh="面向可复现科研的操作文档。">Operational notes for reproducible research.</h2>
+          </div>
+
+          <div class="docs-layout" data-docs-list>
+            <a class="doc-card" href="docs/view.html?doc=tmux-nscc" aria-label="Open TMUX on NSCC Aspire2A documentation">
+              <div>
+                <div class="doc-index"><span>01</span><span>IHPC(A*STAR) / NSCC</span></div>
+                <div class="doc-thumb">
+                  <img src="../img/post-TMUX_usages.jpg" alt="TMUX workflow visual" loading="lazy" decoding="async">
+                </div>
+                <h3 data-i18n-en="TMUX on Singapore NSCC Aspire2A" data-i18n-zh="Singapore NSCC Aspire2A 上的 TMUX 使用">TMUX on Singapore NSCC Aspire2A</h3>
+              </div>
+              <div class="card-footer">
+                <span class="tag gold">TMUX</span>
+                <span class="tag">NSCC</span>
+                <span class="tag cyan">Workflow</span>
+              </div>
+            </a>
           </div>
         </div>
       </section>
@@ -2431,7 +2730,7 @@
 
             <article class="contact-card">
               <h3>CV</h3>
-              <p data-i18n-en="The existing Notion CV link can remain as an external academic record." data-i18n-zh="现有 Notion 简历链接可以继续作为外部学术记录。">The existing Notion CV link can remain as an external academic record.</p>
+              <p data-i18n-en="Full academic CV with education, research experience, projects, and publication details." data-i18n-zh="完整学术简历，包含教育经历、科研经历、项目与论文详情。">Full academic CV with education, research experience, projects, and publication details.</p>
               <div class="contact-actions">
                 <a class="ghost-button" href="https://fluttering-deposit-822.notion.site/e93ec25a84654308af35d828aca3db44?v=28c0f5da65a54effadf57de325a07005" target="_blank" rel="noreferrer" data-i18n-en="Open CV" data-i18n-zh="打开简历">Open CV</a>
               </div>
@@ -2498,11 +2797,18 @@
   <span class="screen-reader" id="status" aria-live="polite"></span>
 
   <script>
-    const sectionFiles = ["hero", "research", "publications", "projects", "profile", "contact"];
+    const sectionFiles = ["hero", "research", "publications", "projects", "profile", "docs", "contact"];
     const canLoadSectionFiles = location.protocol === "http:" || location.protocol === "https:";
     const shouldWatchSectionFiles = ["localhost", "127.0.0.1", "::1"].includes(location.hostname);
     let liveSectionSnapshot = "";
     let reloadQueued = false;
+
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+
+    const navigationEntry = performance.getEntriesByType("navigation")[0];
+    const isReloadNavigation = navigationEntry?.type === "reload";
 
     async function readSectionPartials() {
       const sections = await Promise.all(sectionFiles.map(async (name) => {
@@ -2562,7 +2868,7 @@
         frame: 0,
         hovering: false
       };
-      const hoverSelector = "a, button, [role='button'], .project-card, .paper-card, [data-carousel-card], .portrait-button, .ghost-button";
+      const hoverSelector = "a, button, [role='button'], .project-card, .doc-card, .paper-card, [data-carousel-card], .portrait-button, .ghost-button";
 
       function renderCursor() {
         state.x += (state.targetX - state.x) * 0.58;
@@ -2627,11 +2933,13 @@
         const profileCard = document.querySelector(".profile-card");
         const paperCards = Array.from(document.querySelectorAll(".paper-card"));
         const projectCards = Array.from(document.querySelectorAll(".project-card"));
+        const docCards = Array.from(document.querySelectorAll(".doc-card"));
         const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
         let activeCarouselIndex = 0;
         let lastCarouselTouch = Date.now();
         let carouselFrame = 0;
         let profileFrame = 0;
+        let scrollCorrectionTimers = [];
 
         const sectionMeta = {
           hero: {
@@ -2654,6 +2962,10 @@
             en: ["CV", "Education, research experience, work, and projects"],
             zh: ["简历", "教育、科研经历、工作与项目"]
           },
+          docs: {
+            en: ["Docs", "Markdown-rendered research operations notes"],
+            zh: ["文档", "Markdown 渲染的科研操作文档"]
+          },
           contact: {
             en: ["Contact", "Email, GitHub, ORCID, and CV links"],
             zh: ["联系", "邮箱、GitHub、ORCID 与简历链接"]
@@ -2661,43 +2973,53 @@
         };
 
         const projectData = {
-          "llm-lab": {
+          coscatnet: {
             kicker: "Project / Medical AI",
             title: "CosCatNet adaptive fusion algorithm",
             zhTitle: "CosCatNet 自适应融合算法",
             body: [
-              "Experiment code for the Artificial Intelligence in Medicine 2025 paper on multi-stage multimodal learning for multi-label skin lesion classification.",
-              "The project page should link the repository, paper DOI, PubMed record, model structure image, and BibTeX in one compact academic record."
+              "A code artifact for the Artificial Intelligence in Medicine 2025 paper on multi-stage multimodal learning for multi-label skin lesion classification.",
+              "The project focuses on adaptive multimodal fusion across clinical images, dermoscopy images, and metadata, making the medical AI workflow more inspectable and reproducible.",
+              "The repository address is listed below as the primary project URL."
             ],
             zhBody: [
-              "Artificial Intelligence in Medicine 2025 论文的实验代码，研究多阶段多模态学习在多标签皮肤病灶分类中的应用。",
-              "最终项目页应把代码仓库、论文 DOI、PubMed 记录、模型结构图与 BibTeX 放在一条紧凑的学术记录中。"
+              "Artificial Intelligence in Medicine 2025 论文的代码作品，研究多阶段多模态学习在多标签皮肤病灶分类中的应用。",
+              "项目聚焦临床图像、皮肤镜图像与元数据之间的自适应多模态融合，使医学 AI 工作流更可审查、可复现。",
+              "下方列出该项目的主要地址。"
+            ],
+            links: [
+              {
+                label: "Project address",
+                zhLabel: "项目地址",
+                href: "https://github.com/Zuo-Lihan/CosCatNet-Adaptive_Fusion_Algorithm"
+              }
             ]
           },
-          vision: {
-            kicker: "Project / LLM",
-            title: "LLM-Full-Loop",
-            zhTitle: "LLM-Full-Loop",
+          dementia: {
+            kicker: "Project / Dementia AI",
+            title: "Multi-Modality Dementia Detection Model",
+            zhTitle: "多模态痴呆检测模型",
             body: [
-              "Open-source work around hallucination mitigation and full-loop reliability for large language models.",
-              "The homepage presents it as project work rather than a publication, keeping the academic record precise while still showing the research direction."
+              "Working on the Multi-Modality Dementia Detection Model with members from SUTD and Icekredit.",
+              "The project sits at the intersection of applied multimodal AI, cognitive screening, and healthcare-facing model design.",
+              "The project address and related background material are listed below."
             ],
             zhBody: [
-              "围绕大语言模型幻觉缓解与 full-loop 可靠性的开源工作。",
-              "主页将其作为项目工作而非论文展示，既保持学术记录准确，也呈现研究方向。"
-            ]
-          },
-          hpc: {
-            kicker: "Project / HPC",
-            title: "NSCC/HPC workflow archive",
-            zhTitle: "NSCC/HPC 工作流档案",
-            body: [
-              "A reusable archive for NSCC, TMUX, remote sessions, experiment logs, and server-side research workflows.",
-              "This turns technical blog notes into infrastructure knowledge that collaborators can inspect quickly."
+              "与 SUTD 和 Icekredit 成员共同推进多模态痴呆检测模型。",
+              "该项目位于应用多模态 AI、认知筛查与医疗场景模型设计的交叉位置。",
+              "项目地址与相关背景资料见下方。"
             ],
-            zhBody: [
-              "面向 NSCC、TMUX、远程会话、实验日志和服务器科研流程的可复用档案。",
-              "它把技术博客笔记转化成合作者可以快速审查的基础设施知识。"
+            links: [
+              {
+                label: "Project address",
+                zhLabel: "项目地址",
+                href: "https://academic.oup.com/innovateage/article/9/Supplement_2/igaf122.1204/8411073"
+              },
+              {
+                label: "Background context",
+                zhLabel: "背景资料",
+                href: "https://www.icekredit.com.sg/news/1744"
+              }
             ]
           }
         };
@@ -2723,29 +3045,29 @@
             title: "Hallucination mitigation and reliable LLM workflows",
             zhTitle: "幻觉缓解与可靠大模型工作流",
             body: [
-              "This track follows the public CV research interest in large language models and open-source work around LLM-Full-Loop.",
+              "This track focuses on large language models and reliability-oriented LLM workflows.",
               "The focus is practical reliability: model behavior analysis, hallucination mitigation, evaluation, and full-loop workflow design.",
               "This is presented as ongoing research and engineering work rather than as a peer-reviewed publication."
             ],
             zhBody: [
-              "该方向对应公开简历中的大语言模型研究兴趣，以及 LLM-Full-Loop 相关开源工作。",
+              "该方向聚焦大语言模型与面向可靠性的大模型工作流研究。",
               "重点是实际可靠性：模型行为分析、幻觉缓解、评测与 full-loop 工作流设计。",
               "该部分作为进行中的研究与工程工作呈现，而不是标注为同行评审论文。"
             ]
           },
-          infra: {
-            kicker: "Research / Infrastructure",
-            title: "Reproducible research infrastructure and HPC practice",
-            zhTitle: "可复现科研基础设施与 HPC 实践",
+          "llm-memory": {
+            kicker: "Research / LLM Memory",
+            title: "Memory-aware language models and long-context reasoning",
+            zhTitle: "具备记忆能力的大模型与长上下文推理",
             body: [
-              "This track collects research engineering habits around NSCC, TMUX, remote sessions, logging, and long-running experiments.",
-              "It supports the academic work by making experiments easier to reproduce, inspect, and maintain.",
-              "The existing technical blog posts can live under Projects or Writing, while Publications remains reserved for papers."
+              "This track studies how large language models can keep useful memory over long interactions without confusing stale, private, or irrelevant information with current evidence.",
+              "The focus includes memory storage, retrieval, revision, forgetting, and evaluation for agents and knowledge-intensive workflows.",
+              "It complements the reliability track by treating memory as an inspectable capability rather than a vague conversational feature."
             ],
             zhBody: [
-              "该方向整理 NSCC、TMUX、远程会话、日志与长周期实验相关的科研工程实践。",
-              "它服务于学术研究，使实验更容易复现、审查和维护。",
-              "现有技术博客可以归入 Projects 或 Writing，而 Publications 只保留论文。"
+              "该方向研究大语言模型如何在长交互中保留有用记忆，同时避免把过期、隐私或无关信息误当作当前证据。",
+              "重点包括智能体和知识密集型工作流中的记忆存储、检索、修正、遗忘与评估。",
+              "它与可靠性研究互补：把记忆视作可审查的模型能力，而不是模糊的对话体验。"
             ]
           }
         };
@@ -2756,9 +3078,64 @@
 
         function splitWaveText(text, isChinese) {
           if (isChinese) {
-            return Array.from(text.trim()).map((char) => (/\s/.test(char) ? char : char));
+            return Array.from(text).map((char) => (/\s/.test(char) ? char : char));
           }
-          return text.trim().split(/(\s+)/);
+          return text.split(/(\s+)/);
+        }
+
+        const heroLeadLinks = {
+          en: [
+            { text: "Southwest Jiaotong University (SWJTU)", href: "https://en.swjtu.edu.cn/" },
+            { text: "ISTD", href: "https://www.sutd.edu.sg/istd/" },
+            { text: "SUTD", href: "https://www.sutd.edu.sg/" }
+          ],
+          zh: [
+            { text: "西南交通大学(SWJTU)", href: "https://en.swjtu.edu.cn/" },
+            { text: "ISTD", href: "https://www.sutd.edu.sg/istd/" },
+            { text: "SUTD", href: "https://www.sutd.edu.sg/" }
+          ]
+        };
+
+        function splitLinkedWaveText(text, isChinese) {
+          const links = heroLeadLinks[isChinese ? "zh" : "en"];
+          const pieces = [];
+          let cursor = 0;
+          while (cursor < text.length) {
+            let next = null;
+            links.forEach((link) => {
+              const index = text.indexOf(link.text, cursor);
+              if (index === -1) return;
+              if (!next || index < next.index || (index === next.index && link.text.length > next.text.length)) {
+                next = { ...link, index };
+              }
+            });
+            if (!next) {
+              pieces.push({ text: text.slice(cursor) });
+              break;
+            }
+            if (next.index > cursor) {
+              pieces.push({ text: text.slice(cursor, next.index) });
+            }
+            pieces.push({ text: next.text, href: next.href });
+            cursor = next.index + next.text.length;
+          }
+          return pieces;
+        }
+
+        function appendWaveToken(lead, part, tokenIndex, href) {
+          const token = document.createElement(href ? "a" : "span");
+          token.className = href ? "wave-token wave-link" : "wave-token";
+          if (href) {
+            token.href = href;
+            token.target = "_blank";
+            token.rel = "noreferrer";
+          }
+          token.style.setProperty("--wave", "0");
+          token.style.setProperty("--lift", "0");
+          token.style.setProperty("--shine", "0");
+          token.dataset.waveIndex = String(tokenIndex);
+          token.textContent = part;
+          lead.appendChild(token);
         }
 
         function initHeroLeadWave() {
@@ -2767,20 +3144,17 @@
           const zh = currentLang() === "zh";
           const text = lead.dataset[zh ? "i18nZh" : "i18nEn"] || lead.textContent;
           lead.innerHTML = "";
-          splitWaveText(text, zh).forEach((part, index) => {
-            if (!part) return;
-            if (/^\s+$/.test(part)) {
-              lead.appendChild(document.createTextNode(part));
-              return;
-            }
-            const token = document.createElement("span");
-            token.className = "wave-token";
-            token.style.setProperty("--wave", "0");
-            token.style.setProperty("--lift", "0");
-            token.style.setProperty("--shine", "0");
-            token.dataset.waveIndex = String(index);
-            token.textContent = part;
-            lead.appendChild(token);
+          let tokenIndex = 0;
+          splitLinkedWaveText(text, zh).forEach((piece) => {
+            splitWaveText(piece.text, zh).forEach((part) => {
+              if (!part) return;
+              if (/^\s+$/.test(part)) {
+                lead.appendChild(document.createTextNode(part));
+                return;
+              }
+              appendWaveToken(lead, part, tokenIndex, piece.href);
+              tokenIndex += 1;
+            });
           });
           lead._waveTokens = Array.from(lead.querySelectorAll(".wave-token"));
           lead._waveMetrics = [];
@@ -2852,13 +3226,77 @@
           });
         }
 
-        function goToSection(id) {
+        function sectionTop(target) {
+          return Math.max(0, Math.round(window.scrollY + target.getBoundingClientRect().top));
+        }
+
+        function clearScrollCorrections() {
+          scrollCorrectionTimers.forEach((timer) => window.clearTimeout(timer));
+          scrollCorrectionTimers = [];
+        }
+
+        function alignSection(id, behavior = "auto") {
           const target = document.getElementById(id);
-          if (!target) return;
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
+          if (!target) return false;
+          window.scrollTo({
+            top: sectionTop(target),
+            behavior: prefersReducedMotion.matches ? "auto" : behavior
+          });
+          setActive(id);
+          return true;
+        }
+
+        function scheduleSectionAlignment(id) {
+          clearScrollCorrections();
+          [120, 320, 680, 1180].forEach((delay) => {
+            scrollCorrectionTimers.push(window.setTimeout(() => alignSection(id), delay));
+          });
+          scrollCorrectionTimers.push(window.setTimeout(() => {
+            document.body.classList.remove("is-programmatic-scroll");
+            updateActiveFromViewport();
+          }, 1380));
+        }
+
+        function goToSection(id, behavior = "smooth") {
+          document.body.classList.add("is-programmatic-scroll");
+          if (!alignSection(id, behavior)) {
+            document.body.classList.remove("is-programmatic-scroll");
+            return;
+          }
+          scheduleSectionAlignment(id);
           window.setTimeout(updateActiveFromViewport, 260);
           window.setTimeout(updateActiveFromViewport, 720);
           navLinksWrap.classList.remove("open");
+        }
+
+        function initialSectionTarget() {
+          const params = new URLSearchParams(window.location.search);
+          const section = params.get("section");
+          if (section) return section;
+          if (isReloadNavigation) return "";
+          return decodeURIComponent((window.location.hash || "").replace(/^#/, ""));
+        }
+
+        function cleanSectionUrl() {
+          if (!("replaceState" in window.history)) return;
+          const url = new URL(window.location.href);
+          url.searchParams.delete("section");
+          url.hash = "";
+          const next = `${url.pathname}${url.search}`;
+          window.history.replaceState(null, "", next || url.pathname);
+        }
+
+        function alignTarget(id) {
+          if (!id) return;
+          goToSection(id, "auto");
+        }
+
+        function settleInitialTarget(id) {
+          if (!id) return;
+          window.requestAnimationFrame(() => alignTarget(id));
+          window.setTimeout(() => alignTarget(id), 260);
+          window.setTimeout(() => alignTarget(id), 860);
+          window.setTimeout(cleanSectionUrl, 1420);
         }
 
         function setActive(id) {
@@ -3040,6 +3478,80 @@
           });
         }
 
+        function bindDocCardPointer(card) {
+          if (!card || card.dataset.pointerReady) return;
+          card.dataset.pointerReady = "true";
+          card.addEventListener("pointermove", (event) => setProjectCardPointer(card, event.clientX, event.clientY), { passive: true });
+          card.addEventListener("pointerleave", () => resetProjectCardPointer(card));
+        }
+
+        function resolveHomepageAsset(pathname) {
+          if (!pathname) return "";
+          if (/^https?:/i.test(pathname)) return pathname;
+          const prefix = location.pathname.includes("/preview/") ? "../" : "";
+          return `${prefix}${pathname}`;
+        }
+
+        function createDocCard(doc, index) {
+          const card = document.createElement("a");
+          card.className = "doc-card";
+          card.href = doc.url || `docs/view.html?doc=${encodeURIComponent(doc.slug)}`;
+          card.setAttribute("aria-label", `Open ${doc.title}`);
+
+          const body = document.createElement("div");
+          const docIndex = document.createElement("div");
+          docIndex.className = "doc-index";
+          const number = document.createElement("span");
+          number.textContent = String(index + 1).padStart(2, "0");
+          const eyebrow = document.createElement("span");
+          eyebrow.textContent = doc.eyebrow || "Docs";
+          docIndex.append(number, eyebrow);
+
+          const thumb = document.createElement("div");
+          thumb.className = "doc-thumb";
+          const image = document.createElement("img");
+          image.src = resolveHomepageAsset(doc.image);
+          image.alt = doc.title || "Docs visual";
+          image.loading = "lazy";
+          image.decoding = "async";
+          thumb.appendChild(image);
+
+          const title = document.createElement("h3");
+          title.textContent = doc.title;
+          body.append(docIndex, thumb, title);
+
+          const footer = document.createElement("div");
+          footer.className = "card-footer";
+          (doc.tags || []).slice(0, 3).forEach((tag, tagIndex) => {
+            const pill = document.createElement("span");
+            pill.className = `tag ${tagIndex === 0 ? "gold" : tagIndex === 2 ? "cyan" : ""}`.trim();
+            pill.textContent = tag;
+            footer.appendChild(pill);
+          });
+
+          card.append(body, footer);
+          return card;
+        }
+
+        async function hydrateDocsList() {
+          const docsList = document.querySelector("[data-docs-list]");
+          if (!docsList || !canLoadSectionFiles) return;
+          try {
+            const response = await fetch("docs/docs-manifest.json", { cache: "no-store" });
+            if (!response.ok) return;
+            const docs = await response.json();
+            if (!Array.isArray(docs) || !docs.length) return;
+            docsList.innerHTML = "";
+            docs.forEach((doc, index) => {
+              const card = createDocCard(doc, index);
+              docsList.appendChild(card);
+              bindDocCardPointer(card);
+            });
+          } catch (error) {
+            console.warn("Using static docs cards because the docs manifest could not be loaded.", error);
+          }
+        }
+
         carouselPrev.addEventListener("click", () => moveCarousel(-1));
         carouselNext.addEventListener("click", () => moveCarousel(1));
         carouselShell?.addEventListener("pointermove", (event) => setCarouselPointer(event.clientX, event.clientY), { passive: true });
@@ -3056,6 +3568,27 @@
         projectCards.forEach((card) => {
           card.addEventListener("pointermove", (event) => setProjectCardPointer(card, event.clientX, event.clientY), { passive: true });
           card.addEventListener("pointerleave", () => resetProjectCardPointer(card));
+        });
+        docCards.forEach(bindDocCardPointer);
+        const initialTarget = initialSectionTarget();
+        const docsHydration = hydrateDocsList();
+        if (!initialTarget && isReloadNavigation) {
+          cleanSectionUrl();
+          window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
+        }
+        settleInitialTarget(initialTarget);
+        docsHydration.finally(() => {
+          if (!initialTarget) return;
+          alignTarget(initialTarget);
+          window.setTimeout(() => alignTarget(initialTarget), 360);
+          window.setTimeout(cleanSectionUrl, 980);
+        });
+        window.addEventListener("hashchange", () => {
+          const nextTarget = initialSectionTarget();
+          if (!nextTarget) return;
+          window.setTimeout(() => alignTarget(nextTarget), 0);
+          window.setTimeout(() => alignTarget(nextTarget), 360);
+          window.setTimeout(cleanSectionUrl, 900);
         });
 
         carouselCards.forEach((card, index) => {
@@ -3171,6 +3704,24 @@
             p.textContent = paragraph;
             modalBody.appendChild(p);
           });
+          if (data.links?.length) {
+            const links = document.createElement("div");
+            links.className = "detail-links";
+            data.links.forEach((item) => {
+              const link = document.createElement("a");
+              link.className = "detail-link";
+              link.href = item.href;
+              link.target = "_blank";
+              link.rel = "noreferrer";
+              const label = document.createElement("strong");
+              label.textContent = zh ? item.zhLabel || item.label : item.label;
+              const hint = document.createElement("span");
+              hint.textContent = "Open";
+              link.append(label, hint);
+              links.appendChild(link);
+            });
+            modalBody.appendChild(links);
+          }
           modal.classList.add("open");
           modalClose.focus();
         }

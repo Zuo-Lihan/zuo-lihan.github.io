@@ -11,7 +11,15 @@
   - `preview/sections/publications.html`
   - `preview/sections/projects.html`
   - `preview/sections/profile.html`
+  - `preview/sections/docs.html`
   - `preview/sections/contact.html`
+- Markdown 文档系统：
+  - `preview/docs/markdown/*.md`
+  - `preview/docs/docs-renderer.js`
+  - `preview/docs/docs.css`
+  - `preview/docs/build-docs.js`
+  - `preview/docs/docs-manifest.json`
+  - `preview/docs/docs-data.js`
 - 头像资源：`preview/assets/notion-profile.jpg`
 - 当前工作分支：`develop`
 - 当前线上主页分支应保持为：`master`
@@ -29,12 +37,22 @@ preview/
 ├── index.html
 ├── assets/
 │   └── notion-profile.jpg
+├── docs/
+│   ├── build-docs.js
+│   ├── docs.css
+│   ├── docs-data.js
+│   ├── docs-renderer.js
+│   ├── docs-manifest.json
+│   ├── view.html
+│   └── markdown/
+│       └── tmux-nscc.md
 └── sections/
     ├── hero.html
     ├── research.html
     ├── publications.html
     ├── projects.html
     ├── profile.html
+    ├── docs.html
     └── contact.html
 ```
 
@@ -45,8 +63,10 @@ preview/
 - 改论文列表：编辑 `preview/sections/publications.html`
 - 改项目作品：编辑 `preview/sections/projects.html`
 - 改 CV 时间线：编辑 `preview/sections/profile.html`
+- 改 Docs 入口卡片兜底内容：编辑 `preview/sections/docs.html`
 - 改联系方式：编辑 `preview/sections/contact.html`
 - 改整体样式、背景、卡片 hover、轮播交互、弹窗逻辑：编辑 `preview/index.html`
+- 改或新增 Docs 正文：编辑或新增 `preview/docs/markdown/*.md`
 
 注意：`preview/sections/*.html` 是方便编辑的章节源文件。通过本地开发服务器打开 `preview/index.html` 时，页面会自动读取这些章节文件；保存章节文件后，开发服务器会用 Server-Sent Events 通知浏览器刷新，平时不会反复轮询文件。
 
@@ -58,6 +78,170 @@ node preview/build.js
 
 这个命令会把 `preview/sections/*.html` 同步写入 `preview/index.html` 的兜底内容。
 
+## Docs / Markdown 文档写法
+
+Docs 已经拆成一个轻量的本地 Markdown 渲染系统。后续写文档时，正文主要写 Markdown，不需要为每篇文档重新写 HTML 页面。
+
+新增一篇文档：
+
+1. 在 `preview/docs/markdown/` 新建 Markdown 文件，例如：
+
+   ```text
+   preview/docs/markdown/my-note.md
+   ```
+
+2. 在文件顶部写 front matter：
+
+   ```markdown
+   ---
+   slug: my-note
+   title: My Research Note
+   eyebrow: Docs / Research
+   summary: One-sentence summary shown on the Docs card and document hero.
+   image: img/post-TMUX_usages.jpg
+   tags: Tag One, Tag Two, Tag Three
+   sourceLabel: Optional source label
+   sourceHref: _posts/source-file.md
+   ---
+   ```
+
+3. 用普通 Markdown 写正文，支持标题、段落、列表、引用、表格、链接、行内代码和 fenced code block。
+
+4. 运行：
+
+   ```bash
+   node preview/build.js
+   ```
+
+   这个命令会扫描 `preview/docs/markdown/*.md`，生成 `preview/docs/docs-manifest.json` 和 `preview/docs/docs-data.js`，并同步 `preview/index.html` 的兜底内容。`docs-data.js` 会内嵌 Markdown 内容，让直接从本地 `index.html` 打开时也能渲染文档页。
+
+5. 预览单篇文档：
+
+   ```text
+   http://127.0.0.1:4173/preview/docs/view.html?doc=my-note
+   ```
+
+使用 `node preview/dev-server.js` 本地开发时，修改 `preview/docs/markdown/*.md` 后开发服务器会自动重新生成 manifest 并刷新浏览器。
+
+## 本地 / 全网热更新预览服务
+
+`preview/dev-server.js` 是当前预览页的轻量热更新服务器。它会：
+
+- 静态服务当前仓库文件。
+- 打开 `preview/index.html`。
+- 监听 `preview/` 下的 HTML、JS、CSS、图片、Markdown、JSON 文件变化。
+- 在保存后通过 Server-Sent Events 通知浏览器自动刷新。
+- 修改 `preview/docs/markdown/*.md` 时自动重新生成 `preview/docs/docs-manifest.json` 和 `preview/docs/docs-data.js`。
+
+### 本机热更新预览
+
+只允许本机访问：
+
+```bash
+HOST=127.0.0.1 PORT=4173 node preview/dev-server.js
+```
+
+打开：
+
+```text
+http://127.0.0.1:4173/preview/index.html
+```
+
+如果端口被占用：
+
+```bash
+HOST=127.0.0.1 PORT=4174 node preview/dev-server.js
+```
+
+### 局域网 / 公网热更新预览
+
+允许其他机器通过服务器 IP 访问：
+
+```bash
+HOST=0.0.0.0 PORT=4173 node preview/dev-server.js
+```
+
+访问地址：
+
+```text
+http://<server-ip>:4173/preview/index.html
+```
+
+如果是在云服务器上跑，需要同时确认：
+
+- 服务器系统防火墙允许 `4173` 端口。
+- 云厂商安全组允许 `4173` 端口入站。
+- 只用于预览审查时，建议临时开放；正式上线仍推荐 GitHub Pages 或 Nginx/HTTPS。
+
+### 后台部署热更新服务
+
+在服务器上后台启动：
+
+```bash
+mkdir -p .run logs
+node preview/build.js
+HOST=0.0.0.0 PORT=4173 nohup node preview/dev-server.js > logs/preview-server.log 2>&1 &
+echo $! > .run/preview-server.pid
+```
+
+查看状态：
+
+```bash
+test -f .run/preview-server.pid && ps -p "$(cat .run/preview-server.pid)"
+```
+
+查看日志：
+
+```bash
+tail -f logs/preview-server.log
+```
+
+### 重启热更新服务
+
+```bash
+test -f .run/preview-server.pid && kill "$(cat .run/preview-server.pid)" 2>/dev/null || true
+rm -f .run/preview-server.pid
+node preview/build.js
+HOST=0.0.0.0 PORT=4173 nohup node preview/dev-server.js > logs/preview-server.log 2>&1 &
+echo $! > .run/preview-server.pid
+```
+
+### 停止热更新服务
+
+```bash
+test -f .run/preview-server.pid && kill "$(cat .run/preview-server.pid)" 2>/dev/null || true
+rm -f .run/preview-server.pid
+```
+
+### 拉取最新 develop 并重新部署
+
+服务器上已有仓库时：
+
+```bash
+git switch develop
+git pull origin develop
+node preview/build.js
+test -f .run/preview-server.pid && kill "$(cat .run/preview-server.pid)" 2>/dev/null || true
+rm -f .run/preview-server.pid
+mkdir -p .run logs
+HOST=0.0.0.0 PORT=4173 nohup node preview/dev-server.js > logs/preview-server.log 2>&1 &
+echo $! > .run/preview-server.pid
+```
+
+第一次在服务器部署预览页时：
+
+```bash
+git clone git@github.com:Zuo-Lihan/zuo-lihan.github.io.git
+cd zuo-lihan.github.io
+git switch develop
+node preview/build.js
+mkdir -p .run logs
+HOST=0.0.0.0 PORT=4173 nohup node preview/dev-server.js > logs/preview-server.log 2>&1 &
+echo $! > .run/preview-server.pid
+```
+
+正式发布到 `https://zuo-lihan.github.io/` 不需要运行这个热更新服务器。正式发布走 GitHub Pages：把确认后的页面合并到 `master`，由 GitHub Pages 自动部署。
+
 ## 上线前必须确认
 
 1. 在本地预览完整检查页面：
@@ -65,7 +249,7 @@ node preview/build.js
    启动本地开发服务器：
 
    ```bash
-   node preview/dev-server.js
+   HOST=127.0.0.1 PORT=4173 node preview/dev-server.js
    ```
 
    打开：
@@ -79,7 +263,7 @@ node preview/build.js
    如果 `4173` 端口已被占用，可以换一个端口：
 
    ```bash
-   PORT=4174 node preview/dev-server.js
+   HOST=127.0.0.1 PORT=4174 node preview/dev-server.js
    ```
 
 2. 逐项确认以下内容：
@@ -89,7 +273,9 @@ node preview/build.js
    - `Links` 只保留 `GitHub`、`ORCID`、`CV`，并且可以跳转。
    - `Research` 卡片可以轮播、点击侧边卡片切换、点击当前卡片打开详情。
    - `Publications` 只包含论文，不混入项目、博客或代码记录。
+   - `Projects` 卡片点击后先打开站内介绍弹层，弹层底部再提供项目地址。
    - `CV` 时间线内容完整，时间、单位、角色和项目描述无误。
+   - `Docs` 卡片可以进入 Markdown 渲染的文档查看页。
    - 页面背景、卡片 hover、章节间距、移动端布局都已经确认。
 
 3. 发布或提交前同步一次内联兜底内容：
@@ -107,7 +293,7 @@ node preview/build.js
 ```bash
 git switch develop
 git status
-git add README.md preview/build.js preview/dev-server.js preview/index.html preview/assets/notion-profile.jpg preview/sections
+git add README.md preview/build.js preview/dev-server.js preview/index.html preview/assets/notion-profile.jpg preview/sections preview/docs
 git commit -m "Add academic CV homepage preview"
 git push -u origin develop
 ```
@@ -119,6 +305,7 @@ git push -u origin develop
 - `preview/dev-server.js`
 - `preview/assets/notion-profile.jpg`
 - `preview/sections/*.html`
+- `preview/docs/*`
 - `README.md`
 
 ## 从预览变成正式主页
@@ -136,6 +323,8 @@ rm -rf sections
 cp preview/index.html index.html
 cp preview/assets/notion-profile.jpg assets/notion-profile.jpg
 cp -R preview/sections sections
+rm -rf docs
+cp -R preview/docs docs
 git status
 ```
 
@@ -154,7 +343,7 @@ http://127.0.0.1:4173/index.html
 如果正式路径检查无误，再提交：
 
 ```bash
-git add index.html assets/notion-profile.jpg sections README.md preview/build.js preview/dev-server.js preview/index.html preview/assets/notion-profile.jpg preview/sections
+git add index.html assets/notion-profile.jpg sections docs README.md preview/build.js preview/dev-server.js preview/index.html preview/assets/notion-profile.jpg preview/sections preview/docs
 git commit -m "Promote academic CV homepage"
 git push origin develop
 ```
@@ -169,6 +358,7 @@ git push origin develop
    - 根目录 `index.html` 是否被新的 CV 页面替换。
    - `assets/notion-profile.jpg` 是否存在。
    - 根目录 `sections/*.html` 是否存在。
+   - 根目录 `docs/` 是否存在，且 `docs/view.html?doc=tmux-nscc` 可以渲染 Markdown。
    - 旧页面相关文件没有被误删。
 4. PR 检查无误后再 Merge 到 `master`。
 

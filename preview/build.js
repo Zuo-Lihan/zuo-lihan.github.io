@@ -5,7 +5,10 @@ const path = require("path");
 
 const root = __dirname;
 const indexPath = path.join(root, "index.html");
-const sectionNames = ["hero", "research", "publications", "projects", "profile", "contact"];
+const sectionNames = ["hero", "research", "publications", "projects", "profile", "docs", "contact"];
+const { buildDocs } = require("./docs/build-docs");
+
+buildDocs();
 
 function indent(text, spaces) {
   const prefix = " ".repeat(spaces);

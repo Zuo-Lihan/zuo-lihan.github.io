@@ -33,3 +33,7 @@ Temporary Items
 
 # debug file
 _site
+
+# local preview server runtime
+.run/
+logs/

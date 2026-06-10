@@ -8,13 +8,16 @@ const { URL } = require("url");
 const root = path.resolve(__dirname, "..");
 const previewRoot = path.join(root, "preview");
 const port = Number(process.env.PORT || 4173);
+const host = process.env.HOST || "127.0.0.1";
 const clients = new Set();
+const { buildDocs } = require("./docs/build-docs");
 
 const mimeTypes = new Map([
   [".html", "text/html; charset=utf-8"],
   [".js", "text/javascript; charset=utf-8"],
   [".css", "text/css; charset=utf-8"],
   [".json", "application/json; charset=utf-8"],
+  [".md", "text/markdown; charset=utf-8"],
   [".jpg", "image/jpeg"],
   [".jpeg", "image/jpeg"],
   [".png", "image/png"],
@@ -99,21 +102,29 @@ function watchPreviewFiles() {
   fs.watch(previewRoot, { recursive: true }, (_event, filename) => {
     if (!filename) return;
     if (filename.includes(".DS_Store")) return;
-    if (!/\.(html|js|css|jpg|jpeg|png|svg)$/i.test(filename)) return;
+    if (!/\.(html|js|css|jpg|jpeg|png|svg|md|json)$/i.test(filename)) return;
+
+    if (/^docs\/markdown\/.+\.md$/i.test(filename)) {
+      try {
+        buildDocs();
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
     clearTimeout(debounce);
     debounce = setTimeout(() => sendChange(filename), 90);
   });
 }
 
-server.listen(port, "127.0.0.1", () => {
+server.listen(port, host, () => {
   watchPreviewFiles();
-  console.log(`Preview server running at http://127.0.0.1:${port}/preview/index.html`);
+  console.log(`Preview server running at http://${host}:${port}/preview/index.html`);
 });
 
 server.on("error", (error) => {
   if (error.code === "EADDRINUSE") {
-    console.error(`Port ${port} is already in use. Try: PORT=4174 node preview/dev-server.js`);
+    console.error(`Port ${port} is already in use. Try: PORT=4174 HOST=${host} node preview/dev-server.js`);
   } else {
     console.error(error);
   }

@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "tmux-nscc",
+    "title": "TMUX on Singapore NSCC Aspire2A",
+    "eyebrow": "IHPC(A*STAR) / NSCC / TMUX",
+    "summary": "A research-computing note rewritten from the original TMUX blog source. The aim is simple: keep long-running remote experiments alive, inspect sessions cleanly, and make HPC work easier to resume after network interruption.",
+    "image": "img/post-TMUX_usages.jpg",
+    "tags": [
+      "Session Persistence",
+      "Window and Pane Control",
+      "Experiment Logging"
+    ],
+    "sourceLabel": "Original TMUX source post",
+    "sourceHref": "_posts/2024-07-18-To Use TMUX in Singapore NSCC.md",
+    "markdown": "markdown/tmux-nscc.md",
+    "url": "docs/view.html?doc=tmux-nscc"
+  }
+]
