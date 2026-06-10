@@ -1,10 +1,11 @@
 # Zuo-Lihan.github.io CV / Personal Page 发布说明
 
-这个仓库是 `Zuo-Lihan/zuo-lihan.github.io` 的 GitHub Pages 个人主页仓库。当前新的学术 CV / 个人主页还在 `preview/` 目录中做交互预览，目的是先不破坏线上已有主页，等确认后再合并到 `master` 并发布到互联网。
+这个仓库是 `Zuo-Lihan/zuo-lihan.github.io` 的 GitHub Pages 个人主页仓库。新的学术 CV / 个人主页已经作为根目录静态页面发布；后续内容维护仍建议先在 `develop` 分支和 `preview/` 目录中修改、预览和审查，再同步到根目录并发布到 `master`。
 
 ## 当前状态
 
-- 新页面预览文件：`preview/index.html`
+- 线上发布入口：`index.html`
+- 维护预览入口：`preview/index.html`
 - 分章节内容文件：
   - `preview/sections/hero.html`
   - `preview/sections/research.html`
@@ -21,16 +22,16 @@
   - `preview/docs/docs-manifest.json`
   - `preview/docs/docs-data.js`
 - 头像资源：`preview/assets/notion-profile.jpg`
-- 访客地球统计：位于 `preview/index.html` 底部 `visitor-footer`，使用 LiveTrafficFeed 3D visitor map 脚本按域名记录国家级访客来源。
+- 访客地球统计：位于 `index.html` 与 `preview/index.html` 底部 `visitor-footer`，使用 LiveTrafficFeed 3D visitor map 脚本按域名记录国家级访客来源。
 - 旧 Service Worker 清理脚本：`preview/sw.js`
-- 当前工作分支：`develop`
-- 当前线上主页分支应保持为：`master`
+- 日常编辑分支：`develop`
+- 线上发布分支：`master`
 - 本地预览地址：`http://127.0.0.1:4173/preview/index.html`
-- 目标线上地址：`https://zuo-lihan.github.io/`
+- 线上地址：`https://zuo-lihan.github.io/`
 
 ## 文件结构和编辑方式
 
-新的预览页已经按章节拆分，方便后续单独修改内容：
+页面已经按章节拆分，方便后续单独修改内容：
 
 ```text
 preview/
@@ -304,16 +305,16 @@ https://cdn.livetrafficfeed.com/static/3d-maps/live.v2.js?o=eaf9ff&l=7eddbd&b=0b
 - 不要把 `visitor-footer` 加入顶部导航或右侧进度点；它只是页面最底部的独立统计区。
 - 如果未来更换统计服务或更换 widget URL，服务端历史记录可能从新服务重新开始。
 
-## 先推送到 develop
+## 日常修改：先推送到 develop
 
-确认预览版本可以进入远端审查后，先提交到 `develop`，不要直接推 `master`。
+确认预览版本可以进入远端审查后，先提交到 `develop`。`master` 只放已经确认要对外发布的根目录静态页面。
 
 ```bash
 git switch develop
 git status
 git add README.md preview/build.js preview/dev-server.js preview/index.html preview/assets/notion-profile.jpg preview/sections preview/docs
-git commit -m "Add academic CV homepage preview"
-git push -u origin develop
+git commit -m "Update academic CV homepage"
+git push origin develop
 ```
 
 推送后，在 GitHub 上打开 `develop` 分支检查文件是否完整：
@@ -326,9 +327,9 @@ git push -u origin develop
 - `preview/docs/*`
 - `README.md`
 
-## 从预览变成正式主页
+## 同步为正式主页
 
-等你确认 `preview/` 中的页面就是最终版本后，再把预览页面提升为根目录首页。GitHub Pages 的个人主页默认从仓库发布源的根目录读取 `index.html`，所以最终需要让新的 CV 页面成为根目录的 `index.html`，同时把分章节文件复制到根目录的 `sections/`。
+等你确认 `preview/` 中的页面就是最终版本后，再把预览页面同步到根目录首页。GitHub Pages 的个人主页默认从仓库发布源的根目录读取 `index.html`，所以正式发布需要让根目录的 `index.html`、`sections/`、`docs/` 和 `assets/` 与预览版本保持一致。
 
 推荐在 `develop` 上完成这一步：
 
@@ -366,7 +367,7 @@ git commit -m "Promote academic CV homepage"
 git push origin develop
 ```
 
-## 合并到 master 并发布
+## 发布到 master
 
 不要在没有审查 diff 的情况下直接覆盖 `master`。推荐使用 Pull Request：
 
@@ -447,7 +448,7 @@ git push origin master
 1. 在 `develop` 修改对应的 `preview/sections/*.html`；如果是整体样式或交互，再修改 `preview/index.html`。
 2. 本地 HTTP 预览会自动刷新，确认页面显示无误。
 3. 发布或提交前运行 `node preview/build.js`，把章节源文件同步进 `preview/index.html` 的兜底内容。
-4. 把确认后的内容同步到根目录 `index.html` 和 `sections/`。
+4. 把确认后的内容同步到根目录 `index.html`、`sections/`、`docs/` 和 `assets/`。
 5. 推送 `develop`。
 6. PR 合并到 `master`。
 7. 等待 GitHub Pages 自动部署。
