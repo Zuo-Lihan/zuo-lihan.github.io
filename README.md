@@ -82,6 +82,47 @@ node preview/build.js
 
 这个命令会把 `preview/sections/*.html` 同步写入 `preview/index.html` 的兜底内容。
 
+## Node 环境说明
+
+README 里的 `node preview/*.js` 不是浏览器命令，而是用 Node.js 运行本仓库自带的维护脚本：
+
+- `node preview/dev-server.js`：启动本地热更新预览服务器。
+- `node preview/build.js`：把 `preview/sections/*.html` 和 `preview/docs/markdown/*.md` 同步进可直接发布的静态文件。
+
+正式线上页面本身不需要你安装 Node；GitHub Pages 只会发布静态 HTML、CSS、JS 和图片。只有你在本地编辑章节、生成 Docs 或使用热更新预览时，才需要 Node。
+
+如果你的终端提示 `node: command not found`，先安装 Node.js：
+
+```bash
+brew install node
+node -v
+```
+
+如果没有 Homebrew，可以从 Node.js 官网下载安装 LTS 版本：
+
+```text
+https://nodejs.org/
+```
+
+安装完成后，重新打开终端，再运行：
+
+```bash
+node preview/build.js
+HOST=127.0.0.1 PORT=4173 node preview/dev-server.js
+```
+
+如果只是临时查看已经生成好的静态页面，不需要热更新，可以不用 Node，直接用 Python 启一个静态服务器：
+
+```bash
+python3 -m http.server 4173 --bind 127.0.0.1
+```
+
+然后打开：
+
+```text
+http://127.0.0.1:4173/index.html
+```
+
 ## Docs / Markdown 文档写法
 
 Docs 已经拆成一个轻量的本地 Markdown 渲染系统。后续写文档时，正文主要写 Markdown，不需要为每篇文档重新写 HTML 页面。
