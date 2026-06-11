@@ -25,6 +25,27 @@ http://127.0.0.1:4173/index.html
 
 Use `develop` for normal editing. The editable source lives under `preview/` on that branch.
 
+The `node preview/*.js` commands are local maintenance commands. The published GitHub Pages site itself is static and does not need Node.js to run. Node is only needed when you want the local hot-refresh preview server or when you regenerate the built static files from `preview/sections/` and `preview/docs/markdown/`.
+
+If your terminal says `node: command not found`, install Node.js first:
+
+```bash
+brew install node
+node -v
+```
+
+If you do not use Homebrew, install the LTS version from:
+
+```text
+https://nodejs.org/
+```
+
+For a quick local check of the already published static page, Node is not required:
+
+```bash
+python3 -m http.server 4173 --bind 127.0.0.1
+```
+
 ```bash
 git switch develop
 HOST=127.0.0.1 PORT=4173 node preview/dev-server.js
