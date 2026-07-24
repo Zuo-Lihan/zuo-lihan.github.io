@@ -7,7 +7,7 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #ecf9ff;
+      --bg: #f8fdff;
       --panel: rgba(255, 255, 255, 0.58);
       --panel-strong: rgba(255, 255, 255, 0.78);
       --line: rgba(18, 57, 82, 0.16);
@@ -48,8 +48,8 @@
       font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       letter-spacing: 0;
       background:
-        linear-gradient(118deg, #fbfdff 0%, #edf9fb 34%, #f8f2fb 68%, #fff8e8 100%),
-        #f7fcfd;
+        linear-gradient(118deg, #fbfdff 0%, #effaff 34%, #fff8f5 72%, #fbfdff 100%),
+        #f8fdff;
       background-attachment: fixed;
       overflow-x: hidden;
     }
@@ -60,11 +60,18 @@
       z-index: -2;
       content: "";
       background:
-        linear-gradient(132deg, rgba(255, 255, 255, 0.88), rgba(219, 246, 246, 0.62) 28%, transparent 50%),
-        linear-gradient(28deg, rgba(255, 244, 218, 0.78), transparent 42%),
-        linear-gradient(222deg, rgba(245, 223, 243, 0.54), transparent 44%);
-      filter: saturate(1.02) contrast(0.99);
-      animation: background-breathe 18s var(--ease) infinite alternate;
+        conic-gradient(from 138deg at 48% 42%,
+          rgba(0, 156, 198, 0.12),
+          rgba(126, 221, 189, 0.09) 18%,
+          rgba(255, 231, 184, 0.14) 36%,
+          rgba(196, 81, 166, 0.11) 54%,
+          rgba(237, 248, 255, 0.32) 72%,
+          rgba(0, 156, 198, 0.12) 100%),
+        linear-gradient(118deg, rgba(255, 255, 255, 0.82), transparent 38%, rgba(255, 255, 255, 0.54));
+      opacity: 0.82;
+      transform-origin: 52% 46%;
+      animation: background-aurora 30s linear infinite;
+      will-change: transform, opacity;
     }
 
     body::after {
@@ -74,11 +81,14 @@
       pointer-events: none;
       content: "";
       background:
-        linear-gradient(100deg, rgba(255, 255, 255, 0.14) 0 18%, rgba(255, 255, 255, 0.48) 32%, transparent 48%),
-        linear-gradient(194deg, transparent 0 42%, rgba(233, 249, 245, 0.46) 62%, rgba(255, 255, 255, 0.22) 100%);
+        linear-gradient(105deg, transparent 0 18%, rgba(255, 255, 255, 0.42) 29%, transparent 42%),
+        linear-gradient(188deg, transparent 0 44%, rgba(232, 249, 246, 0.34) 60%, transparent 82%),
+        linear-gradient(16deg, rgba(255, 247, 230, 0.26), transparent 36%, rgba(245, 239, 255, 0.22) 74%, transparent);
+      background-size: 170% 170%, 150% 150%, 130% 130%;
       mix-blend-mode: normal;
-      opacity: 0.74;
-      animation: background-silk 22s var(--ease) infinite alternate;
+      opacity: 0.68;
+      animation: background-silk 26s var(--ease) infinite alternate;
+      will-change: transform, opacity;
     }
 
     a {
@@ -102,70 +112,293 @@
       z-index: 0;
       pointer-events: none;
       overflow: hidden;
-      opacity: 0.72;
+      opacity: 0.86;
       mix-blend-mode: normal;
+    }
+
+    .particle-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      opacity: 0.36;
+      mix-blend-mode: multiply;
+      transition: opacity 160ms var(--ease);
+    }
+
+    .boot-particle-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 22;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: normal;
+      transition: opacity 120ms var(--ease);
+    }
+
+    body.is-ambient-booting .particle-canvas {
+      opacity: 0.42;
+    }
+
+    body.is-ambient-booting .boot-particle-canvas {
+      opacity: 0.94;
     }
 
     .energy-field::before,
     .energy-field::after {
       position: absolute;
-      inset: -20%;
+      inset: -24%;
       content: "";
       will-change: transform, opacity;
     }
 
     .energy-field::before {
       background:
-        linear-gradient(112deg, transparent 0 24%, rgba(155, 218, 217, 0.24) 36%, transparent 48% 58%, rgba(255, 238, 207, 0.34) 70%, transparent 82%),
-        linear-gradient(32deg, rgba(255, 255, 255, 0.48), transparent 36%, rgba(248, 228, 247, 0.3) 70%, transparent 100%);
-      background-size: 180% 100%, 140% 100%;
-      animation: field-drift 20s var(--ease) infinite alternate;
+        linear-gradient(116deg, transparent 0 17%, rgba(99, 206, 220, 0.18) 27%, transparent 40% 56%, rgba(255, 222, 162, 0.22) 68%, transparent 80%),
+        linear-gradient(38deg, rgba(255, 255, 255, 0.5), transparent 32%, rgba(248, 228, 247, 0.2) 68%, transparent 100%);
+      background-size: 210% 150%, 170% 140%;
+      animation: field-drift 32s var(--ease) infinite alternate;
     }
 
     .energy-field::after {
       background:
-        linear-gradient(104deg, transparent 0 30%, rgba(255, 255, 255, 0.34) 44%, transparent 60% 100%),
-        linear-gradient(244deg, transparent 0 36%, rgba(235, 249, 243, 0.4) 58%, transparent 82% 100%);
-      transform: rotate(-4deg) scale(1.12);
-      animation: field-scan 26s var(--ease) infinite alternate;
-      opacity: 0.54;
+        conic-gradient(from 220deg at 50% 42%,
+          transparent 0 16%,
+          rgba(255, 255, 255, 0.48) 21%,
+          rgba(0, 156, 198, 0.12) 26%,
+          transparent 33% 58%,
+          rgba(196, 81, 166, 0.08) 65%,
+          transparent 72% 100%),
+        linear-gradient(244deg, transparent 0 36%, rgba(235, 249, 243, 0.28) 58%, transparent 82% 100%);
+      transform: rotate(-3deg) scale(1.1);
+      animation: field-scan 38s var(--ease) infinite alternate;
+      opacity: 0.48;
     }
 
-    @keyframes background-breathe {
-      from {
-        opacity: 0.72;
-        transform: scale(1);
+    .ambient-asset {
+      position: absolute;
+      z-index: 1;
+      pointer-events: none;
+      transform-style: preserve-3d;
+      will-change: transform, opacity;
+    }
+
+    .ambient-asset::before {
+      position: absolute;
+      inset: 14% 8% 4%;
+      content: "";
+      border-radius: 999px;
+      background:
+        radial-gradient(closest-side at 50% 48%, rgba(255, 255, 255, 0.72), transparent 68%),
+        radial-gradient(closest-side at 34% 44%, rgba(0, 156, 198, 0.16), transparent 78%),
+        radial-gradient(closest-side at 68% 56%, rgba(196, 81, 166, 0.12), transparent 76%);
+      filter: blur(26px);
+      transform: translate3d(2%, 9%, 0) scale(0.84);
+    }
+
+    .ambient-asset::after {
+      position: absolute;
+      inset: 18% 16% 12%;
+      content: "";
+      border-radius: 999px;
+      pointer-events: none;
+      background:
+        conic-gradient(from 0deg at 50% 50%,
+          transparent 0 18%,
+          rgba(0, 156, 198, 0.2) 24%,
+          transparent 30% 54%,
+          rgba(196, 81, 166, 0.14) 60%,
+          transparent 66% 100%),
+        radial-gradient(closest-side, rgba(255, 255, 255, 0.54), transparent 72%);
+      filter: blur(14px);
+      opacity: 0;
+      transform: scale(0.7) rotate(-8deg);
+    }
+
+    .ambient-asset img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      opacity: 1;
+      transform: translateZ(0);
+      transition: opacity 180ms var(--ease), filter 180ms var(--ease), transform 180ms var(--ease);
+      filter:
+        saturate(0.96)
+        contrast(1.04)
+        drop-shadow(0 30px 74px rgba(15, 64, 92, 0.13));
+    }
+
+    body.is-ambient-booting .ambient-asset::after {
+      animation: ambient-boot-aura 1000ms var(--spring) both;
+    }
+
+    body.is-ambient-booting .ambient-asset {
+      animation-play-state: paused;
+    }
+
+    body.is-ambient-booting .ambient-asset img {
+      opacity: 0.12;
+      transform: translateZ(0) scale(0.992);
+      filter:
+        saturate(0.88)
+        contrast(1)
+        blur(0.45px)
+        drop-shadow(0 18px 54px rgba(15, 64, 92, 0.1));
+    }
+
+    body.is-ambient-booting #hero .section-inner {
+      opacity: 0;
+      filter: blur(0.5px);
+      pointer-events: none;
+    }
+
+    body.is-ambient-ready #hero .section-inner {
+      animation: boot-section-handoff 450ms var(--ease) both;
+    }
+
+    body.is-ambient-booting #hero .hero-title,
+    body.is-ambient-booting #hero .hero-lead,
+    body.is-ambient-booting #hero .section-grid > div:first-child > .eyebrow,
+    body.is-ambient-booting #hero .profile-card h3,
+    body.is-ambient-booting #hero .profile-card .muted {
+      opacity: 0;
+      filter: blur(0.25px);
+      transform: translate3d(0, 0, 0);
+      transition: opacity 450ms var(--ease), filter 450ms var(--ease), text-shadow 450ms var(--ease);
+    }
+
+    body.is-ambient-ready #hero .hero-title,
+    body.is-ambient-ready #hero .hero-lead,
+    body.is-ambient-ready #hero .section-grid > div:first-child > .eyebrow,
+    body.is-ambient-ready #hero .profile-card h3,
+    body.is-ambient-ready #hero .profile-card .muted {
+      animation-fill-mode: both;
+      text-shadow: 0 0 0 rgba(0, 156, 198, 0);
+    }
+
+    body.is-ambient-ready #hero .hero-title {
+      animation-name: title-current, boot-text-handoff;
+      animation-duration: 4.2s, 450ms;
+      animation-timing-function: linear, var(--ease);
+      animation-iteration-count: infinite, 1;
+    }
+
+    body.is-ambient-ready #hero .hero-lead,
+    body.is-ambient-ready #hero .section-grid > div:first-child > .eyebrow,
+    body.is-ambient-ready #hero .profile-card h3,
+    body.is-ambient-ready #hero .profile-card .muted {
+      animation-name: boot-text-handoff;
+      animation-duration: 450ms;
+      animation-timing-function: var(--ease);
+      animation-iteration-count: 1;
+    }
+
+    .ambient-ai-lab {
+      top: clamp(104px, 13vh, 166px);
+      right: clamp(-46px, 3vw, 74px);
+      width: clamp(620px, 55vw, 1040px);
+      opacity: 0.42;
+      transform-origin: 66% 44%;
+      animation: ambient-ai-lab-float 34s var(--ease) infinite alternate;
+      -webkit-mask-image: radial-gradient(ellipse at 56% 48%, #000 0 54%, rgba(0, 0, 0, 0.78) 68%, transparent 86%);
+      mask-image: radial-gradient(ellipse at 56% 48%, #000 0 54%, rgba(0, 0, 0, 0.78) 68%, transparent 86%);
+    }
+
+    .ambient-llm-system {
+      top: clamp(480px, 57vh, 690px);
+      left: clamp(-110px, 2.5vw, 44px);
+      width: clamp(250px, 19vw, 380px);
+      opacity: 0.26;
+      transform-origin: 42% 52%;
+      animation: ambient-llm-float 31s var(--ease) infinite alternate;
+      -webkit-mask-image: radial-gradient(ellipse at 50% 50%, #000 0 58%, rgba(0, 0, 0, 0.76) 72%, transparent 89%);
+      mask-image: radial-gradient(ellipse at 50% 50%, #000 0 58%, rgba(0, 0, 0, 0.76) 72%, transparent 89%);
+    }
+
+    .ambient-llm-system::after {
+      inset: 16% 8% 10%;
+      transform: scale(0.66) rotate(10deg);
+    }
+
+    @keyframes background-aurora {
+      0% {
+        opacity: 0.76;
+        transform: rotate(0deg) scale(1.08);
       }
-      to {
-        opacity: 0.95;
-        transform: scale(1.025);
+      50% {
+        opacity: 0.92;
+        transform: rotate(8deg) scale(1.12);
+      }
+      100% {
+        opacity: 0.76;
+        transform: rotate(0deg) scale(1.08);
       }
     }
 
     @keyframes background-silk {
       from {
-        transform: translate3d(-1.5%, -1%, 0);
+        transform: translate3d(-2.4%, -1.4%, 0) scale(1.02);
       }
       to {
-        transform: translate3d(1.5%, 1%, 0);
+        transform: translate3d(2.4%, 1.4%, 0) scale(1.02);
       }
     }
 
     @keyframes field-drift {
       from {
-        transform: translate3d(-5%, -1%, 0);
+        transform: translate3d(-6%, -1.2%, 0) rotate(-1deg);
       }
       to {
-        transform: translate3d(5%, 2%, 0);
+        transform: translate3d(6%, 1.8%, 0) rotate(1deg);
       }
     }
 
     @keyframes field-scan {
       from {
-        transform: rotate(-4deg) translate3d(-2%, -1%, 0) scale(1.12);
+        transform: rotate(-3deg) translate3d(-2.5%, -1.2%, 0) scale(1.1);
       }
       to {
-        transform: rotate(-4deg) translate3d(2%, 1%, 0) scale(1.12);
+        transform: rotate(-3deg) translate3d(2.5%, 1.2%, 0) scale(1.1);
+      }
+    }
+
+    @keyframes ambient-ai-lab-float {
+      from {
+        opacity: 0.36;
+        transform: translate3d(0, -10px, 0) rotateZ(-1.1deg) scale(1);
+      }
+      to {
+        opacity: 0.47;
+        transform: translate3d(-22px, 14px, 0) rotateZ(1deg) scale(1.018);
+      }
+    }
+
+    @keyframes ambient-llm-float {
+      from {
+        opacity: 0.24;
+        transform: translate3d(0, 12px, 0) rotateZ(1.2deg) scale(0.986);
+      }
+      to {
+        opacity: 0.34;
+        transform: translate3d(16px, -12px, 0) rotateZ(-1deg) scale(1.015);
+      }
+    }
+
+    @keyframes ambient-boot-aura {
+      0% {
+        opacity: 0;
+        transform: scale(0.56) rotate(-18deg);
+      }
+      44% {
+        opacity: 0.36;
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.14) rotate(24deg);
       }
     }
 
@@ -640,6 +873,38 @@
       100% {
         background-position: -200% 50%;
         opacity: 0.44;
+      }
+    }
+
+    @keyframes boot-text-handoff {
+      0% {
+        opacity: 0;
+        filter: blur(1.6px);
+        text-shadow: 0 0 22px rgba(0, 156, 198, 0.36), 0 0 34px rgba(196, 81, 166, 0.2);
+      }
+      46% {
+        opacity: 0.68;
+        filter: blur(0.28px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0);
+        text-shadow: 0 0 0 rgba(0, 156, 198, 0);
+      }
+    }
+
+    @keyframes boot-section-handoff {
+      0% {
+        opacity: 0;
+        filter: blur(1.4px);
+      }
+      58% {
+        opacity: 0.72;
+        filter: blur(0.28px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0);
       }
     }
 
@@ -2428,6 +2693,20 @@
       .progress-rail {
         display: none;
       }
+
+      .ambient-ai-lab {
+        top: 116px;
+        right: -44px;
+        width: 740px;
+        opacity: 0.3;
+      }
+
+      .ambient-llm-system {
+        top: 510px;
+        left: -72px;
+        width: 330px;
+        opacity: 0.16;
+      }
     }
 
     @media (max-width: 760px) {
@@ -2527,12 +2806,39 @@
         grid-template-columns: 1fr;
       }
 
+      .particle-canvas {
+        opacity: 0.24;
+      }
+
+      .ambient-ai-lab {
+        top: 130px;
+        right: -170px;
+        width: 700px;
+        opacity: 0.2;
+      }
+
+      .ambient-llm-system {
+        top: 560px;
+        left: -180px;
+        width: 350px;
+        opacity: 0.12;
+      }
+
     }
   </style>
 </head>
-<body class="snap" data-lang="en">
+<body class="snap is-ambient-booting" data-lang="en">
   <div class="shell">
-    <div class="energy-field" aria-hidden="true"></div>
+    <div class="energy-field" aria-hidden="true">
+      <canvas class="particle-canvas" id="particleCanvas"></canvas>
+      <div class="ambient-asset ambient-ai-lab" data-particle-count="520">
+        <img src="assets/ambient-ai-lab.webp" alt="" loading="eager" decoding="async">
+      </div>
+      <div class="ambient-asset ambient-llm-system" data-particle-count="330">
+        <img src="assets/ambient-llm-system.webp" alt="" loading="eager" decoding="async">
+      </div>
+    </div>
+    <canvas class="boot-particle-canvas" id="bootParticleCanvas" aria-hidden="true"></canvas>
 
     <header class="topbar">
       <a class="brand" href="#hero" data-target="hero" aria-label="Lihan Zuo home">
@@ -2964,8 +3270,7 @@
         </div>
 
         <div class="visitor-globe-card">
-          <div class="visitor-widget-shell">
-            <script type="text/javascript" src="https://cdn.livetrafficfeed.com/static/3d-maps/live.v2.js?o=eaf9ff&amp;l=7eddbd&amp;b=0b6b87&amp;c=2fe2ff&amp;n=c451a6&amp;root=1&amp;s=310" async="async"></script>
+          <div class="visitor-widget-shell" data-visitor-src="https://cdn.livetrafficfeed.com/static/3d-maps/live.v2.js?o=eaf9ff&amp;l=7eddbd&amp;b=0b6b87&amp;c=2fe2ff&amp;n=c451a6&amp;root=1&amp;s=310">
             <noscript><a href="https://livetrafficfeed.com/3d-visitor-maps">Visitor map</a></noscript>
           </div>
         </div>
@@ -3043,16 +3348,34 @@
     const isReloadNavigation = navigationEntry?.type === "reload";
 
     function clearLegacySiteWorker() {
+      const cleanupKey = "lihan-site-legacy-cleanup-v3";
+      try {
+        if (localStorage.getItem(cleanupKey) === "done") return;
+      } catch (error) {
+        // Storage may be unavailable under file:// or strict privacy settings.
+      }
+
       const clear = async () => {
         try {
           const hadController = Boolean(navigator.serviceWorker?.controller);
+          let cacheKeys = [];
           if ("caches" in window) {
-            const keys = await caches.keys();
-            await Promise.all(keys.map((key) => caches.delete(key)));
+            cacheKeys = await caches.keys();
+            if (cacheKeys.length) {
+              await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+            }
           }
+          let registrations = [];
           if ("serviceWorker" in navigator) {
-            const registrations = await navigator.serviceWorker.getRegistrations();
-            await Promise.all(registrations.map((registration) => registration.unregister()));
+            registrations = await navigator.serviceWorker.getRegistrations();
+            if (registrations.length) {
+              await Promise.all(registrations.map((registration) => registration.unregister()));
+            }
+          }
+          try {
+            localStorage.setItem(cleanupKey, "done");
+          } catch (storageError) {
+            sessionStorage.setItem(cleanupKey, "done");
           }
           if (hadController && !sessionStorage.getItem("legacy-sw-cleared")) {
             sessionStorage.setItem("legacy-sw-cleared", "1");
@@ -3071,6 +3394,872 @@
     }
 
     clearLegacySiteWorker();
+
+    function initAcademicParticleField() {
+      const canvas = document.getElementById("particleCanvas");
+      if (!canvas) return;
+      const bootCanvas = document.getElementById("bootParticleCanvas");
+      const ambientAssets = Array.from(document.querySelectorAll(".ambient-asset"));
+      const templateImages = ambientAssets.map((asset) => asset.querySelector("img")).filter(Boolean);
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const context = canvas.getContext("2d", { alpha: true });
+      const bootContext = bootCanvas?.getContext("2d", { alpha: true });
+      if (!context) return;
+
+      const colors = [
+        "rgba(0, 156, 198, 0.55)",
+        "rgba(126, 221, 189, 0.48)",
+        "rgba(196, 81, 166, 0.38)",
+        "rgba(154, 106, 0, 0.34)"
+      ];
+      const state = {
+        width: 0,
+        height: 0,
+        ambientRatio: 1,
+        bootRatio: 1,
+        ratio: 1,
+        particles: [],
+        bootParticles: [],
+        templateTargets: [],
+        bootStart: 0,
+        booting: false,
+        bootComplete: false,
+        frame: 0,
+        mouseX: -9999,
+        mouseY: -9999,
+        mouseActive: false
+      };
+
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+      const lerp = (a, b, t) => a + (b - a) * t;
+      const easeInOut = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+      function particleCount() {
+        const area = window.innerWidth * window.innerHeight;
+        return Math.max(36, Math.min(76, Math.round(area / 28000)));
+      }
+
+      function createParticle(index) {
+        const band = index % 3;
+        return {
+          x: Math.random() * state.width,
+          y: Math.random() * state.height,
+          originX: Math.random() * state.width,
+          originY: Math.random() * state.height,
+          vx: (Math.random() - 0.5) * 0.16,
+          vy: (Math.random() - 0.5) * 0.12,
+          radius: 1.1 + Math.random() * 1.8,
+          phase: Math.random() * Math.PI * 2,
+          color: colors[index % colors.length],
+          band
+        };
+      }
+
+      function assetRect(assetElement, fallbackIndex = 0) {
+        const rect = assetElement?.getBoundingClientRect();
+        const width = rect?.width || Math.min(state.width * (fallbackIndex ? 0.24 : 0.52), fallbackIndex ? 440 : 900);
+        const height = rect?.height || width * (fallbackIndex ? 1 : 0.54);
+        return {
+          left: rect?.left ?? (fallbackIndex ? -width * 0.26 : state.width - width * 0.84),
+          top: rect?.top ?? (fallbackIndex ? state.height * 0.52 : state.height * 0.14),
+          width,
+          height
+        };
+      }
+
+      function pointInAsset(rect, x, y) {
+        return {
+          x: rect.left + rect.width * x,
+          y: rect.top + rect.height * y
+        };
+      }
+
+      function waitForImage(image) {
+        if (image.complete && image.naturalWidth) return Promise.resolve();
+        return new Promise((resolve) => {
+          let settled = false;
+          const finish = () => {
+            if (settled) return;
+            settled = true;
+            resolve();
+          };
+          image.addEventListener("load", finish, { once: true });
+          image.addEventListener("error", finish, { once: true });
+          window.setTimeout(finish, 1500);
+        });
+      }
+
+      function particleColorFromPixel(r, g, b, assetIndex, x, y, importance) {
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const brightness = (r + g + b) / 3;
+        const saturation = max ? (max - min) / max : 0;
+        if (brightness > 224 || saturation < 0.08) {
+          return colors[(assetIndex + Math.floor(x / 13) + Math.floor(y / 17)) % colors.length];
+        }
+        const alpha = clamp(0.44 + importance * 0.24, 0.46, 0.72);
+        return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${alpha.toFixed(3)})`;
+      }
+
+      function textColorForTarget(targetIndex, xRatio, importance) {
+        const titlePalette = [
+          [16, 34, 55],
+          [0, 127, 163],
+          [122, 105, 203],
+          [196, 81, 166]
+        ];
+        const paletteIndex = Math.min(titlePalette.length - 1, Math.floor(clamp(xRatio, 0, 0.999) * titlePalette.length));
+        const [r, g, b] = titlePalette[(targetIndex + paletteIndex) % titlePalette.length];
+        const alpha = clamp(0.48 + importance * 0.28, 0.52, 0.82);
+        return `rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)})`;
+      }
+
+      function normalizedElementText(element) {
+        let text = element.innerText || element.textContent || "";
+        text = text.replace(/\s+/g, " ").trim();
+        if (getComputedStyle(element).textTransform === "uppercase") {
+          text = text.toUpperCase();
+        }
+        return text;
+      }
+
+      function wrapCanvasText(drawContext, text, maxWidth) {
+        if (!text) return [];
+        const tokens = text.match(/[\u4e00-\u9fff]|[^\s]+|\s+/g) || [text];
+        const lines = [];
+        let line = "";
+        for (const token of tokens) {
+          const next = line + token;
+          if (line.trim() && drawContext.measureText(next).width > maxWidth) {
+            lines.push(line.trimEnd());
+            line = token.trimStart();
+          } else {
+            line = next;
+          }
+        }
+        if (line.trim()) lines.push(line.trim());
+        return lines;
+      }
+
+      function sampleTextElement(element, textIndex, desired) {
+        const rect = element?.getBoundingClientRect();
+        if (!rect || rect.width < 8 || rect.height < 8) return [];
+
+        const isHeroTitle = element.classList.contains("hero-title");
+        const styles = getComputedStyle(element);
+        const text = normalizedElementText(element);
+        if (!text) return [];
+
+        const fontSize = Number.parseFloat(styles.fontSize) || 18;
+        const fontWeight = styles.fontWeight || "700";
+        const fontStyle = styles.fontStyle || "normal";
+        const fontFamily = styles.fontFamily || "ui-sans-serif, system-ui, sans-serif";
+        const lineHeight = Number.parseFloat(styles.lineHeight) || fontSize * 1.25;
+        const sampleWidth = Math.ceil(rect.width + (isHeroTitle ? fontSize * 0.18 : 0));
+        const sampleHeight = Math.ceil(Math.max(rect.height, lineHeight + 8));
+        const sampler = document.createElement("canvas");
+        const samplerContext = sampler.getContext("2d", { willReadFrequently: true });
+        if (!samplerContext) return [];
+
+        sampler.width = sampleWidth;
+        sampler.height = sampleHeight;
+        samplerContext.clearRect(0, 0, sampleWidth, sampleHeight);
+        samplerContext.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+        samplerContext.textBaseline = "alphabetic";
+        samplerContext.fillStyle = "#000";
+
+        const lines = isHeroTitle ? [text] : wrapCanvasText(samplerContext, text, Math.max(32, sampleWidth - 2));
+        const blockHeight = Math.min(sampleHeight, lines.length * lineHeight);
+        const startY = Math.max(fontSize * 0.86, (sampleHeight - blockHeight) / 2 + fontSize * 0.86);
+        lines.forEach((line, index) => {
+          samplerContext.fillText(line, 0, startY + index * lineHeight);
+        });
+
+        let data;
+        try {
+          data = samplerContext.getImageData(0, 0, sampleWidth, sampleHeight).data;
+        } catch (error) {
+          return [];
+        }
+
+        const candidates = [];
+        const step = isHeroTitle ? 1 : 3;
+        for (let y = 1; y < sampleHeight - 1; y += step) {
+          for (let x = 1; x < sampleWidth - 1; x += step) {
+            const offset = (y * sampleWidth + x) * 4;
+            const alpha = data[offset + 3];
+            if (alpha < 34) continue;
+            const leftAlpha = data[offset - 1] || 0;
+            const rightAlpha = data[offset + 7] || 0;
+            const topAlpha = data[offset - sampleWidth * 4 + 3] || 0;
+            const bottomAlpha = data[offset + sampleWidth * 4 + 3] || 0;
+            const edge = Math.max(
+              Math.abs(alpha - leftAlpha),
+              Math.abs(alpha - rightAlpha),
+              Math.abs(alpha - topAlpha),
+              Math.abs(alpha - bottomAlpha)
+            ) / 255;
+            const importance = clamp(alpha / 255 * 0.62 + edge * 0.78, 0.08, 1);
+            if (Math.random() > clamp(0.18 + importance * 0.78, 0.26, 0.95)) continue;
+            candidates.push({
+              x,
+              y,
+              weight: 0.45 + importance * 2.2,
+              radius: (isHeroTitle ? 0.8 : 0.62) + importance * (isHeroTitle ? 1 : 0.82),
+              importance
+            });
+          }
+        }
+
+        if (!candidates.length) return [];
+        const cumulative = [];
+        const totalWeight = candidates.reduce((sum, candidate) => {
+          const next = sum + candidate.weight;
+          cumulative.push(next);
+          return next;
+        }, 0);
+        const density = state.width < 760 ? 0.55 : state.width < 1040 ? 0.75 : 1;
+        const targetCount = Math.min(candidates.length, Math.round(desired * density));
+        const targets = [];
+
+        for (let index = 0; index < targetCount; index += 1) {
+          const pick = Math.random() * totalWeight;
+          const candidateIndex = cumulative.findIndex((value) => value >= pick);
+          const candidate = candidates[Math.max(0, candidateIndex)];
+          const jitter = isHeroTitle ? 0.42 : 0.35;
+          const nx = (candidate.x + Math.random() * jitter - jitter / 2) / sampleWidth;
+          const ny = (candidate.y + Math.random() * jitter - jitter / 2) / sampleHeight;
+          targets.push({
+            tx: rect.left + nx * rect.width,
+            ty: rect.top + ny * rect.height,
+            radius: candidate.radius,
+            color: textColorForTarget(textIndex, nx, candidate.importance),
+            assetIndex: 8 + textIndex,
+            importance: candidate.importance,
+            assetCenterX: rect.left + rect.width * 0.5,
+            assetCenterY: rect.top + rect.height * 0.5,
+            kind: "text"
+          });
+        }
+
+        return targets;
+      }
+
+      function sampleHeroTextTargets() {
+        const specs = [
+          { selector: "#hero .hero-title", desired: 1450 },
+          { selector: "#hero .section-grid > div:first-child > .eyebrow", desired: 140 },
+          { selector: "#hero .hero-lead", desired: 340 },
+          { selector: "#hero .profile-card h3", desired: 160 },
+          { selector: "#hero .profile-card .muted", desired: 180 }
+        ];
+        return specs.flatMap((spec, index) => sampleTextElement(document.querySelector(spec.selector), index, spec.desired));
+      }
+
+      function structureColorForElement(element, index, importance) {
+        const className = element.className || "";
+        if (typeof className === "string" && className.includes("magenta")) {
+          return `rgba(196, 81, 166, ${clamp(0.32 + importance * 0.28, 0.36, 0.72).toFixed(3)})`;
+        }
+        if (typeof className === "string" && className.includes("gold")) {
+          return `rgba(154, 106, 0, ${clamp(0.28 + importance * 0.25, 0.32, 0.66).toFixed(3)})`;
+        }
+        if (typeof className === "string" && (className.includes("solid-button") || className.includes("cyan"))) {
+          return `rgba(0, 156, 198, ${clamp(0.34 + importance * 0.3, 0.38, 0.76).toFixed(3)})`;
+        }
+        return colors[index % colors.length];
+      }
+
+      function sampleElementStructure(element, elementIndex, desired) {
+        const rect = element?.getBoundingClientRect();
+        if (!rect || rect.width < 6 || rect.height < 6) return [];
+
+        const density = state.width < 760 ? 0.5 : state.width < 1040 ? 0.72 : 1;
+        const count = Math.max(12, Math.round(desired * density));
+        const targets = [];
+        const isLargePanel = element.classList.contains("profile-card");
+        const isPortrait = element.classList.contains("portrait-button") || element.classList.contains("portrait");
+        const radiusBase = isLargePanel ? 0.58 : isPortrait ? 0.76 : 0.5;
+
+        for (let index = 0; index < count; index += 1) {
+          const edge = isLargePanel ? Math.random() < 0.72 : Math.random() < 0.58;
+          let x;
+          let y;
+          if (edge) {
+            const side = Math.floor(Math.random() * 4);
+            const t = Math.random();
+            if (side === 0) {
+              x = t;
+              y = Math.random() * 0.04;
+            } else if (side === 1) {
+              x = 1 - Math.random() * 0.04;
+              y = t;
+            } else if (side === 2) {
+              x = t;
+              y = 1 - Math.random() * 0.04;
+            } else {
+              x = Math.random() * 0.04;
+              y = t;
+            }
+          } else {
+            x = 0.08 + Math.random() * 0.84;
+            y = 0.08 + Math.random() * 0.84;
+          }
+
+          const importance = edge ? 0.78 + Math.random() * 0.22 : 0.28 + Math.random() * 0.36;
+          targets.push({
+            tx: rect.left + x * rect.width,
+            ty: rect.top + y * rect.height,
+            radius: radiusBase + importance * (isLargePanel ? 0.9 : 0.72),
+            color: structureColorForElement(element, elementIndex + index, importance),
+            assetIndex: 30 + elementIndex,
+            importance,
+            assetCenterX: rect.left + rect.width * 0.5,
+            assetCenterY: rect.top + rect.height * 0.5,
+            kind: "structure"
+          });
+        }
+        return targets;
+      }
+
+      function sampleHeroStructureTargets() {
+        const targets = [];
+        const groups = [
+          { selector: "#hero .profile-card", desired: 520 },
+          { selector: "#hero .portrait-button", desired: 180 },
+          { selector: "#hero .hero-actions > *", desired: 110 },
+          { selector: "#hero .hero-meta .tag", desired: 92 },
+          { selector: "#hero .signal", desired: 80 },
+          { selector: "#hero .signal-links a", desired: 48 },
+          { selector: "#hero .profile-card .eyebrow", desired: 80 },
+          { selector: "#hero .profile-card::before", desired: 0 }
+        ];
+
+        groups.forEach((group, groupIndex) => {
+          if (group.selector.includes("::")) return;
+          document.querySelectorAll(group.selector).forEach((element, elementIndex) => {
+            targets.push(...sampleElementStructure(element, groupIndex * 20 + elementIndex, group.desired));
+          });
+        });
+
+        return targets;
+      }
+
+      function createHeroFieldTargets() {
+        const hero = document.getElementById("hero");
+        const heroRect = hero?.getBoundingClientRect() || { left: 0, top: 0, width: state.width, height: Math.min(state.height, 760) };
+        const cardRect = document.querySelector("#hero .profile-card")?.getBoundingClientRect();
+        const count = Math.round(clamp((state.width * state.height) / 5200, state.width < 760 ? 80 : 150, state.width < 760 ? 150 : 360));
+        const targets = [];
+        for (let index = 0; index < count; index += 1) {
+          const useCardOrbit = cardRect && Math.random() < 0.36;
+          const sourceRect = useCardOrbit ? cardRect : heroRect;
+          const angle = Math.random() * Math.PI * 2;
+          const edgeBias = Math.random() < 0.58;
+          const radius = edgeBias ? 0.5 + Math.random() * 0.5 : Math.sqrt(Math.random()) * 0.5;
+          const centerX = sourceRect.left + sourceRect.width * (useCardOrbit ? 0.52 : 0.5);
+          const centerY = sourceRect.top + sourceRect.height * (useCardOrbit ? 0.48 : 0.52);
+          const spreadX = sourceRect.width * (useCardOrbit ? 0.58 : 0.52);
+          const spreadY = sourceRect.height * (useCardOrbit ? 0.46 : 0.42);
+          targets.push({
+            tx: centerX + Math.cos(angle) * spreadX * radius,
+            ty: centerY + Math.sin(angle) * spreadY * radius,
+            radius: 0.55 + Math.random() * 1.25,
+            color: colors[index % colors.length],
+            assetIndex: 20,
+            importance: 0.22 + Math.random() * 0.54,
+            assetCenterX: centerX,
+            assetCenterY: centerY,
+            kind: "field"
+          });
+        }
+        return targets;
+      }
+
+      function sampleTemplateForAsset(assetElement, assetIndex) {
+        const image = assetElement.querySelector("img");
+        const desired = Number.parseInt(assetElement.dataset.particleCount || "", 10)
+          || (assetElement.classList.contains("ambient-ai-lab") ? 176 : 112);
+        const rect = assetRect(assetElement, assetIndex);
+        if (!image?.naturalWidth || !image?.naturalHeight || rect.width <= 0 || rect.height <= 0) {
+          return [];
+        }
+
+        const maxSample = assetElement.classList.contains("ambient-ai-lab") ? 156 : 128;
+        const scale = Math.min(maxSample / image.naturalWidth, maxSample / image.naturalHeight, 1);
+        const sampleWidth = Math.max(42, Math.round(image.naturalWidth * scale));
+        const sampleHeight = Math.max(42, Math.round(image.naturalHeight * scale));
+        const sampler = document.createElement("canvas");
+        const samplerContext = sampler.getContext("2d", { willReadFrequently: true });
+        if (!samplerContext) return [];
+
+        sampler.width = sampleWidth;
+        sampler.height = sampleHeight;
+        samplerContext.clearRect(0, 0, sampleWidth, sampleHeight);
+        samplerContext.drawImage(image, 0, 0, sampleWidth, sampleHeight);
+
+        let data;
+        try {
+          data = samplerContext.getImageData(0, 0, sampleWidth, sampleHeight).data;
+        } catch (error) {
+          return [];
+        }
+
+        const candidates = [];
+        for (let y = 1; y < sampleHeight - 1; y += 2) {
+          for (let x = 1; x < sampleWidth - 1; x += 2) {
+            const offset = (y * sampleWidth + x) * 4;
+            const alpha = data[offset + 3];
+            if (alpha < 28) continue;
+
+            const r = data[offset];
+            const g = data[offset + 1];
+            const b = data[offset + 2];
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const brightness = (r + g + b) / 765;
+            const saturation = max ? (max - min) / max : 0;
+            const leftAlpha = data[offset - 1] || 0;
+            const rightAlpha = data[offset + 7] || 0;
+            const topAlpha = data[offset - sampleWidth * 4 + 3] || 0;
+            const bottomAlpha = data[offset + sampleWidth * 4 + 3] || 0;
+            const edge = Math.max(
+              Math.abs(alpha - leftAlpha),
+              Math.abs(alpha - rightAlpha),
+              Math.abs(alpha - topAlpha),
+              Math.abs(alpha - bottomAlpha)
+            ) / 255;
+            const importance = clamp(alpha / 255 * 0.54 + edge * 0.62 + saturation * 0.28 + (1 - brightness) * 0.1, 0.05, 1);
+            if (Math.random() > clamp(0.12 + importance * 0.66, 0.18, 0.88)) continue;
+
+            candidates.push({
+              x,
+              y,
+              weight: 0.35 + importance * 1.9,
+              radius: 0.82 + importance * 1.45,
+              importance,
+              color: particleColorFromPixel(r, g, b, assetIndex, x, y, importance)
+            });
+          }
+        }
+
+        if (!candidates.length) return [];
+        const cumulative = [];
+        const totalWeight = candidates.reduce((sum, candidate) => {
+          const next = sum + candidate.weight;
+          cumulative.push(next);
+          return next;
+        }, 0);
+        const targets = [];
+        const density = state.width < 760 ? 0.46 : state.width < 1040 ? 0.68 : 1;
+        const targetCount = Math.min(candidates.length, Math.max(42, Math.round(desired * density)));
+
+        for (let index = 0; index < targetCount; index += 1) {
+          const pick = Math.random() * totalWeight;
+          const candidateIndex = cumulative.findIndex((value) => value >= pick);
+          const candidate = candidates[Math.max(0, candidateIndex)];
+          const nx = (candidate.x + Math.random() * 0.6 - 0.3) / sampleWidth;
+          const ny = (candidate.y + Math.random() * 0.6 - 0.3) / sampleHeight;
+          targets.push({
+            tx: rect.left + nx * rect.width,
+            ty: rect.top + ny * rect.height,
+            nx,
+            ny,
+            radius: candidate.radius,
+            color: candidate.color,
+            assetIndex,
+            importance: candidate.importance,
+            assetCenterX: rect.left + rect.width * 0.5,
+            assetCenterY: rect.top + rect.height * 0.5
+          });
+        }
+
+        return targets;
+      }
+
+      function fallbackTemplateTargets() {
+        return ambientAssets.flatMap((assetElement, assetIndex) => {
+          const rect = assetRect(assetElement, assetIndex);
+          const count = assetElement.classList.contains("ambient-ai-lab") ? 92 : 58;
+          return Array.from({ length: count }, (_, index) => {
+            const angle = (index / count) * Math.PI * 2 + Math.random() * 0.18;
+            const radius = Math.sqrt(Math.random());
+            const rx = assetIndex ? 0.22 : 0.3;
+            const ry = assetIndex ? 0.28 : 0.22;
+            const nx = 0.5 + Math.cos(angle) * rx * radius;
+            const ny = 0.5 + Math.sin(angle) * ry * radius;
+            return {
+              tx: rect.left + nx * rect.width,
+              ty: rect.top + ny * rect.height,
+              nx,
+              ny,
+              radius: 1.1 + Math.random() * 1.4,
+              color: colors[(assetIndex + index) % colors.length],
+              assetIndex,
+              importance: 0.5,
+              assetCenterX: rect.left + rect.width * 0.5,
+              assetCenterY: rect.top + rect.height * 0.5
+            };
+          });
+        });
+      }
+
+      function createTemplateTargets() {
+        const imageTargets = ambientAssets.flatMap((assetElement, assetIndex) => sampleTemplateForAsset(assetElement, assetIndex));
+        const textTargets = sampleHeroTextTargets();
+        const structureTargets = sampleHeroStructureTargets();
+        const fieldTargets = createHeroFieldTargets();
+        const targets = balanceBootTargets(imageTargets, textTargets, structureTargets, fieldTargets);
+        state.templateTargets = targets.length ? targets : fallbackTemplateTargets();
+        for (let index = state.templateTargets.length - 1; index > 0; index -= 1) {
+          const swapIndex = Math.floor(Math.random() * (index + 1));
+          [state.templateTargets[index], state.templateTargets[swapIndex]] = [state.templateTargets[swapIndex], state.templateTargets[index]];
+        }
+      }
+
+      function weightedSample(targets, limit) {
+        if (targets.length <= limit) return targets;
+        return [...targets]
+          .sort((a, b) => ((b.importance || 0) + Math.random() * 0.18) - ((a.importance || 0) + Math.random() * 0.18))
+          .slice(0, limit);
+      }
+
+      function balanceBootTargets(imageTargets, textTargets, structureTargets, fieldTargets) {
+        const desktop = state.width >= 1040;
+        const titleTargets = textTargets.filter((target) => target.assetIndex === 8);
+        const otherTextTargets = textTargets.filter((target) => target.assetIndex !== 8);
+        const titleLimit = desktop ? 1450 : state.width < 760 ? 620 : 980;
+        const otherTextLimit = desktop ? 520 : state.width < 760 ? 180 : 320;
+        const imageLimit = desktop ? 680 : state.width < 760 ? 260 : 440;
+        const structureLimit = desktop ? 900 : state.width < 760 ? 280 : 560;
+        const fieldLimit = desktop ? 140 : state.width < 760 ? 50 : 90;
+        return [
+          ...weightedSample(titleTargets, titleLimit),
+          ...weightedSample(otherTextTargets, otherTextLimit),
+          ...weightedSample(imageTargets, imageLimit),
+          ...weightedSample(structureTargets, structureLimit),
+          ...weightedSample(fieldTargets, fieldLimit)
+        ];
+      }
+
+      function createBootParticle(target, index) {
+        const isLeft = target.assetCenterX < state.width * 0.5;
+        const isText = target.kind === "text";
+        const isField = target.kind === "field";
+        const isStructure = target.kind === "structure";
+        const sourceAnchors = [
+          ...(isText || isStructure
+            ? [
+              { x: target.tx + (Math.random() - 0.5) * 150, y: target.ty - 54 - Math.random() * 34, spread: 28 },
+              { x: target.tx - 58 - Math.random() * 42, y: target.ty + (Math.random() - 0.5) * 76, spread: 30 },
+              { x: target.tx + 58 + Math.random() * 42, y: target.ty + (Math.random() - 0.5) * 76, spread: 30 },
+              { x: target.tx + (Math.random() - 0.5) * 120, y: target.ty + 54 + Math.random() * 34, spread: 28 }
+            ]
+            : isField
+              ? [
+                { x: target.tx + (Math.random() - 0.5) * 120, y: target.ty - 42, spread: 34 },
+                { x: target.tx - 48, y: target.ty + (Math.random() - 0.5) * 96, spread: 34 },
+                { x: target.tx + 48, y: target.ty + (Math.random() - 0.5) * 96, spread: 34 },
+                { x: target.tx + (Math.random() - 0.5) * 120, y: target.ty + 42, spread: 34 }
+              ]
+              : isLeft
+            ? [
+              { x: target.tx + (Math.random() - 0.5) * 150, y: target.ty - 54, spread: 42 },
+              { x: target.tx - 62, y: target.ty + (Math.random() - 0.5) * 120, spread: 42 },
+              { x: target.tx + 62, y: target.ty + (Math.random() - 0.5) * 120, spread: 42 },
+              { x: target.tx + (Math.random() - 0.5) * 150, y: target.ty + 54, spread: 42 }
+            ]
+            : [
+              { x: target.tx + (Math.random() - 0.5) * 150, y: target.ty - 54, spread: 42 },
+              { x: target.tx - 62, y: target.ty + (Math.random() - 0.5) * 120, spread: 42 },
+              { x: target.tx + 62, y: target.ty + (Math.random() - 0.5) * 120, spread: 42 },
+              { x: target.tx + (Math.random() - 0.5) * 150, y: target.ty + 54, spread: 42 }
+            ])
+        ];
+        const source = sourceAnchors[index % sourceAnchors.length];
+        const sourceAngle = Math.random() * Math.PI * 2;
+        const sourceRadius = Math.sqrt(Math.random()) * source.spread;
+        return {
+          sx: source.x + Math.cos(sourceAngle) * sourceRadius,
+          sy: source.y + Math.sin(sourceAngle) * sourceRadius,
+          tx: target.tx,
+          ty: target.ty,
+          x: source.x,
+          y: source.y,
+          color: target.color,
+          radius: target.radius,
+          delay: isText ? Math.random() * 0.08 : isStructure ? Math.random() * 0.09 : Math.random() * 0.12 + Math.min(target.assetIndex, 2) * 0.02,
+          duration: isText ? 0.7 + Math.random() * 0.14 : isStructure ? 0.64 + Math.random() * 0.14 : isField ? 0.72 + Math.random() * 0.12 : 0.72 + Math.random() * 0.14,
+          phase: Math.random() * Math.PI * 2,
+          arc: (Math.random() - 0.5) * (isText || isStructure ? 22 : target.assetIndex ? 32 : 42),
+          importance: target.importance,
+          trail: !isText && !isField && target.importance > 0.72 && index % 4 === 0,
+          kind: target.kind || "image"
+        };
+      }
+
+      function createBootParticles() {
+        try {
+          createTemplateTargets();
+          state.bootParticles = state.templateTargets.map((target, index) => createBootParticle(target, index));
+        } catch (error) {
+          state.templateTargets = fallbackTemplateTargets();
+          state.bootParticles = state.templateTargets.map((target, index) => createBootParticle(target, index));
+          console.warn("Using lightweight boot particles because template sampling failed.", error);
+        }
+      }
+
+      function resizeCanvas() {
+        state.width = window.innerWidth;
+        state.height = window.innerHeight;
+        state.ambientRatio = Math.min(window.devicePixelRatio || 1, 1.28);
+        state.bootRatio = Math.min(window.devicePixelRatio || 1, 1.12);
+        state.ratio = state.ambientRatio;
+        canvas.width = Math.round(state.width * state.ambientRatio);
+        canvas.height = Math.round(state.height * state.ambientRatio);
+        canvas.style.width = `${state.width}px`;
+        canvas.style.height = `${state.height}px`;
+        context.setTransform(state.ambientRatio, 0, 0, state.ambientRatio, 0, 0);
+        if (bootCanvas && bootContext && !state.bootComplete) {
+          bootCanvas.width = Math.round(state.width * state.bootRatio);
+          bootCanvas.height = Math.round(state.height * state.bootRatio);
+          bootCanvas.style.width = `${state.width}px`;
+          bootCanvas.style.height = `${state.height}px`;
+          bootContext.setTransform(state.bootRatio, 0, 0, state.bootRatio, 0, 0);
+        }
+
+        const nextCount = reduceMotion.matches ? Math.min(28, particleCount()) : particleCount();
+        state.particles = Array.from({ length: nextCount }, (_, index) => createParticle(index));
+        if (!state.bootComplete) createBootParticles();
+      }
+
+      function drawAmbientParticles(time = 0, alphaScale = 1) {
+        for (const particle of state.particles) {
+          if (!reduceMotion.matches) {
+            const driftX = Math.sin(time * 0.00018 + particle.phase) * (0.08 + particle.band * 0.04);
+            const driftY = Math.cos(time * 0.00016 + particle.phase) * 0.08;
+            particle.x += particle.vx + driftX;
+            particle.y += particle.vy + driftY;
+
+            if (particle.x < -40) particle.x = state.width + 40;
+            if (particle.x > state.width + 40) particle.x = -40;
+            if (particle.y < -40) particle.y = state.height + 40;
+            if (particle.y > state.height + 40) particle.y = -40;
+
+            if (state.mouseActive) {
+              const dx = particle.x - state.mouseX;
+              const dy = particle.y - state.mouseY;
+              const distance = Math.hypot(dx, dy);
+              if (distance < 150 && distance > 0.1) {
+                const push = (150 - distance) / 150;
+                particle.x += (dx / distance) * push * 0.48;
+                particle.y += (dy / distance) * push * 0.48;
+              }
+            }
+          }
+
+          context.beginPath();
+          context.fillStyle = particle.color;
+          context.globalAlpha = 0.28 * alphaScale;
+          context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+          context.fill();
+        }
+
+        for (let i = 0; i < state.particles.length; i += 1) {
+          for (let j = i + 1; j < state.particles.length; j += 1) {
+            const a = state.particles[i];
+            const b = state.particles[j];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const distance = Math.hypot(dx, dy);
+            if (distance > 128) continue;
+            const alpha = (1 - distance / 128) * 0.14 * alphaScale;
+            context.beginPath();
+            context.strokeStyle = `rgba(0, 156, 198, ${alpha.toFixed(3)})`;
+            context.moveTo(a.x, a.y);
+            context.lineTo(b.x, b.y);
+            context.stroke();
+          }
+        }
+
+        if (state.mouseActive) {
+          const gradient = context.createRadialGradient(state.mouseX, state.mouseY, 0, state.mouseX, state.mouseY, 180);
+          gradient.addColorStop(0, "rgba(255, 255, 255, 0.32)");
+          gradient.addColorStop(0.35, "rgba(126, 221, 189, 0.12)");
+          gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+          context.globalAlpha = 1;
+          context.fillStyle = gradient;
+          context.fillRect(state.mouseX - 180, state.mouseY - 180, 360, 360);
+        }
+      }
+
+      function drawAssembly(time = 0) {
+        const layer = bootContext || context;
+        if (!state.bootStart) {
+          state.bootStart = time;
+          document.body.classList.add("is-ambient-booting");
+        }
+        const elapsed = time - state.bootStart;
+        const progress = clamp(elapsed / 1000, 0, 1);
+        const imageAlpha = progress < 0.72 ? 1 : clamp(1 - (progress - 0.72) / 0.28, 0, 1);
+        const textAlpha = progress < 0.68 ? 1 : clamp(1 - (progress - 0.68) / 0.32, 0, 1);
+        const fieldAlpha = progress < 0.82 ? 0.64 : clamp(1 - (progress - 0.82) / 0.18, 0, 0.64);
+        const auraAssets = ambientAssets.length ? ambientAssets : [null];
+        auraAssets.forEach((assetElement, assetIndex) => {
+          const rect = assetRect(assetElement, assetIndex);
+          const center = pointInAsset(rect, assetIndex ? 0.5 : 0.64, assetIndex ? 0.5 : 0.48);
+          const auraRadius = rect.width * (assetIndex ? 0.22 : 0.28);
+          const aura = layer.createRadialGradient(center.x, center.y, 0, center.x, center.y, auraRadius);
+          aura.addColorStop(0, `rgba(255, 255, 255, ${(0.24 * imageAlpha).toFixed(3)})`);
+          aura.addColorStop(0.42, assetIndex
+            ? `rgba(196, 81, 166, ${(0.07 * imageAlpha).toFixed(3)})`
+            : `rgba(126, 221, 189, ${(0.08 * imageAlpha).toFixed(3)})`);
+          aura.addColorStop(1, "rgba(255, 255, 255, 0)");
+          layer.fillStyle = aura;
+          layer.globalAlpha = 1;
+          layer.fillRect(center.x - auraRadius, center.y - auraRadius, auraRadius * 2, auraRadius * 2);
+        });
+
+        layer.save();
+        layer.globalCompositeOperation = "source-over";
+        for (const particle of state.bootParticles) {
+          const local = clamp((progress - particle.delay) / particle.duration, 0, 1);
+          const eased = easeInOut(local);
+          const bend = Math.sin(local * Math.PI) * particle.arc;
+          const shimmer = Math.sin(time * 0.008 + particle.phase) * (1 - eased) * (particle.kind === "text" ? 2.8 : 6);
+          const particleAlpha = particle.kind === "text" ? textAlpha : particle.kind === "field" ? fieldAlpha : imageAlpha;
+          const hold = local > 0.98 ? Math.sin(time * 0.003 + particle.phase) * (particle.kind === "text" ? 0.6 : 1.8) * particleAlpha : 0;
+          particle.x = lerp(particle.sx, particle.tx, eased) + bend * 0.34 + shimmer;
+          particle.y = lerp(particle.sy, particle.ty, eased) - bend * 0.16 + Math.cos(time * 0.006 + particle.phase) * (1 - eased) * 8 + hold;
+
+          if (particle.trail && local > 0.05 && local < 0.72) {
+            const trailAlpha = (1 - local) * 0.035 * particleAlpha;
+            layer.beginPath();
+            layer.strokeStyle = `rgba(0, 156, 198, ${trailAlpha.toFixed(3)})`;
+            layer.moveTo(particle.x, particle.y);
+            layer.quadraticCurveTo(
+              (particle.x + particle.tx) / 2 + particle.arc * 0.28,
+              (particle.y + particle.ty) / 2 - particle.arc * 0.12,
+              particle.x + (particle.tx - particle.x) * 0.32,
+              particle.y + (particle.ty - particle.y) * 0.32
+            );
+            layer.stroke();
+          }
+
+          const pulse = 0.76 + Math.sin(time * 0.01 + particle.phase) * 0.24;
+          layer.beginPath();
+          layer.fillStyle = particle.color;
+          layer.globalAlpha = (particle.kind === "field" ? 0.18 : 0.42 + local * 0.32) * particleAlpha * pulse;
+          layer.arc(particle.x, particle.y, particle.radius + local * (particle.kind === "text" ? 0.38 : 0.9), 0, Math.PI * 2);
+          layer.fill();
+
+          if (particle.kind !== "field") {
+            layer.beginPath();
+            layer.fillStyle = "rgba(255, 255, 255, 0.74)";
+            layer.globalAlpha = 0.18 * particleAlpha * pulse;
+            layer.arc(particle.x, particle.y, particle.radius * 0.38, 0, Math.PI * 2);
+            layer.fill();
+          }
+        }
+        layer.restore();
+
+        if (progress > 0.72) {
+          drawAmbientParticles(time, clamp((progress - 0.72) / 0.28, 0, 1));
+        }
+
+        layer.globalAlpha = 1;
+        if (progress >= 1) {
+          state.booting = false;
+          state.bootComplete = true;
+          state.bootParticles = [];
+          state.templateTargets = [];
+          if (bootContext && bootCanvas) {
+            bootContext.clearRect(0, 0, state.width, state.height);
+            bootCanvas.width = 1;
+            bootCanvas.height = 1;
+            bootCanvas.style.width = "1px";
+            bootCanvas.style.height = "1px";
+          }
+          document.body.classList.remove("is-ambient-booting");
+          document.body.classList.add("is-ambient-ready");
+        }
+      }
+
+      function drawParticleNetwork(time = 0) {
+        context.clearRect(0, 0, state.width, state.height);
+        if (bootContext) bootContext.clearRect(0, 0, state.width, state.height);
+        context.lineWidth = 1;
+        if (bootContext) bootContext.lineWidth = 1;
+
+        if (state.booting && !reduceMotion.matches) {
+          drawAssembly(time);
+        } else {
+          drawAmbientParticles(time);
+        }
+
+        context.globalAlpha = 1;
+        if (!reduceMotion.matches && document.visibilityState === "visible") {
+          state.frame = window.requestAnimationFrame(drawParticleNetwork);
+        } else {
+          state.frame = 0;
+        }
+      }
+
+      function start() {
+        if (!state.frame && !reduceMotion.matches) {
+          state.frame = window.requestAnimationFrame(drawParticleNetwork);
+        } else if (reduceMotion.matches) {
+          drawParticleNetwork(0);
+        }
+      }
+
+      let resizeFrame = 0;
+      window.addEventListener("resize", () => {
+        if (resizeFrame) return;
+        resizeFrame = window.requestAnimationFrame(() => {
+          resizeFrame = 0;
+          resizeCanvas();
+          if (!state.frame) drawParticleNetwork(0);
+        });
+      }, { passive: true });
+
+      window.addEventListener("pointermove", (event) => {
+        state.mouseX = event.clientX;
+        state.mouseY = event.clientY;
+        state.mouseActive = true;
+      }, { passive: true });
+
+      document.addEventListener("pointerleave", () => {
+        state.mouseActive = false;
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") start();
+      });
+
+      reduceMotion.addEventListener("change", () => {
+        state.bootStart = 0;
+        state.booting = !reduceMotion.matches;
+        state.bootComplete = reduceMotion.matches;
+        document.body.classList.toggle("is-ambient-booting", state.booting);
+        document.body.classList.toggle("is-ambient-ready", !state.booting);
+        resizeCanvas();
+        start();
+      });
+
+      Promise.race([
+        Promise.all(templateImages.map(waitForImage)),
+        new Promise((resolve) => window.setTimeout(resolve, 70))
+      ]).then(() => {
+        resizeCanvas();
+        state.bootStart = 0;
+        state.booting = !reduceMotion.matches;
+        state.bootComplete = reduceMotion.matches;
+        document.body.classList.toggle("is-ambient-booting", state.booting);
+        document.body.classList.toggle("is-ambient-ready", !state.booting);
+        start();
+      });
+    }
 
     async function readSectionPartials() {
       const sections = await Promise.all(sectionFiles.map(async (name) => {
@@ -3230,6 +4419,36 @@
           neutralizeInjectedNavigation();
           const observer = new MutationObserver(neutralizeInjectedNavigation);
           observer.observe(shell, { attributeFilter: ["onclick"], attributes: true, childList: true, subtree: true });
+        }
+
+        function loadVisitorGlobeWhenIdle() {
+          const shell = document.querySelector(".visitor-widget-shell");
+          if (!shell || shell.dataset.loaded === "true") return;
+          const src = shell.dataset.visitorSrc;
+          if (!src) return;
+
+          const load = () => {
+            if (shell.dataset.loaded === "true") return;
+            shell.dataset.loaded = "true";
+            const script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = src;
+            script.async = true;
+            shell.appendChild(script);
+          };
+          const schedule = () => {
+            if ("requestIdleCallback" in window) {
+              window.requestIdleCallback(load, { timeout: 2200 });
+            } else {
+              window.setTimeout(load, 1400);
+            }
+          };
+
+          if (document.body.classList.contains("is-ambient-ready")) {
+            schedule();
+          } else {
+            window.setTimeout(schedule, 1200);
+          }
         }
 
         const sectionMeta = {
@@ -3960,6 +5179,7 @@
         });
         initHeroLeadWave();
         initVisitorGlobeGuard();
+        loadVisitorGlobeWhenIdle();
         scheduleActiveUpdate();
 
         menuToggle.addEventListener("click", () => {
@@ -4123,6 +5343,7 @@
 
     loadSectionPartialsIfAvailable()
       .then(() => {
+        initAcademicParticleField();
         initRobotCursor();
         initPage();
       })
