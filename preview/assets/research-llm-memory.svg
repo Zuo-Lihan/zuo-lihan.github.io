@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Memory-aware language model research visual</title>
+  <desc id="desc">A long-context language model retrieves, revises, and forgets memory nodes over time.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbfeff"/>
+      <stop offset=".5" stop-color="#e9fbff"/>
+      <stop offset="1" stop-color="#fff4f8"/>
+    </linearGradient>
+    <linearGradient id="node" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#47e0ff"/>
+      <stop offset=".55" stop-color="#6fa2ff"/>
+      <stop offset="1" stop-color="#c451a6"/>
+    </linearGradient>
+    <linearGradient id="memory" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dff8ff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#37658c" flood-opacity=".16"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="680" rx="44" fill="url(#bg)"/>
+  <circle cx="980" cy="540" r="260" fill="#d3edff" opacity=".36"/>
+  <circle cx="170" cy="150" r="230" fill="#ffe0f5" opacity=".26"/>
+  <path d="M80 334c128-74 248-86 372-32 142 62 245 46 386-44 112-70 208-84 302-48" fill="none" stroke="#26bcd8" stroke-width="4" stroke-opacity=".18"/>
+  <path d="M80 392c138-44 252-38 382 18 126 54 248 56 386-12 124-61 220-59 292-20" fill="none" stroke="#c451a6" stroke-width="4" stroke-opacity=".16"/>
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="116" width="300" height="360" rx="36" fill="#fff" fill-opacity=".78" stroke="#9edce8"/>
+    <rect x="806" y="112" width="324" height="374" rx="38" fill="#fff" fill-opacity=".8" stroke="#9edce8"/>
+    <rect x="420" y="150" width="330" height="278" rx="40" fill="#fff" fill-opacity=".82" stroke="#75d8e8"/>
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif" transform="translate(70 116)">
+    <text x="34" y="54" fill="#0d2d44" font-size="25" font-weight="900">Interaction timeline</text>
+    <line x1="58" y1="100" x2="58" y2="300" stroke="#95dcea" stroke-width="5" stroke-linecap="round"/>
+    <g fill="#ffffff" stroke="#27cce7" stroke-width="5">
+      <circle cx="58" cy="112" r="16"/>
+      <circle cx="58" cy="188" r="16"/>
+      <circle cx="58" cy="264" r="16"/>
+    </g>
+    <g fill="#496c80" font-size="19" font-weight="700">
+      <text x="92" y="118">preference</text>
+      <text x="92" y="194">evidence</text>
+      <text x="92" y="270">revision</text>
+    </g>
+    <g fill="#0a6f8a" opacity=".45">
+      <rect x="92" y="134" width="154" height="11" rx="6"/>
+      <rect x="92" y="210" width="128" height="11" rx="6"/>
+      <rect x="92" y="286" width="176" height="11" rx="6"/>
+    </g>
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif" transform="translate(420 150)">
+    <text x="42" y="58" fill="#0d2d44" font-size="26" font-weight="900">Memory controller</text>
+    <circle cx="166" cy="154" r="82" fill="url(#node)" opacity=".9"/>
+    <circle cx="166" cy="154" r="50" fill="#ffffff" fill-opacity=".72"/>
+    <path d="M132 154h68M166 120v68" stroke="#16445a" stroke-width="8" stroke-linecap="round" opacity=".6"/>
+    <g fill="#fff">
+      <circle cx="98" cy="102" r="10"/>
+      <circle cx="240" cy="120" r="10"/>
+      <circle cx="226" cy="218" r="10"/>
+      <circle cx="94" cy="218" r="10"/>
+    </g>
+    <g stroke="#16445a" stroke-opacity=".42" stroke-width="5">
+      <path d="M106 108l48 30"/>
+      <path d="M230 126l-46 24"/>
+      <path d="M218 212l-36-34"/>
+      <path d="M104 212l46-32"/>
+    </g>
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif" transform="translate(806 112)">
+    <text x="34" y="58" fill="#0d2d44" font-size="25" font-weight="900">Retrieval graph</text>
+    <g stroke="#5aaec2" stroke-opacity=".44" stroke-width="5">
+      <path d="M86 142l88 64 82-104"/>
+      <path d="M86 142l30 150 140-190"/>
+      <path d="M174 206l70 86"/>
+      <path d="M116 292h128"/>
+    </g>
+    <g>
+      <circle cx="86" cy="142" r="34" fill="url(#memory)" stroke="#32cfe8" stroke-width="5"/>
+      <circle cx="174" cy="206" r="40" fill="url(#node)" opacity=".88"/>
+      <circle cx="256" cy="102" r="34" fill="url(#memory)" stroke="#c451a6" stroke-width="5"/>
+      <circle cx="116" cy="292" r="32" fill="url(#memory)" stroke="#7eddbd" stroke-width="5"/>
+      <circle cx="244" cy="292" r="36" fill="url(#memory)" stroke="#32cfe8" stroke-width="5"/>
+    </g>
+    <g fill="#16445a" font-size="17" font-weight="800">
+      <text x="60" y="148">store</text>
+      <text x="144" y="212" fill="#fff">rank</text>
+      <text x="228" y="108">revise</text>
+      <text x="90" y="298">use</text>
+      <text x="214" y="298">forget</text>
+    </g>
+  </g>
+
+  <g fill="none" stroke-width="7" stroke-linecap="round">
+    <path d="M370 294h52" stroke="#35d9f0"/>
+    <path d="M750 294h56" stroke="#35d9f0"/>
+    <path d="M594 430c-10 68 26 106 102 120" stroke="#c451a6" stroke-opacity=".42"/>
+  </g>
+
+  <g transform="translate(330 536)" font-family="Inter, Arial, sans-serif">
+    <rect x="0" y="0" width="542" height="66" rx="26" fill="#ffffff" fill-opacity=".76" stroke="#9edce8"/>
+    <text x="30" y="42" fill="#16445a" font-size="22" font-weight="850">inspectable memory: store -> retrieve -> revise -> forget</text>
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif">
+    <text x="74" y="594" fill="#0d2d44" font-size="30" font-weight="900">Memory-aware language models and long-context reasoning</text>
+    <text x="76" y="632" fill="#496c80" font-size="22" font-weight="650">persistent memory as an auditable model capability</text>
+  </g>
+</svg>

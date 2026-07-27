@@ -37,3 +37,7 @@ _site
 # local preview server runtime
 .run/
 logs/
+
+# generated ambient image intermediates
+preview/assets/ambient-*.png
+preview/assets/ambient-*-green.png
