@@ -139,12 +139,72 @@
       transition: opacity 120ms var(--ease);
     }
 
+    .intro-assembly-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 24;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: normal;
+      transition: opacity 220ms var(--ease);
+    }
+
+    .intro-three-field {
+      position: fixed;
+      inset: 0;
+      z-index: 25;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: normal;
+      transition: opacity 140ms var(--ease);
+    }
+
+    .intro-three-field canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
     body.is-ambient-booting .particle-canvas {
       opacity: 0.42;
     }
 
     body.is-ambient-booting .boot-particle-canvas {
       opacity: 0.94;
+    }
+
+    body.is-intro-assembly .particle-canvas {
+      opacity: 0.3;
+    }
+
+    body.is-intro-assembly .boot-particle-canvas {
+      opacity: 0;
+    }
+
+    body.is-intro-assembly .intro-assembly-canvas {
+      opacity: 1;
+    }
+
+    body.is-intro-assembly .intro-three-field {
+      opacity: 1;
+    }
+
+    body.is-intro-assembly.is-ambient-booting .ambient-asset::before,
+    body.is-intro-assembly.is-ambient-booting .ambient-asset::after {
+      opacity: 0;
+    }
+
+    body.is-intro-assembly.is-ambient-booting .ambient-asset img {
+      opacity: 0.045;
+      filter:
+        saturate(0.82)
+        contrast(0.95)
+        blur(1.1px)
+        drop-shadow(0 18px 54px rgba(15, 64, 92, 0.05));
     }
 
     .energy-field::before,
@@ -2839,6 +2899,8 @@
       </div>
     </div>
     <canvas class="boot-particle-canvas" id="bootParticleCanvas" aria-hidden="true"></canvas>
+    <canvas class="intro-assembly-canvas" id="introAssemblyCanvas" aria-hidden="true"></canvas>
+    <div class="intro-three-field" id="introThreeField" aria-hidden="true"></div>
 
     <header class="topbar">
       <a class="brand" href="#hero" data-target="hero" aria-label="Lihan Zuo home">
@@ -3333,6 +3395,324 @@
 
   <span class="screen-reader" id="status" aria-live="polite"></span>
 
+  <script type="module">
+    (async () => {
+      try {
+        const THREE = await import("./vendor/three.module.js");
+
+        const vertexShader = `
+          uniform float uTime;
+          uniform float uRaw;
+          uniform float uOpacity;
+          uniform float uPixelRatio;
+          uniform vec2 uCenter;
+          uniform vec2 uField;
+          uniform vec2 uMouse;
+          uniform float uMouseActive;
+          attribute vec4 aSeed;
+          attribute vec3 aColor;
+          attribute vec2 aModule;
+          varying vec3 vColor;
+          varying float vAlpha;
+          varying float vDepth;
+
+          float saturate(float value) {
+            return clamp(value, 0.0, 1.0);
+          }
+
+          float easeOutCubic(float value) {
+            value = saturate(value);
+            return 1.0 - pow(1.0 - value, 3.0);
+          }
+
+          float easeInOutCubic(float value) {
+            value = saturate(value);
+            return value < 0.5
+              ? 4.0 * value * value * value
+              : 1.0 - pow(-2.0 * value + 2.0, 3.0) * 0.5;
+          }
+
+          void main() {
+            float appear = easeOutCubic((uRaw - 0.5) / 0.18);
+            float collapse = easeInOutCubic((uRaw - 0.79) / 0.17);
+            float vanish = 1.0 - easeInOutCubic((uRaw - 0.91) / 0.09);
+            float depthBand = floor(aSeed.w * 6.0);
+            float layer = (depthBand - 2.5) / 2.5;
+            float branchId = floor(aSeed.z * 9.0);
+            float branchParity = mod(branchId, 2.0) * 2.0 - 1.0;
+            float branchT = pow(aSeed.y, 0.62);
+            vec2 jitter = vec2(
+              fract(aSeed.z * 37.73 + aSeed.x * 11.17) - 0.5,
+              fract(aSeed.w * 41.91 + aSeed.y * 13.31) - 0.5
+            );
+
+            float baseAngle = branchId / 9.0 * 6.2831853
+              + aModule.x * 1.55
+              - aModule.y * 1.25
+              + (aSeed.x - 0.5) * 0.9
+              + uTime * (0.055 + aSeed.w * 0.055) * branchParity;
+            vec2 hub = uCenter + aModule * uField * vec2(0.92, 0.68);
+            vec2 dir = vec2(cos(baseAngle), sin(baseAngle));
+            vec2 normal = vec2(-dir.y, dir.x);
+            float fieldMin = min(uField.x, uField.y * 1.58);
+            float branchLength = fieldMin * (0.13 + aSeed.x * 0.2 + (1.0 - saturate(abs(aModule.x))) * 0.065);
+            float organicWave = sin(branchT * 3.1415926 * (1.55 + aSeed.z * 2.2) + aSeed.x * 6.2831853 + uTime * (0.42 + aSeed.w * 0.35));
+            float arbor = smoothstep(0.22, 0.96, branchT);
+            vec2 dendrite = hub
+              + dir * branchLength * branchT
+              + normal * organicWave * branchLength * (0.04 + 0.07 * aSeed.w) * (0.35 + arbor);
+            float twigMask = step(0.48, aSeed.z);
+            float twigT = pow(fract(aSeed.x * 6.0 + aSeed.y * 3.7), 0.78);
+            float twigAngle = baseAngle + branchParity * (0.68 + aSeed.w * 0.82);
+            vec2 twigDir = vec2(cos(twigAngle), sin(twigAngle));
+            dendrite += twigDir * branchLength * (0.045 + 0.14 * twigT) * twigMask * smoothstep(0.26, 0.9, branchT);
+            dendrite += jitter * uField * vec2(0.011, 0.01);
+
+            float flowTargetX = min(0.56, aModule.x + 0.24 + aSeed.x * 0.34);
+            float flowTargetY = mix(aModule.y, cos(aModule.x * 3.8 + aSeed.w * 5.8 + branchId * 0.7) * 0.34, 0.48);
+            vec2 bridgeTarget = uCenter + vec2(flowTargetX * uField.x, flowTargetY * uField.y);
+            vec2 bridgeNormal = normalize(vec2(
+              -(bridgeTarget.y - hub.y),
+              bridgeTarget.x - hub.x
+            ) + vec2(0.001, 0.002));
+            vec2 bridge = mix(hub, bridgeTarget, branchT)
+              + bridgeNormal * sin(branchT * 3.1415926 + uTime * 0.2 + aSeed.z * 5.0) * fieldMin * (0.018 + aSeed.x * 0.022);
+            float bridgeMask = step(0.78, aSeed.z);
+            vec2 neuralPlane = mix(dendrite, bridge, bridgeMask * 0.46);
+            float breathe = sin(uTime * 0.72 + aSeed.w * 6.2831853 + branchT * 2.5) * 0.018;
+            neuralPlane = uCenter + (neuralPlane - uCenter) * (0.94 + breathe);
+            float travel = fract(branchT - uTime * (0.23 + aSeed.z * 0.08) - aSeed.x * 0.9);
+            float signal = smoothstep(0.0, 0.075, travel) * (1.0 - smoothstep(0.075, 0.19, travel));
+            float depthShift = layer * 78.0 + organicWave * 20.0 + bridgeMask * 18.0;
+            vec2 moduleOffset = aModule * uField * 1.04;
+            vec2 source = uCenter + moduleOffset + jitter * uField * vec2(0.18, 0.14);
+            vec2 core = uCenter + vec2(
+              cos(baseAngle + uTime * 1.1) * uField.x * (0.016 + 0.065 * (1.0 - branchT)),
+              sin(baseAngle * 1.35 - uTime * 0.82) * uField.y * (0.012 + 0.042 * (1.0 - branchT))
+            );
+            vec2 target = mix(neuralPlane, core, collapse);
+            vec2 pos = mix(source, target, appear);
+            float leftToRight = saturate((pos.x - (uCenter.x - uField.x * 0.58)) / max(uField.x * 1.16, 1.0));
+            float flowHead = fract(uTime * 0.34);
+            float flowEcho = fract(flowHead + 0.42);
+            float flowDelta = abs(leftToRight - flowHead);
+            flowDelta = min(flowDelta, 1.0 - flowDelta);
+            float echoDelta = abs(leftToRight - flowEcho);
+            echoDelta = min(echoDelta, 1.0 - echoDelta);
+            float flowSignal = max(exp(-pow(flowDelta, 2.0) * 86.0), exp(-pow(echoDelta, 2.0) * 104.0) * 0.62) * (0.48 + bridgeMask * 0.58);
+            float hubFire = pow(sin(uTime * (1.28 + aSeed.x * 0.24) + aModule.x * 11.0 - aModule.y * 9.0 + aSeed.z * 5.0) * 0.5 + 0.5, 8.0)
+              * (1.0 - smoothstep(0.03, 0.24, branchT));
+            signal = max(signal, max(flowSignal, hubFire));
+            float centerSoft = smoothstep(34.0, 92.0, distance(pos, uCenter));
+
+            vec2 mouseDrift = (uMouse - uCenter) / max(uField.x, 1.0);
+            float mouseLift = pow(1.0 - saturate(distance(pos, uMouse) / max(uField.x * 0.32, 1.0)), 2.0);
+            pos += mouseDrift * uMouseActive * mouseLift * (1.0 - collapse) * 18.0 * (0.35 + aSeed.y);
+
+            float z = depthShift + sin(uTime * 0.9 + aSeed.y * 9.0) * 12.0;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos.x, pos.y, z, 1.0);
+
+            float depth = clamp(0.78 + layer * 0.08 + aSeed.z * 0.25 + signal * 0.12, 0.58, 1.36);
+            float pulse = 0.86 + signal * 0.78 + sin(uTime * 1.6 + aSeed.w * 6.2831853) * 0.07;
+            gl_PointSize = (1.34 + aSeed.z * 2.55 + smoothstep(0.72, 1.0, branchT) * 0.56) * uPixelRatio * depth * pulse * mix(0.42, 1.0, centerSoft);
+            vColor = mix(aColor, vec3(0.54, 0.95, 0.92), signal * 0.58);
+            vColor = mix(vColor, vec3(0.92, 0.82, 1.0), bridgeMask * 0.14);
+            vDepth = depth;
+            vAlpha = uOpacity * appear * vanish * (0.24 + aSeed.w * 0.5 + signal * 0.48 + smoothstep(0.76, 1.0, branchT) * 0.11) * depth * mix(0.08, 1.0, centerSoft);
+          }
+        `;
+
+        const fragmentShader = `
+          uniform float uTime;
+          varying vec3 vColor;
+          varying float vAlpha;
+          varying float vDepth;
+
+          void main() {
+            float dist = distance(gl_PointCoord, vec2(0.5));
+            if (dist > 0.5) discard;
+            float strength = pow(1.0 - dist * 2.0, 1.65);
+            float core = smoothstep(0.32, 0.0, dist);
+            vec3 finalColor = vColor * (0.9 + vDepth * 0.18);
+            float alpha = min(strength * vAlpha * (0.82 + sin(uTime * 2.0 + vDepth * 7.0) * 0.12), 0.58);
+            gl_FragColor = vec4(finalColor, alpha);
+          }
+        `;
+
+        class AcademicIntroStorm {
+          constructor(host) {
+            this.host = host;
+            this.width = 0;
+            this.height = 0;
+            this.count = 0;
+            this.scene = new THREE.Scene();
+            this.camera = new THREE.OrthographicCamera(0, 1, 0, 1, -1000, 1000);
+            this.renderer = new THREE.WebGLRenderer({
+              alpha: true,
+              antialias: false,
+              powerPreference: "high-performance"
+            });
+            this.renderer.autoClear = true;
+            this.renderer.setClearColor(0xffffff, 0);
+            this.renderer.domElement.setAttribute("aria-hidden", "true");
+            this.host.appendChild(this.renderer.domElement);
+            this.material = null;
+            this.points = null;
+          }
+
+          particleCount() {
+            if (this.width < 760) return 8800;
+            if (this.width < 1180) return 15400;
+            return 26000;
+          }
+
+          palette(index) {
+            const colors = [
+              [0.045, 0.176, 0.265],
+              [0.0, 0.545, 0.655],
+              [0.302, 0.478, 0.84],
+              [0.667, 0.294, 0.643],
+              [0.592, 0.478, 0.14],
+              [0.42, 0.82, 0.78]
+            ];
+            return colors[index % colors.length];
+          }
+
+          rebuildGeometry() {
+            if (this.points) {
+              this.scene.remove(this.points);
+              this.points.geometry.dispose();
+              this.points.material.dispose();
+            }
+
+            this.count = this.particleCount();
+            const positions = new Float32Array(this.count * 3);
+            const seeds = new Float32Array(this.count * 4);
+            const colors = new Float32Array(this.count * 3);
+            const modules = new Float32Array(this.count * 2);
+            const anchors = [
+              [-0.48, -0.2],
+              [-0.24, -0.32],
+              [0.08, -0.28],
+              [0.38, -0.18],
+              [-0.54, 0.04],
+              [-0.24, 0.02],
+              [0.04, 0.06],
+              [0.34, 0.04],
+              [0.54, 0.14],
+              [-0.36, 0.28],
+              [-0.08, 0.32],
+              [0.22, 0.3],
+              [0.48, 0.3]
+            ];
+
+            for (let index = 0; index < this.count; index += 1) {
+              const positionIndex = index * 3;
+              const seedIndex = index * 4;
+              const moduleIndex = index * 2;
+              const colorIndex = index * 3;
+              const anchor = anchors[index % anchors.length];
+              const color = this.palette(index + Math.floor(Math.random() * 5));
+              positions[positionIndex] = 0;
+              positions[positionIndex + 1] = 0;
+              positions[positionIndex + 2] = 0;
+              seeds[seedIndex] = Math.random();
+              seeds[seedIndex + 1] = Math.random();
+              seeds[seedIndex + 2] = Math.random();
+              seeds[seedIndex + 3] = Math.random();
+              modules[moduleIndex] = anchor[0] + (Math.random() - 0.5) * 0.08;
+              modules[moduleIndex + 1] = anchor[1] + (Math.random() - 0.5) * 0.07;
+              colors[colorIndex] = color[0];
+              colors[colorIndex + 1] = color[1];
+              colors[colorIndex + 2] = color[2];
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 4));
+            geometry.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute("aModule", new THREE.BufferAttribute(modules, 2));
+
+            this.material = new THREE.ShaderMaterial({
+              vertexShader,
+              fragmentShader,
+              transparent: true,
+              depthWrite: false,
+              depthTest: false,
+              blending: THREE.NormalBlending,
+              uniforms: {
+                uTime: { value: 0 },
+                uRaw: { value: 0 },
+                uOpacity: { value: 0 },
+                uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, 1.5) },
+                uCenter: { value: new THREE.Vector2(0, 0) },
+                uField: { value: new THREE.Vector2(900, 520) },
+                uMouse: { value: new THREE.Vector2(0, 0) },
+                uMouseActive: { value: 0 }
+              }
+            });
+
+            this.points = new THREE.Points(geometry, this.material);
+            this.scene.add(this.points);
+          }
+
+          resize(width, height) {
+            const nextWidth = Math.max(1, Math.round(width));
+            const nextHeight = Math.max(1, Math.round(height));
+            const needsGeometry = !this.points || Math.abs(nextWidth - this.width) > 180;
+            if (nextWidth === this.width && nextHeight === this.height && !needsGeometry) return;
+            this.width = nextWidth;
+            this.height = nextHeight;
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+            this.renderer.setSize(this.width, this.height, false);
+            this.camera.left = 0;
+            this.camera.right = this.width;
+            this.camera.top = 0;
+            this.camera.bottom = this.height;
+            this.camera.near = -1000;
+            this.camera.far = 1000;
+            this.camera.updateProjectionMatrix();
+            if (needsGeometry) this.rebuildGeometry();
+          }
+
+          render(options) {
+            this.resize(options.width, options.height);
+            const raw = options.raw || 0;
+            const appear = Math.min(1, Math.max(0, (raw - 0.54) / 0.16));
+            const vanish = 1 - Math.min(1, Math.max(0, (raw - 0.91) / 0.09));
+            const opacity = Math.min(1, Math.max(0, appear * vanish));
+            this.host.style.opacity = opacity > 0.01 ? String(Math.min(1, opacity * 1.12)) : "0";
+            if (!this.material || opacity <= 0.003) {
+              this.renderer.clear();
+              return false;
+            }
+            this.material.uniforms.uTime.value = (options.time || 0) * 0.001;
+            this.material.uniforms.uRaw.value = raw;
+            this.material.uniforms.uOpacity.value = opacity;
+            this.material.uniforms.uPixelRatio.value = Math.min(window.devicePixelRatio || 1, 1.5);
+            this.material.uniforms.uCenter.value.set(options.centerX, options.centerY);
+            this.material.uniforms.uField.value.set(options.fieldWidth, options.fieldHeight);
+            this.material.uniforms.uMouse.value.set(options.mouseX || options.centerX, options.mouseY || options.centerY);
+            this.material.uniforms.uMouseActive.value = options.mouseActive ? 1 : 0;
+            this.renderer.render(this.scene, this.camera);
+            return true;
+          }
+
+          hide() {
+            this.host.style.opacity = "0";
+            if (this.renderer) this.renderer.clear();
+          }
+        }
+
+        window.AcademicIntroStorm = AcademicIntroStorm;
+        window.dispatchEvent(new CustomEvent("academic-three-ready"));
+      } catch (error) {
+        console.warn("Three.js intro particle field is unavailable.", error);
+        window.dispatchEvent(new CustomEvent("academic-three-failed"));
+      }
+    })();
+  </script>
+
   <script>
     const sectionFiles = ["hero", "research", "publications", "projects", "profile", "docs", "contact"];
     const canLoadSectionFiles = location.protocol === "http:" || location.protocol === "https:";
@@ -3399,12 +3779,22 @@
       const canvas = document.getElementById("particleCanvas");
       if (!canvas) return;
       const bootCanvas = document.getElementById("bootParticleCanvas");
+      const introCanvas = document.getElementById("introAssemblyCanvas");
+      const introThreeField = document.getElementById("introThreeField");
       const ambientAssets = Array.from(document.querySelectorAll(".ambient-asset"));
       const templateImages = ambientAssets.map((asset) => asset.querySelector("img")).filter(Boolean);
+      const introChip = new Image();
+      introChip.decoding = "async";
+      introChip.src = "assets/agentic-ai-chip-template.png";
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const context = canvas.getContext("2d", { alpha: true });
       const bootContext = bootCanvas?.getContext("2d", { alpha: true });
+      const introContext = introCanvas?.getContext("2d", { alpha: true });
       if (!context) return;
+      const introParams = new URLSearchParams(window.location.search);
+      const introDurationScale = introParams.has("intro-slow") ? 2.6 : 1;
+      const introFreezeRawValue = Number.parseFloat(introParams.get("intro-raw") || "NaN");
+      const introFreezeRaw = Number.isFinite(introFreezeRawValue) ? Math.min(1, Math.max(0, introFreezeRawValue)) : null;
 
       const colors = [
         "rgba(0, 156, 198, 0.55)",
@@ -3417,10 +3807,18 @@
         height: 0,
         ambientRatio: 1,
         bootRatio: 1,
+        introRatio: 1,
         ratio: 1,
         particles: [],
         bootParticles: [],
         templateTargets: [],
+        introStart: 0,
+        introActive: false,
+        introComplete: false,
+        introHandoffReady: false,
+        introHandoffX: 0,
+        introHandoffY: 0,
+        introThree: null,
         bootStart: 0,
         booting: false,
         bootComplete: false,
@@ -3433,6 +3831,41 @@
       const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
       const lerp = (a, b, t) => a + (b - a) * t;
       const easeInOut = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const easeOut = (t) => 1 - Math.pow(1 - clamp(t, 0, 1), 3);
+      const seedWave = (value) => {
+        const wave = Math.sin(value * 12.9898) * 43758.5453;
+        return wave - Math.floor(wave);
+      };
+      const introModules = [
+        { src: [555, 220, 455, 295], from: [0, -138, 0.04, 1.04], delay: 0.03, tint: "rgba(0, 156, 198, 0.26)", radius: 34, shape: "core" },
+        { src: [465, 20, 355, 205], from: [0, -265, -0.035, 1], delay: 0.08, tint: "rgba(154, 106, 0, 0.24)", radius: 24, shape: "iso" },
+        { src: [180, 110, 370, 270], from: [-305, -185, -0.05, 0.99], delay: 0.13, tint: "rgba(78, 125, 255, 0.23)", radius: 26, shape: "iso" },
+        { src: [820, 70, 420, 260], from: [305, -190, 0.05, 0.99], delay: 0.13, tint: "rgba(149, 103, 239, 0.23)", radius: 26, shape: "iso" },
+        { src: [45, 260, 355, 320], from: [-390, -45, -0.04, 0.98], delay: 0.22, tint: "rgba(0, 156, 198, 0.22)", radius: 28, shape: "slab" },
+        { src: [360, 335, 345, 300], from: [-185, 34, 0.03, 0.98], delay: 0.25, tint: "rgba(126, 221, 189, 0.22)", radius: 28, shape: "slab" },
+        { src: [820, 330, 355, 300], from: [188, 34, -0.03, 0.98], delay: 0.25, tint: "rgba(78, 125, 255, 0.22)", radius: 28, shape: "slab" },
+        { src: [1140, 260, 350, 340], from: [395, -38, 0.04, 0.98], delay: 0.22, tint: "rgba(0, 143, 107, 0.22)", radius: 28, shape: "slab" },
+        { src: [115, 560, 405, 340], from: [-360, 190, 0.05, 0.99], delay: 0.34, tint: "rgba(196, 81, 166, 0.22)", radius: 26, shape: "slab" },
+        { src: [495, 610, 370, 315], from: [-110, 255, -0.025, 0.99], delay: 0.38, tint: "rgba(154, 106, 0, 0.2)", radius: 24, shape: "slab" },
+        { src: [835, 590, 420, 330], from: [132, 250, 0.025, 0.99], delay: 0.38, tint: "rgba(78, 125, 255, 0.22)", radius: 26, shape: "slab" },
+        { src: [315, 780, 430, 220], from: [-235, 345, 0.04, 0.98], delay: 0.45, tint: "rgba(0, 156, 198, 0.2)", radius: 24, shape: "slab" },
+        { src: [760, 760, 470, 220], from: [250, 342, -0.04, 0.98], delay: 0.45, tint: "rgba(196, 81, 166, 0.2)", radius: 24, shape: "slab" }
+      ];
+      const introNeuronHubs = [
+        [-0.48, -0.2],
+        [-0.24, -0.32],
+        [0.08, -0.28],
+        [0.38, -0.18],
+        [-0.54, 0.04],
+        [-0.24, 0.02],
+        [0.04, 0.06],
+        [0.34, 0.04],
+        [0.54, 0.14],
+        [-0.36, 0.28],
+        [-0.08, 0.32],
+        [0.22, 0.3],
+        [0.48, 0.3]
+      ];
 
       function particleCount() {
         const area = window.innerWidth * window.innerHeight;
@@ -3485,7 +3918,24 @@
           };
           image.addEventListener("load", finish, { once: true });
           image.addEventListener("error", finish, { once: true });
-          window.setTimeout(finish, 1500);
+          window.setTimeout(finish, 3500);
+        });
+      }
+
+      function waitForIntroThree() {
+        if (reduceMotion.matches || window.AcademicIntroStorm) return Promise.resolve();
+        return new Promise((resolve) => {
+          let settled = false;
+          const finish = () => {
+            if (settled) return;
+            settled = true;
+            window.removeEventListener("academic-three-ready", finish);
+            window.removeEventListener("academic-three-failed", finish);
+            resolve();
+          };
+          window.addEventListener("academic-three-ready", finish, { once: true });
+          window.addEventListener("academic-three-failed", finish, { once: true });
+          window.setTimeout(finish, 1400);
         });
       }
 
@@ -3947,8 +4397,27 @@
         const isText = target.kind === "text";
         const isField = target.kind === "field";
         const isStructure = target.kind === "structure";
+        const useIntroHandoff = state.introHandoffReady && !reduceMotion.matches;
         const sourceAnchors = [
-          ...(isText || isStructure
+          ...(useIntroHandoff
+            ? [
+              {
+                x: state.introHandoffX + Math.cos(index * 2.39996) * Math.min(state.width, state.height) * 0.16,
+                y: state.introHandoffY + Math.sin(index * 2.39996) * Math.min(state.width, state.height) * 0.055,
+                spread: 22
+              },
+              {
+                x: state.introHandoffX + Math.cos(index * 1.618) * Math.min(state.width, state.height) * 0.09,
+                y: state.introHandoffY + Math.sin(index * 1.618) * Math.min(state.width, state.height) * 0.032,
+                spread: 18
+              },
+              {
+                x: state.introHandoffX + (Math.random() - 0.5) * 92,
+                y: state.introHandoffY + (Math.random() - 0.5) * 38,
+                spread: 16
+              }
+            ]
+            : isText || isStructure
             ? [
               { x: target.tx + (Math.random() - 0.5) * 150, y: target.ty - 54 - Math.random() * 34, spread: 28 },
               { x: target.tx - 58 - Math.random() * 42, y: target.ty + (Math.random() - 0.5) * 76, spread: 30 },
@@ -4014,6 +4483,7 @@
         state.height = window.innerHeight;
         state.ambientRatio = Math.min(window.devicePixelRatio || 1, 1.28);
         state.bootRatio = Math.min(window.devicePixelRatio || 1, 1.12);
+        state.introRatio = Math.min(window.devicePixelRatio || 1, 1.28);
         state.ratio = state.ambientRatio;
         canvas.width = Math.round(state.width * state.ambientRatio);
         canvas.height = Math.round(state.height * state.ambientRatio);
@@ -4026,6 +4496,13 @@
           bootCanvas.style.width = `${state.width}px`;
           bootCanvas.style.height = `${state.height}px`;
           bootContext.setTransform(state.bootRatio, 0, 0, state.bootRatio, 0, 0);
+        }
+        if (introCanvas && introContext && state.introActive) {
+          introCanvas.width = Math.round(state.width * state.introRatio);
+          introCanvas.height = Math.round(state.height * state.introRatio);
+          introCanvas.style.width = `${state.width}px`;
+          introCanvas.style.height = `${state.height}px`;
+          introContext.setTransform(state.introRatio, 0, 0, state.introRatio, 0, 0);
         }
 
         const nextCount = reduceMotion.matches ? Math.min(28, particleCount()) : particleCount();
@@ -4090,6 +4567,598 @@
           context.globalAlpha = 1;
           context.fillStyle = gradient;
           context.fillRect(state.mouseX - 180, state.mouseY - 180, 360, 360);
+        }
+      }
+
+      function introLayout() {
+        if (!introChip.naturalWidth) return null;
+        const scale = Math.min(
+          (state.width / introChip.naturalWidth) * 0.78,
+          (state.height / introChip.naturalHeight) * 0.64
+        );
+        const width = introChip.naturalWidth * scale;
+        const height = introChip.naturalHeight * scale;
+        return {
+          scale,
+          x: state.width / 2 - width / 2,
+          y: state.height * 0.53 - height / 2 + 30,
+          width,
+          height
+        };
+      }
+
+      function introModuleProgress(raw, delay) {
+        return 1 - easeInOut(clamp((raw - delay) / 0.44, 0, 1));
+      }
+
+      function introFragmentCollapse(raw, delay = 0) {
+        return easeInOut(clamp((raw - 0.46 - delay * 0.08) / 0.16, 0, 1));
+      }
+
+      function introSeparationScale() {
+        if (state.width < 760) return 1.58;
+        if (state.width < 1180) return 1.86;
+        return 2.12;
+      }
+
+      function introRoundedRect(layer, x, y, width, height, radius) {
+        const r = Math.min(radius, width / 2, height / 2);
+        layer.beginPath();
+        layer.moveTo(x + r, y);
+        layer.lineTo(x + width - r, y);
+        layer.quadraticCurveTo(x + width, y, x + width, y + r);
+        layer.lineTo(x + width, y + height - r);
+        layer.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+        layer.lineTo(x + r, y + height);
+        layer.quadraticCurveTo(x, y + height, x, y + height - r);
+        layer.lineTo(x, y + r);
+        layer.quadraticCurveTo(x, y, x + r, y);
+      }
+
+      function introModuleClipPath(layer, module, width, height) {
+        if (module.shape === "core") {
+          layer.beginPath();
+          layer.moveTo(-width * 0.4, -height * 0.34);
+          layer.lineTo(width * 0.03, -height * 0.49);
+          layer.lineTo(width * 0.43, -height * 0.28);
+          layer.lineTo(width * 0.48, height * 0.2);
+          layer.lineTo(width * 0.12, height * 0.49);
+          layer.lineTo(-width * 0.42, height * 0.32);
+          layer.lineTo(-width * 0.5, -height * 0.06);
+          layer.closePath();
+          return;
+        }
+        if (module.shape === "iso") {
+          layer.beginPath();
+          layer.moveTo(-width * 0.46, -height * 0.26);
+          layer.lineTo(-width * 0.08, -height * 0.48);
+          layer.lineTo(width * 0.46, -height * 0.28);
+          layer.lineTo(width * 0.5, height * 0.2);
+          layer.lineTo(width * 0.12, height * 0.48);
+          layer.lineTo(-width * 0.48, height * 0.28);
+          layer.closePath();
+          return;
+        }
+        if (module.shape === "slab") {
+          layer.beginPath();
+          layer.moveTo(-width * 0.49, -height * 0.2);
+          layer.lineTo(width * 0.18, -height * 0.46);
+          layer.lineTo(width * 0.5, -height * 0.14);
+          layer.lineTo(width * 0.4, height * 0.32);
+          layer.lineTo(-width * 0.18, height * 0.48);
+          layer.lineTo(-width * 0.52, height * 0.14);
+          layer.closePath();
+          return;
+        }
+        introRoundedRect(layer, -width / 2, -height / 2, width, height, (module.radius || 28) * (state.width / 1280));
+      }
+
+      function drawIntroCompleteChip(layer, layout, raw, time) {
+        const alpha = 1 - clamp((raw - 0.04) / 0.2, 0, 1);
+        if (alpha <= 0) return;
+        const breathe = Math.sin(time * 0.0011) * 1.2;
+        layer.save();
+        layer.globalAlpha = 0.9 * alpha;
+        layer.shadowColor = "rgba(42, 154, 200, 0.2)";
+        layer.shadowBlur = 30;
+        layer.drawImage(introChip, layout.x + pointerDriftX(0.18), layout.y + breathe + pointerDriftY(0.12), layout.width, layout.height);
+        layer.restore();
+
+        const flare = clamp(raw / 0.16, 0, 1) * clamp((0.28 - raw) / 0.16, 0, 1);
+        if (!flare) return;
+        layer.save();
+        layer.globalCompositeOperation = "lighter";
+        const sweep = lerp(layout.x - layout.width * 0.16, layout.x + layout.width * 1.06, flare);
+        const gradient = layer.createLinearGradient(sweep - 80, layout.y, sweep + 80, layout.y + layout.height);
+        gradient.addColorStop(0, "rgba(255, 255, 255, 0)");
+        gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.48)");
+        gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+        layer.fillStyle = gradient;
+        layer.fillRect(layout.x, layout.y, layout.width, layout.height);
+        layer.restore();
+      }
+
+      function drawIntroModule(layer, module, layout, raw, time) {
+        const [sx, sy, sw, sh] = module.src;
+        const progress = introModuleProgress(raw, module.delay);
+        const split = 1 - progress;
+        const collapse = introFragmentCollapse(raw, module.delay);
+        const separation = introSeparationScale();
+        const finalX = layout.x + sx * layout.scale;
+        const finalY = layout.y + sy * layout.scale;
+        const width = sw * layout.scale;
+        const height = sh * layout.scale;
+        const centerX = finalX + width / 2;
+        const centerY = finalY + height / 2;
+        const [offsetX, offsetY, rotation, startScale] = module.from;
+        const floatLift = split * (module.ghost ? 18 : 64) * separation;
+        const hover = Math.sin(time * 0.0014 + sx * 0.03) * 1.8;
+        const splitEase = easeOut(split);
+        const introCenterX = layout.x + layout.width * 0.5;
+        const introCenterY = layout.y + layout.height * 0.48;
+        const separatedX = centerX + offsetX * splitEase * separation + pointerDriftX(module.ghost ? 0.16 : 0.62);
+        const separatedY = centerY + offsetY * splitEase * separation - floatLift + hover + pointerDriftY(module.ghost ? 0.12 : 0.42);
+        const collectOrbit = sx * 0.017 + sy * 0.013 + time * 0.0022;
+        const collectedX = introCenterX + Math.cos(collectOrbit) * 14 * (1 - collapse);
+        const collectedY = introCenterY + Math.sin(collectOrbit) * 8 * (1 - collapse);
+        const x = lerp(separatedX, collectedX, collapse);
+        const y = lerp(separatedY, collectedY, collapse);
+        const separatedScale = lerp(startScale, 1, progress) * (1 + splitEase * (module.ghost ? 0.1 : 0.28));
+        const scale = lerp(separatedScale, 0.035, collapse);
+        const pointerLean = state.mouseActive ? ((state.mouseX / Math.max(1, state.width)) - 0.5) * 2 : 0;
+        const angle = rotation * splitEase + collapse * 1.8 * (rotation > 0 ? 1 : -1) + pointerLean * 0.012 * progress;
+        const alphaBase = (module.ghost ? 0.16 - split * 0.06 : 0.18 + split * 0.6);
+        const alpha = alphaBase * Math.pow(1 - collapse, 1.45);
+        if (alpha <= 0) return;
+
+        layer.save();
+        layer.translate(x, y);
+        layer.rotate(angle);
+        layer.scale(scale, scale);
+        layer.globalAlpha = alpha;
+        layer.shadowColor = module.tint;
+        layer.shadowBlur = 16 + split * 28;
+        layer.shadowOffsetY = 8 + split * 26;
+        introModuleClipPath(layer, module, width, height);
+        layer.clip();
+        layer.drawImage(introChip, sx, sy, sw, sh, -width / 2, -height / 2, width, height);
+        layer.restore();
+
+        const scan = clamp((raw - module.delay - 0.12) / 0.34, 0, 1) * clamp((module.delay + 0.72 - raw) / 0.22, 0, 1);
+        if (module.ghost || !scan) return;
+        layer.save();
+        layer.translate(x, y);
+        layer.rotate(angle);
+        layer.scale(scale, scale);
+        introModuleClipPath(layer, module, width, height);
+        layer.clip();
+        layer.globalCompositeOperation = "lighter";
+        const sweepX = lerp(-width * 0.7, width * 0.76, scan);
+        const gradient = layer.createLinearGradient(sweepX - width * 0.12, -height, sweepX + width * 0.12, height);
+        gradient.addColorStop(0, "rgba(255, 255, 255, 0)");
+        gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.5)");
+        gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+        layer.fillStyle = gradient;
+        layer.fillRect(-width / 2, -height / 2, width, height);
+        layer.restore();
+      }
+
+      function introModuleSnapshot(module, layout, raw) {
+        const [sx, sy, sw, sh] = module.src;
+        const progress = introModuleProgress(raw, module.delay);
+        const split = 1 - progress;
+        const collapse = introFragmentCollapse(raw, module.delay);
+        const separation = introSeparationScale();
+        const width = sw * layout.scale;
+        const height = sh * layout.scale;
+        const finalX = layout.x + sx * layout.scale + width / 2;
+        const finalY = layout.y + sy * layout.scale + height / 2;
+        const [offsetX, offsetY] = module.from;
+        const splitEase = easeOut(split);
+        const introCenterX = layout.x + layout.width * 0.5;
+        const introCenterY = layout.y + layout.height * 0.48;
+        const separatedX = finalX + offsetX * splitEase * separation + pointerDriftX(module.ghost ? 0.08 : 0.3);
+        const separatedY = finalY + offsetY * splitEase * separation - split * (module.ghost ? 14 : 52) * separation + pointerDriftY(module.ghost ? 0.08 : 0.24);
+        return {
+          x: lerp(separatedX, introCenterX, collapse),
+          y: lerp(separatedY, introCenterY, collapse),
+          width,
+          height,
+          split
+        };
+      }
+
+      function drawIntroPulse(layer, layout, raw, time, alphaScale = 1) {
+        const appear = easeOut(clamp((raw - 0.52) / 0.16, 0, 1));
+        const fade = 1 - easeInOut(clamp((raw - 0.9) / 0.1, 0, 1));
+        const energy = appear * fade * alphaScale;
+        if (energy <= 0.002) return;
+
+        const centerX = layout.x + layout.width * 0.5 + pointerDriftX(0.22);
+        const centerY = layout.y + layout.height * 0.48 + pointerDriftY(0.16);
+        const fieldWidth = Math.min(state.width * 0.96, Math.max(layout.width * 1.58, 960));
+        const fieldHeight = Math.min(state.height * 0.78, Math.max(layout.height * 1.52, 540));
+        state.introHandoffX = centerX;
+        state.introHandoffY = centerY;
+
+        const collapse = easeInOut(clamp((raw - 0.78) / 0.18, 0, 1));
+        const palette = [
+          [11, 45, 68],
+          [0, 139, 167],
+          [77, 122, 214],
+          [170, 75, 164],
+          [151, 122, 36],
+          [104, 210, 198]
+        ];
+
+        layer.save();
+        layer.globalCompositeOperation = "lighter";
+
+        const fieldGlow = layer.createRadialGradient(centerX, centerY, 0, centerX, centerY, fieldWidth * 0.58);
+        fieldGlow.addColorStop(0, `rgba(198, 248, 244, ${(0.11 * energy).toFixed(3)})`);
+        fieldGlow.addColorStop(0.3, `rgba(129, 223, 213, ${(0.085 * energy).toFixed(3)})`);
+        fieldGlow.addColorStop(0.62, `rgba(226, 206, 255, ${(0.055 * energy).toFixed(3)})`);
+        fieldGlow.addColorStop(1, "rgba(255, 255, 255, 0)");
+        layer.fillStyle = fieldGlow;
+        layer.fillRect(centerX - fieldWidth * 0.62, centerY - fieldWidth * 0.62, fieldWidth * 1.24, fieldWidth * 1.24);
+
+        const hubPoints = introNeuronHubs.map((anchor, anchorIndex) => {
+          const depth = ((anchorIndex % 6) - 2.5) / 2.5;
+          const x = centerX + anchor[0] * fieldWidth * 0.92 + depth * fieldWidth * 0.018;
+          const y = centerY + anchor[1] * fieldHeight * 0.7 + depth * fieldHeight * 0.026;
+          return { x, y, depth };
+        });
+        const orderedHubs = [...hubPoints].sort((a, b) => a.x - b.x);
+        const leftEdge = orderedHubs[0]?.x || centerX - fieldWidth * 0.48;
+        const rightEdge = orderedHubs[orderedHubs.length - 1]?.x || centerX + fieldWidth * 0.48;
+        const flowHead = (time * 0.00036) % 1;
+        const flowEcho = (flowHead + 0.42) % 1;
+        const inputLeft = Math.max(10, leftEdge - fieldWidth * 0.18);
+        const flowSpan = Math.max(1, rightEdge - inputLeft);
+        const cycleDistance = (a, b) => {
+          const diff = Math.abs(a - b);
+          return Math.min(diff, 1 - diff);
+        };
+        const bezierAt = (p0, p1, p2, p3, t) => {
+          const q = 1 - t;
+          return {
+            x: q * q * q * p0.x + 3 * q * q * t * p1.x + 3 * q * t * t * p2.x + t * t * t * p3.x,
+            y: q * q * q * p0.y + 3 * q * q * t * p1.y + 3 * q * t * t * p2.y + t * t * t * p3.y
+          };
+        };
+        const networkConnections = [];
+        orderedHubs.slice(0, state.width < 760 ? 6 : 7).forEach((end, inputIndex) => {
+          const start = {
+            x: inputLeft - fieldWidth * (0.018 + inputIndex * 0.012),
+            y: end.y + (seedWave(inputIndex * 9.17 + 3) - 0.5) * fieldHeight * 0.22,
+            depth: end.depth
+          };
+          networkConnections.push({
+            start,
+            end,
+            input: true,
+            colorIndex: inputIndex + 1,
+            phase: inputIndex * 0.035
+          });
+        });
+        const maxHop = state.width < 760 ? 3 : 4;
+        orderedHubs.forEach((start, startIndex) => {
+          for (let hop = 1; hop <= maxHop; hop += 1) {
+            const endIndex = startIndex + hop;
+            if (endIndex >= orderedHubs.length) continue;
+            const end = orderedHubs[endIndex];
+            const span = end.x - start.x;
+            const keepDenseLeft = start.x < centerX && hop <= 3;
+            const keep = keepDenseLeft || hop === 1 || (startIndex + hop) % 2 === 0;
+            if (!keep || span <= fieldWidth * 0.045) continue;
+            networkConnections.push({
+              start,
+              end,
+              input: false,
+              colorIndex: startIndex + hop,
+              phase: seedWave(startIndex * 11.3 + hop * 5.7) * 0.08
+            });
+          }
+        });
+
+        const connectionLimit = state.width < 760 ? 46 : state.width < 1180 ? 60 : 78;
+        networkConnections.slice(0, connectionLimit).forEach((connection, edgeIndex) => {
+          const { start, end } = connection;
+          const dx = end.x - start.x;
+          const bendSeed = seedWave(edgeIndex * 13.7 + 5);
+          const bend = (bendSeed - 0.5) * fieldHeight * (connection.input ? 0.18 : 0.24)
+            + (edgeIndex % 2 ? 1 : -1) * fieldHeight * (connection.input ? 0.035 : 0.055);
+          const controlA = { x: start.x + dx * (connection.input ? 0.48 : 0.3 + seedWave(edgeIndex + 1) * 0.14), y: start.y + bend };
+          const controlB = { x: end.x - dx * (connection.input ? 0.18 : 0.24 + seedWave(edgeIndex + 2) * 0.13), y: end.y - bend * 0.62 };
+          const color = palette[(connection.colorIndex + 1) % palette.length];
+          const startNorm = clamp((start.x - inputLeft) / flowSpan, 0, 1);
+          const endNorm = clamp((end.x - inputLeft) / flowSpan, 0, 1);
+          const localFlow = clamp(((start.x + dx * 0.62) - inputLeft) / flowSpan, 0, 1);
+          const flowLight = Math.max(
+            Math.exp(-Math.pow(cycleDistance(localFlow, flowHead), 2) * 46),
+            Math.exp(-Math.pow(cycleDistance(localFlow, flowEcho), 2) * 58) * 0.68
+          );
+          const lineAlpha = energy * ((connection.input ? 0.078 : 0.048) + flowLight * (connection.input ? 0.22 : 0.15)) * (1 - collapse * 0.68);
+          if (lineAlpha > 0.003) {
+            layer.beginPath();
+            layer.moveTo(start.x, start.y);
+            layer.bezierCurveTo(controlA.x, controlA.y, controlB.x, controlB.y, end.x, end.y);
+            layer.strokeStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${lineAlpha.toFixed(3)})`;
+            layer.lineWidth = (connection.input ? 0.84 : 0.62) + flowLight * (connection.input ? 1.48 : 1.08);
+            layer.stroke();
+          }
+          [
+            { head: (flowHead + connection.phase) % 1, strength: 1 },
+            { head: (flowEcho + connection.phase * 0.7) % 1, strength: 0.72 }
+          ].forEach((wave) => {
+            const duration = Math.max(0.08, endNorm - startNorm + (connection.input ? 0.1 : 0.075));
+            const travel = (wave.head - startNorm + 1) % 1;
+            if (travel > duration) return;
+            const pulseT = clamp(travel / duration, 0, 1);
+            const pulseGate = Math.sin(pulseT * Math.PI) * wave.strength;
+            if (pulseGate <= 0.045) return;
+            const point = bezierAt(start, controlA, controlB, end, pulseT);
+            const backPoint = bezierAt(start, controlA, controlB, end, clamp(pulseT - 0.055, 0, 1));
+            const centerSoft = clamp((Math.hypot(point.x - centerX, point.y - centerY) - 28) / 58, 0, 1);
+            const pulseAlpha = energy * pulseGate * (0.28 + flowLight * 0.2) * (1 - collapse * 0.8) * lerp(0.08, 1, centerSoft);
+            const pulseRadius = (1.28 + pulseGate * 2.45 + seedWave(edgeIndex + Math.round(wave.strength * 19)) * 0.5) * lerp(0.54, 1, centerSoft);
+            layer.beginPath();
+            layer.moveTo(backPoint.x, backPoint.y);
+            layer.lineTo(point.x, point.y);
+            layer.strokeStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${(pulseAlpha * 0.8).toFixed(3)})`;
+            layer.lineWidth = pulseRadius * 0.86;
+            layer.stroke();
+            const pulseGlow = layer.createRadialGradient(point.x, point.y, 0, point.x, point.y, pulseRadius * 5.8);
+            pulseGlow.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${(pulseAlpha * 0.96).toFixed(3)})`);
+            pulseGlow.addColorStop(0.36, `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${(pulseAlpha * 0.34).toFixed(3)})`);
+            pulseGlow.addColorStop(1, "rgba(255, 255, 255, 0)");
+            layer.fillStyle = pulseGlow;
+            layer.fillRect(point.x - pulseRadius * 5.8, point.y - pulseRadius * 5.8, pulseRadius * 11.6, pulseRadius * 11.6);
+            layer.beginPath();
+            layer.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${pulseAlpha.toFixed(3)})`;
+            layer.arc(point.x, point.y, pulseRadius, 0, Math.PI * 2);
+            layer.fill();
+          });
+        });
+
+        hubPoints.forEach((hub, hubIndex) => {
+          const color = palette[hubIndex % palette.length];
+          const breath = 0.7 + Math.sin(time * 0.001 + hubIndex * 1.7) * 0.3;
+          const xNorm = clamp((hub.x - inputLeft) / flowSpan, 0, 1);
+          const flowActivation = Math.max(
+            Math.exp(-Math.pow(cycleDistance(xNorm, flowHead), 2) * 58),
+            Math.exp(-Math.pow(cycleDistance(xNorm, flowEcho), 2) * 68) * 0.72
+          );
+          const randomActivation = Math.pow(Math.max(0, Math.sin(time * 0.0019 + hubIndex * 2.73 + seedWave(hubIndex + 4) * 4.6)), 7);
+          const activation = clamp(flowActivation * 1.08 + randomActivation * 0.72, 0, 1);
+          const radius = fieldWidth * (0.045 + (hubIndex % 4) * 0.006 + breath * 0.012);
+          const glow = layer.createRadialGradient(hub.x, hub.y, 0, hub.x, hub.y, radius);
+          glow.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${((0.09 + activation * 0.18) * energy).toFixed(3)})`);
+          glow.addColorStop(0.42, `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${((0.038 + activation * 0.09) * energy).toFixed(3)})`);
+          glow.addColorStop(1, "rgba(255, 255, 255, 0)");
+          layer.fillStyle = glow;
+          layer.fillRect(hub.x - radius, hub.y - radius, radius * 2, radius * 2);
+          if (activation > 0.04) {
+            const ringRadius = 4.2 + activation * 12 + Math.sin(time * 0.003 + hubIndex) * 1.4;
+            layer.beginPath();
+            layer.strokeStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${(energy * activation * 0.3).toFixed(3)})`;
+            layer.lineWidth = 0.62 + activation * 1.02;
+            layer.arc(hub.x, hub.y, ringRadius, 0, Math.PI * 2);
+            layer.stroke();
+            layer.beginPath();
+            layer.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${(energy * (0.2 + activation * 0.5)).toFixed(3)})`;
+            layer.arc(hub.x, hub.y, 1.35 + activation * 2.65, 0, Math.PI * 2);
+            layer.fill();
+          }
+        });
+
+        const moduleOrigins = introModules
+          .filter((module) => !module.ghost)
+          .map((module) => introModuleSnapshot(module, layout, raw));
+        const count = state.width < 760 ? 1180 : state.width < 1180 ? 1960 : 3080;
+        const fieldMin = Math.min(fieldWidth, fieldHeight * 1.58);
+        for (let index = 0; index < count; index += 1) {
+          const seed = seedWave(index + 31);
+          const seedB = seedWave(index * 2.7 + 9);
+          const seedC = seedWave(index * 4.31 + 17);
+          const color = palette[index % palette.length];
+          const hub = hubPoints[index % hubPoints.length];
+          const partner = hubPoints[(index * 7 + 3) % hubPoints.length];
+          const branchId = Math.floor(seedC * 9);
+          const branchParity = branchId % 2 ? 1 : -1;
+          const branchT = Math.pow(seedB, 0.62);
+          const baseAngle = (branchId / 9) * Math.PI * 2
+            + introNeuronHubs[index % introNeuronHubs.length][0] * 1.55
+            - introNeuronHubs[index % introNeuronHubs.length][1] * 1.25
+            + (seed - 0.5) * 0.9
+            + time * 0.00007 * branchParity;
+          const dirX = Math.cos(baseAngle);
+          const dirY = Math.sin(baseAngle);
+          const normalX = -dirY;
+          const normalY = dirX;
+          const branchLength = fieldMin * (0.13 + seed * 0.2 + (1 - clamp(Math.abs(introNeuronHubs[index % introNeuronHubs.length][0]), 0, 1)) * 0.065);
+          const organicWave = Math.sin(branchT * Math.PI * (1.55 + seedC * 2.2) + seed * Math.PI * 2 + time * (0.00042 + seedB * 0.00035));
+          const arbor = clamp((branchT - 0.22) / 0.74, 0, 1);
+          let neuralX = hub.x
+            + dirX * branchLength * branchT
+            + normalX * organicWave * branchLength * (0.04 + 0.07 * seedB) * (0.35 + arbor)
+            + (seed - 0.5) * fieldWidth * 0.018;
+          let neuralY = hub.y
+            + dirY * branchLength * branchT
+            + normalY * organicWave * branchLength * (0.04 + 0.07 * seedB) * (0.35 + arbor)
+            + (seedC - 0.5) * fieldHeight * 0.016;
+          if (seedC > 0.48) {
+            const twigT = Math.pow(seedWave(index * 5.9 + 2), 0.78);
+            const twigAngle = baseAngle + branchParity * (0.68 + seedB * 0.82);
+            const twigScale = clamp((branchT - 0.26) / 0.64, 0, 1);
+            neuralX += Math.cos(twigAngle) * branchLength * (0.045 + 0.14 * twigT) * twigScale;
+            neuralY += Math.sin(twigAngle) * branchLength * (0.045 + 0.14 * twigT) * twigScale;
+          }
+          if (seedC > 0.78) {
+            const bridgeT = branchT;
+            const bridgeNormalX = -(partner.y - hub.y);
+            const bridgeNormalY = partner.x - hub.x;
+            const bridgeNorm = Math.max(1, Math.hypot(bridgeNormalX, bridgeNormalY));
+            const bridgeCurve = Math.sin(bridgeT * Math.PI + time * 0.0002 + seedC * 5);
+            const bridgeX = lerp(hub.x, partner.x, bridgeT) + (bridgeNormalX / bridgeNorm) * bridgeCurve * fieldMin * (0.018 + seed * 0.022);
+            const bridgeY = lerp(hub.y, partner.y, bridgeT) + (bridgeNormalY / bridgeNorm) * bridgeCurve * fieldMin * (0.018 + seed * 0.022);
+            neuralX = lerp(neuralX, bridgeX, 0.46);
+            neuralY = lerp(neuralY, bridgeY, 0.46);
+          }
+          const breathe = Math.sin(time * 0.00072 + seedB * Math.PI * 2 + branchT * 2.5) * 0.018;
+          neuralX = centerX + (neuralX - centerX) * (0.94 + breathe);
+          neuralY = centerY + (neuralY - centerY) * (0.94 + breathe);
+          const module = moduleOrigins[index % moduleOrigins.length];
+          const sourceMix = easeOut(clamp((raw - 0.52) / 0.18, 0, 1));
+          const sourceX = module.x + (seed - 0.5) * module.width * 0.34;
+          const sourceY = module.y + (seedB - 0.5) * module.height * 0.28;
+          const coreX = centerX + Math.cos(baseAngle + time * 0.0011) * fieldWidth * (0.016 + 0.065 * (1 - branchT));
+          const coreY = centerY + Math.sin(baseAngle * 1.35 - time * 0.00082) * fieldHeight * (0.012 + 0.042 * (1 - branchT));
+          const targetX = lerp(neuralX, coreX, collapse);
+          const targetY = lerp(neuralY, coreY, collapse);
+          const x = lerp(sourceX, targetX, sourceMix);
+          const y = lerp(sourceY, targetY, sourceMix);
+          const centerSoft = clamp((Math.hypot(x - centerX, y - centerY) - 28) / 58, 0, 1);
+          const signalPhase = (branchT - ((time * (0.00034 + seedC * 0.00008) + seed) % 1) + 1) % 1;
+          const localFlowX = clamp((x - inputLeft) / flowSpan, 0, 1);
+          const directionalBoost = Math.max(
+            Math.exp(-Math.pow(cycleDistance(localFlowX, flowHead), 2) * 52),
+            Math.exp(-Math.pow(cycleDistance(localFlowX, flowEcho), 2) * 64) * 0.68
+          ) * 0.9;
+          const randomFire = Math.pow(Math.max(0, Math.sin(time * 0.0015 + (index % hubPoints.length) * 2.19 + seed * 4)), 8) * clamp((0.22 - branchT) / 0.22, 0, 1);
+          const signalBoost = Math.max(Math.exp(-Math.pow(signalPhase - 0.48, 2) * 92), directionalBoost, randomFire);
+          const depth = clamp(0.76 + hub.depth * 0.08 + seedC * 0.24 + signalBoost * 0.12, 0.58, 1.34);
+          const terminal = clamp((branchT - 0.74) / 0.26, 0, 1);
+          const radius = (0.36 + seed * 0.86 + terminal * 0.34 + signalBoost * 0.48) * depth * lerp(0.46, 1, centerSoft);
+          const alpha = energy * (0.14 + seedB * 0.4 + signalBoost * 0.3 + terminal * 0.08) * depth * lerp(0.08, 1, centerSoft);
+
+          layer.beginPath();
+          layer.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha.toFixed(3)})`;
+          layer.arc(x, y, radius, 0, Math.PI * 2);
+          layer.fill();
+
+          if (index % 37 === 0 || signalBoost > 0.92) {
+            const glow = layer.createRadialGradient(x, y, 0, x, y, radius * 6);
+            glow.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${(alpha * 0.18).toFixed(3)})`);
+            glow.addColorStop(1, "rgba(255, 255, 255, 0)");
+            layer.fillStyle = glow;
+            layer.fillRect(x - radius * 6, y - radius * 6, radius * 12, radius * 12);
+          }
+        }
+
+        const flash = easeOut(clamp((raw - 0.84) / 0.12, 0, 1)) * (1 - clamp((raw - 0.95) / 0.05, 0, 1));
+        if (flash > 0.01) {
+          const burst = layer.createRadialGradient(centerX, centerY, 0, centerX, centerY, fieldWidth * 0.34);
+          burst.addColorStop(0, `rgba(210, 255, 248, ${(0.24 * flash).toFixed(3)})`);
+          burst.addColorStop(0.28, `rgba(126, 221, 189, ${(0.12 * flash).toFixed(3)})`);
+          burst.addColorStop(0.56, `rgba(196, 81, 166, ${(0.07 * flash).toFixed(3)})`);
+          burst.addColorStop(1, "rgba(255, 255, 255, 0)");
+          layer.fillStyle = burst;
+          layer.fillRect(centerX - fieldWidth * 0.34, centerY - fieldWidth * 0.34, fieldWidth * 0.68, fieldWidth * 0.68);
+        }
+
+        layer.restore();
+      }
+
+      function drawIntroThreeStorm(layout, raw, time) {
+        if (!introThreeField || reduceMotion.matches || !window.AcademicIntroStorm) return false;
+        if (!state.introThree) {
+          state.introThree = new window.AcademicIntroStorm(introThreeField);
+        }
+        const centerX = layout.x + layout.width * 0.5 + pointerDriftX(0.18);
+        const centerY = layout.y + layout.height * 0.48 + pointerDriftY(0.12);
+        const fieldWidth = Math.min(state.width * 0.96, Math.max(layout.width * 1.58, 980));
+        const fieldHeight = Math.min(state.height * 0.78, Math.max(layout.height * 1.58, 560));
+        state.introHandoffX = centerX;
+        state.introHandoffY = centerY;
+        return state.introThree.render({
+          raw,
+          time,
+          width: state.width,
+          height: state.height,
+          centerX,
+          centerY,
+          fieldWidth,
+          fieldHeight,
+          mouseX: state.mouseX,
+          mouseY: state.mouseY,
+          mouseActive: state.mouseActive
+        });
+      }
+
+      function hideIntroThreeStorm() {
+        if (state.introThree) state.introThree.hide();
+        if (introThreeField) introThreeField.style.opacity = "0";
+      }
+
+      function pointerDriftX(scale = 1) {
+        return state.mouseActive ? ((state.mouseX / Math.max(1, state.width)) - 0.5) * 18 * scale : 0;
+      }
+
+      function pointerDriftY(scale = 1) {
+        return state.mouseActive ? ((state.mouseY / Math.max(1, state.height)) - 0.5) * 12 * scale : 0;
+      }
+
+      function drawIntroDisassembly(time = 0) {
+        const layer = introContext || bootContext || context;
+        if (!state.introStart) {
+          state.introStart = time;
+          document.body.classList.add("is-intro-assembly", "is-ambient-booting");
+        }
+        const layout = introLayout();
+        if (!layout) {
+          state.introActive = false;
+          state.introComplete = true;
+          state.bootStart = 0;
+          state.booting = !reduceMotion.matches;
+          hideIntroThreeStorm();
+          document.body.classList.remove("is-intro-assembly");
+          document.body.classList.toggle("is-ambient-booting", state.booting);
+          document.body.classList.toggle("is-ambient-ready", !state.booting);
+          return;
+        }
+
+        const raw = introFreezeRaw === null
+          ? clamp((time - state.introStart) / (3200 * introDurationScale), 0, 1.08)
+          : introFreezeRaw;
+        const handoff = clamp((raw - 0.78) / 0.18, 0, 1);
+        layer.clearRect(0, 0, state.width, state.height);
+        layer.save();
+        layer.globalAlpha = 1 - handoff * 0.88;
+        const halo = layer.createRadialGradient(state.width * 0.54, state.height * 0.55, 0, state.width * 0.54, state.height * 0.55, Math.max(state.width, state.height) * 0.68);
+        halo.addColorStop(0, "rgba(207, 251, 246, 0.16)");
+        halo.addColorStop(0.34, "rgba(0, 156, 198, 0.11)");
+        halo.addColorStop(0.66, "rgba(196, 81, 166, 0.07)");
+        halo.addColorStop(1, "rgba(255, 255, 255, 0)");
+        layer.fillStyle = halo;
+        layer.fillRect(0, 0, state.width, state.height);
+        layer.restore();
+
+        drawIntroCompleteChip(layer, layout, raw, time);
+        introModules
+          .sort((a, b) => a.src[1] - b.src[1])
+          .forEach((module) => drawIntroModule(layer, module, layout, raw, time));
+        const threeActive = drawIntroThreeStorm(layout, raw, time);
+        drawIntroPulse(layer, layout, raw, time, threeActive ? 0.82 : 1);
+
+        if (raw >= 1) {
+          state.introActive = false;
+          state.introComplete = true;
+          state.introHandoffReady = true;
+          state.bootStart = 0;
+          state.booting = !reduceMotion.matches;
+          if (state.booting) createBootParticles();
+          hideIntroThreeStorm();
+          layer.clearRect(0, 0, state.width, state.height);
+          if (introCanvas && introContext) {
+            introCanvas.width = 1;
+            introCanvas.height = 1;
+            introCanvas.style.width = "1px";
+            introCanvas.style.height = "1px";
+          }
+          document.body.classList.remove("is-intro-assembly");
+          document.body.classList.toggle("is-ambient-booting", state.booting);
+          document.body.classList.toggle("is-ambient-ready", !state.booting);
         }
       }
 
@@ -4188,10 +5257,15 @@
       function drawParticleNetwork(time = 0) {
         context.clearRect(0, 0, state.width, state.height);
         if (bootContext) bootContext.clearRect(0, 0, state.width, state.height);
+        if (introContext) introContext.clearRect(0, 0, state.width, state.height);
         context.lineWidth = 1;
         if (bootContext) bootContext.lineWidth = 1;
+        if (introContext) introContext.lineWidth = 1;
 
-        if (state.booting && !reduceMotion.matches) {
+        if (state.introActive && !reduceMotion.matches) {
+          drawAmbientParticles(time, 0.24);
+          drawIntroDisassembly(time);
+        } else if (state.booting && !reduceMotion.matches) {
           drawAssembly(time);
         } else {
           drawAmbientParticles(time);
@@ -4238,25 +5312,34 @@
       });
 
       reduceMotion.addEventListener("change", () => {
+        state.introStart = 0;
+        state.introHandoffReady = false;
+        hideIntroThreeStorm();
+        state.introActive = !reduceMotion.matches && introChip.complete && introChip.naturalWidth;
+        state.introComplete = reduceMotion.matches || !state.introActive;
         state.bootStart = 0;
-        state.booting = !reduceMotion.matches;
+        state.booting = !reduceMotion.matches && !state.introActive;
         state.bootComplete = reduceMotion.matches;
-        document.body.classList.toggle("is-ambient-booting", state.booting);
-        document.body.classList.toggle("is-ambient-ready", !state.booting);
+        document.body.classList.toggle("is-intro-assembly", state.introActive);
+        document.body.classList.toggle("is-ambient-booting", state.introActive || state.booting);
+        document.body.classList.toggle("is-ambient-ready", !state.introActive && !state.booting);
         resizeCanvas();
         start();
       });
 
-      Promise.race([
-        Promise.all(templateImages.map(waitForImage)),
-        new Promise((resolve) => window.setTimeout(resolve, 70))
-      ]).then(() => {
-        resizeCanvas();
+      Promise.all([...templateImages, introChip].map(waitForImage).concat(waitForIntroThree())).then(() => {
+        state.introStart = 0;
+        state.introHandoffReady = false;
+        hideIntroThreeStorm();
+        state.introActive = !reduceMotion.matches && introChip.complete && introChip.naturalWidth;
+        state.introComplete = reduceMotion.matches || !state.introActive;
         state.bootStart = 0;
-        state.booting = !reduceMotion.matches;
+        state.booting = !reduceMotion.matches && !state.introActive;
         state.bootComplete = reduceMotion.matches;
-        document.body.classList.toggle("is-ambient-booting", state.booting);
-        document.body.classList.toggle("is-ambient-ready", !state.booting);
+        document.body.classList.toggle("is-intro-assembly", state.introActive);
+        document.body.classList.toggle("is-ambient-booting", state.introActive || state.booting);
+        document.body.classList.toggle("is-ambient-ready", !state.introActive && !state.booting);
+        resizeCanvas();
         start();
       });
     }
