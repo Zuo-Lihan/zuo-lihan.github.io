@@ -22,6 +22,7 @@
   - `preview/docs/docs-manifest.json`
   - `preview/docs/docs-data.js`
 - 头像资源：`preview/assets/notion-profile.jpg`
+- 开场芯片动效资源：优先加载 `preview/assets/agentic-ai-chip-template.webp`，不支持 WebP 时回退到 `preview/assets/agentic-ai-chip-template.png`
 - 访客地球统计：位于 `index.html` 与 `preview/index.html` 底部 `visitor-footer`，使用 LiveTrafficFeed 3D visitor map 脚本按域名记录国家级访客来源。
 - 旧 Service Worker 清理脚本：`preview/sw.js`
 - 日常编辑分支：`develop`
