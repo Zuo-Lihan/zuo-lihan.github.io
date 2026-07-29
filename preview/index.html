@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lihan Zuo | Academic Homepage</title>
+  <link rel="preload" href="assets/agentic-ai-chip-template.png" as="image" type="image/png">
   <style>
     :root {
       color-scheme: light;
@@ -2887,7 +2888,7 @@
     }
   </style>
 </head>
-<body class="snap is-ambient-booting" data-lang="en">
+<body class="snap is-ambient-booting is-intro-assembly" data-lang="en">
   <div class="shell">
     <div class="energy-field" aria-hidden="true">
       <canvas class="particle-canvas" id="particleCanvas"></canvas>
@@ -3728,9 +3729,10 @@
     const isReloadNavigation = navigationEntry?.type === "reload";
 
     function clearLegacySiteWorker() {
-      const cleanupKey = "lihan-site-legacy-cleanup-v3";
+      const cleanupKey = "lihan-site-legacy-cleanup-v4";
+      const hasController = Boolean(navigator.serviceWorker?.controller);
       try {
-        if (localStorage.getItem(cleanupKey) === "done") return;
+        if (localStorage.getItem(cleanupKey) === "done" && !hasController) return;
       } catch (error) {
         // Storage may be unavailable under file:// or strict privacy settings.
       }
@@ -5327,7 +5329,7 @@
         start();
       });
 
-      Promise.all([...templateImages, introChip].map(waitForImage).concat(waitForIntroThree())).then(() => {
+      Promise.all([waitForImage(introChip), waitForIntroThree()]).then(() => {
         state.introStart = 0;
         state.introHandoffReady = false;
         hideIntroThreeStorm();
