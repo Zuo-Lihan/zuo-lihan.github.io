@@ -3726,11 +3726,11 @@
     }
 
     const navigationEntry = performance.getEntriesByType("navigation")[0];
-    const isReloadNavigation = navigationEntry?.type === "reload";
+    const isReloadNavigation = navigationEntry && navigationEntry.type === "reload";
 
     function clearLegacySiteWorker() {
       const cleanupKey = "lihan-site-legacy-cleanup-v4";
-      const hasController = Boolean(navigator.serviceWorker?.controller);
+      const hasController = Boolean(navigator.serviceWorker && navigator.serviceWorker.controller);
       try {
         if (localStorage.getItem(cleanupKey) === "done" && !hasController) return;
       } catch (error) {
@@ -3739,7 +3739,7 @@
 
       const clear = async () => {
         try {
-          const hadController = Boolean(navigator.serviceWorker?.controller);
+          const hadController = Boolean(navigator.serviceWorker && navigator.serviceWorker.controller);
           let cacheKeys = [];
           if ("caches" in window) {
             cacheKeys = await caches.keys();
@@ -3790,8 +3790,8 @@
       introChip.src = "assets/agentic-ai-chip-template.png";
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const context = canvas.getContext("2d", { alpha: true });
-      const bootContext = bootCanvas?.getContext("2d", { alpha: true });
-      const introContext = introCanvas?.getContext("2d", { alpha: true });
+      const bootContext = bootCanvas ? bootCanvas.getContext("2d", { alpha: true }) : null;
+      const introContext = introCanvas ? introCanvas.getContext("2d", { alpha: true }) : null;
       if (!context) return;
       const introParams = new URLSearchParams(window.location.search);
       const introDurationScale = introParams.has("intro-slow") ? 2.6 : 1;
@@ -3804,6 +3804,8 @@
         "rgba(196, 81, 166, 0.38)",
         "rgba(154, 106, 0, 0.34)"
       ];
+      const fallbackIntroChipWidth = 1536;
+      const fallbackIntroChipHeight = 1024;
       const state = {
         width: 0,
         height: 0,
@@ -3891,12 +3893,12 @@
       }
 
       function assetRect(assetElement, fallbackIndex = 0) {
-        const rect = assetElement?.getBoundingClientRect();
-        const width = rect?.width || Math.min(state.width * (fallbackIndex ? 0.24 : 0.52), fallbackIndex ? 440 : 900);
-        const height = rect?.height || width * (fallbackIndex ? 1 : 0.54);
+        const rect = assetElement ? assetElement.getBoundingClientRect() : null;
+        const width = (rect && rect.width) || Math.min(state.width * (fallbackIndex ? 0.24 : 0.52), fallbackIndex ? 440 : 900);
+        const height = (rect && rect.height) || width * (fallbackIndex ? 1 : 0.54);
         return {
-          left: rect?.left ?? (fallbackIndex ? -width * 0.26 : state.width - width * 0.84),
-          top: rect?.top ?? (fallbackIndex ? state.height * 0.52 : state.height * 0.14),
+          left: rect ? rect.left : (fallbackIndex ? -width * 0.26 : state.width - width * 0.84),
+          top: rect ? rect.top : (fallbackIndex ? state.height * 0.52 : state.height * 0.14),
           width,
           height
         };
@@ -3939,6 +3941,16 @@
           window.addEventListener("academic-three-failed", finish, { once: true });
           window.setTimeout(finish, 1400);
         });
+      }
+
+      function watchMediaQuery(query, handler) {
+        if (query.addEventListener) {
+          query.addEventListener("change", handler);
+          return;
+        }
+        if (query.addListener) {
+          query.addListener(handler);
+        }
       }
 
       function particleColorFromPixel(r, g, b, assetIndex, x, y, importance) {
@@ -3994,7 +4006,7 @@
       }
 
       function sampleTextElement(element, textIndex, desired) {
-        const rect = element?.getBoundingClientRect();
+        const rect = element ? element.getBoundingClientRect() : null;
         if (!rect || rect.width < 8 || rect.height < 8) return [];
 
         const isHeroTitle = element.classList.contains("hero-title");
@@ -4123,7 +4135,7 @@
       }
 
       function sampleElementStructure(element, elementIndex, desired) {
-        const rect = element?.getBoundingClientRect();
+        const rect = element ? element.getBoundingClientRect() : null;
         if (!rect || rect.width < 6 || rect.height < 6) return [];
 
         const density = state.width < 760 ? 0.5 : state.width < 1040 ? 0.72 : 1;
@@ -4199,8 +4211,9 @@
 
       function createHeroFieldTargets() {
         const hero = document.getElementById("hero");
-        const heroRect = hero?.getBoundingClientRect() || { left: 0, top: 0, width: state.width, height: Math.min(state.height, 760) };
-        const cardRect = document.querySelector("#hero .profile-card")?.getBoundingClientRect();
+        const heroRect = hero ? hero.getBoundingClientRect() : { left: 0, top: 0, width: state.width, height: Math.min(state.height, 760) };
+        const profileCardElement = document.querySelector("#hero .profile-card");
+        const cardRect = profileCardElement ? profileCardElement.getBoundingClientRect() : null;
         const count = Math.round(clamp((state.width * state.height) / 5200, state.width < 760 ? 80 : 150, state.width < 760 ? 150 : 360));
         const targets = [];
         for (let index = 0; index < count; index += 1) {
@@ -4233,7 +4246,7 @@
         const desired = Number.parseInt(assetElement.dataset.particleCount || "", 10)
           || (assetElement.classList.contains("ambient-ai-lab") ? 176 : 112);
         const rect = assetRect(assetElement, assetIndex);
-        if (!image?.naturalWidth || !image?.naturalHeight || rect.width <= 0 || rect.height <= 0) {
+        if (!image || !image.naturalWidth || !image.naturalHeight || rect.width <= 0 || rect.height <= 0) {
           return [];
         }
 
@@ -4573,13 +4586,14 @@
       }
 
       function introLayout() {
-        if (!introChip.naturalWidth) return null;
+        const naturalWidth = introChip.naturalWidth || fallbackIntroChipWidth;
+        const naturalHeight = introChip.naturalHeight || fallbackIntroChipHeight;
         const scale = Math.min(
-          (state.width / introChip.naturalWidth) * 0.78,
-          (state.height / introChip.naturalHeight) * 0.64
+          (state.width / naturalWidth) * 0.78,
+          (state.height / naturalHeight) * 0.64
         );
-        const width = introChip.naturalWidth * scale;
-        const height = introChip.naturalHeight * scale;
+        const width = naturalWidth * scale;
+        const height = naturalHeight * scale;
         return {
           scale,
           x: state.width / 2 - width / 2,
@@ -4587,6 +4601,73 @@
           width,
           height
         };
+      }
+
+      function drawIntroFallbackChip(layer, layout, time) {
+        const radius = Math.max(18, layout.width * 0.035);
+        const shimmer = (Math.sin(time * 0.002) + 1) * 0.5;
+        layer.save();
+        introRoundedRect(layer, layout.x, layout.y, layout.width, layout.height, radius);
+        const bodyGradient = layer.createLinearGradient(layout.x, layout.y, layout.x + layout.width, layout.y + layout.height);
+        bodyGradient.addColorStop(0, "rgba(236, 252, 255, 0.88)");
+        bodyGradient.addColorStop(0.48, "rgba(255, 255, 255, 0.72)");
+        bodyGradient.addColorStop(1, "rgba(252, 239, 255, 0.78)");
+        layer.fillStyle = bodyGradient;
+        layer.fill();
+        layer.lineWidth = Math.max(1, layout.width * 0.0022);
+        layer.strokeStyle = "rgba(0, 156, 198, 0.2)";
+        layer.stroke();
+
+        layer.globalCompositeOperation = "lighter";
+        layer.lineWidth = Math.max(1, layout.width * 0.0015);
+        for (let index = 0; index < 9; index += 1) {
+          const y = layout.y + layout.height * (0.18 + index * 0.075);
+          const offset = Math.sin(time * 0.0012 + index) * layout.width * 0.02;
+          layer.beginPath();
+          layer.moveTo(layout.x + layout.width * 0.14 + offset, y);
+          layer.bezierCurveTo(
+            layout.x + layout.width * 0.32,
+            y - layout.height * 0.04,
+            layout.x + layout.width * 0.58,
+            y + layout.height * 0.06,
+            layout.x + layout.width * 0.86 - offset,
+            y
+          );
+          layer.strokeStyle = index % 3 === 0
+            ? `rgba(196, 81, 166, ${0.08 + shimmer * 0.05})`
+            : `rgba(0, 156, 198, ${0.1 + shimmer * 0.06})`;
+          layer.stroke();
+        }
+
+        const coreX = layout.x + layout.width * 0.52;
+        const coreY = layout.y + layout.height * 0.48;
+        const core = layer.createRadialGradient(coreX, coreY, 0, coreX, coreY, layout.width * 0.2);
+        core.addColorStop(0, "rgba(126, 221, 189, 0.32)");
+        core.addColorStop(0.42, "rgba(0, 156, 198, 0.14)");
+        core.addColorStop(1, "rgba(255, 255, 255, 0)");
+        layer.fillStyle = core;
+        layer.fillRect(coreX - layout.width * 0.22, coreY - layout.width * 0.22, layout.width * 0.44, layout.width * 0.44);
+        layer.restore();
+      }
+
+      function fillIntroFallbackModule(layer, module, width, height, time) {
+        const pulse = (Math.sin(time * 0.002 + module.src[0] * 0.013) + 1) * 0.5;
+        const gradient = layer.createLinearGradient(-width / 2, -height / 2, width / 2, height / 2);
+        gradient.addColorStop(0, "rgba(235, 252, 255, 0.72)");
+        gradient.addColorStop(0.45, module.tint || "rgba(0, 156, 198, 0.45)");
+        gradient.addColorStop(1, "rgba(255, 244, 255, 0.68)");
+        layer.fillStyle = gradient;
+        layer.fillRect(-width / 2, -height / 2, width, height);
+        layer.globalCompositeOperation = "lighter";
+        layer.strokeStyle = `rgba(255, 255, 255, ${0.18 + pulse * 0.2})`;
+        layer.lineWidth = Math.max(1, Math.min(width, height) * 0.018);
+        for (let index = 0; index < 3; index += 1) {
+          const y = -height * 0.24 + index * height * 0.22;
+          layer.beginPath();
+          layer.moveTo(-width * 0.34, y);
+          layer.lineTo(width * 0.34, y + Math.sin(time * 0.0015 + index) * height * 0.05);
+          layer.stroke();
+        }
       }
 
       function introModuleProgress(raw, delay) {
@@ -4663,7 +4744,16 @@
         layer.globalAlpha = 0.9 * alpha;
         layer.shadowColor = "rgba(42, 154, 200, 0.2)";
         layer.shadowBlur = 30;
-        layer.drawImage(introChip, layout.x + pointerDriftX(0.18), layout.y + breathe + pointerDriftY(0.12), layout.width, layout.height);
+        if (introChip.naturalWidth) {
+          layer.drawImage(introChip, layout.x + pointerDriftX(0.18), layout.y + breathe + pointerDriftY(0.12), layout.width, layout.height);
+        } else {
+          drawIntroFallbackChip(layer, {
+            x: layout.x + pointerDriftX(0.18),
+            y: layout.y + breathe + pointerDriftY(0.12),
+            width: layout.width,
+            height: layout.height
+          }, time);
+        }
         layer.restore();
 
         const flare = clamp(raw / 0.16, 0, 1) * clamp((0.28 - raw) / 0.16, 0, 1);
@@ -4723,7 +4813,11 @@
         layer.shadowOffsetY = 8 + split * 26;
         introModuleClipPath(layer, module, width, height);
         layer.clip();
-        layer.drawImage(introChip, sx, sy, sw, sh, -width / 2, -height / 2, width, height);
+        if (introChip.naturalWidth) {
+          layer.drawImage(introChip, sx, sy, sw, sh, -width / 2, -height / 2, width, height);
+        } else {
+          fillIntroFallbackModule(layer, module, width, height, time);
+        }
         layer.restore();
 
         const scan = clamp((raw - module.delay - 0.12) / 0.34, 0, 1) * clamp((module.delay + 0.72 - raw) / 0.22, 0, 1);
@@ -4811,8 +4905,10 @@
           return { x, y, depth };
         });
         const orderedHubs = [...hubPoints].sort((a, b) => a.x - b.x);
-        const leftEdge = orderedHubs[0]?.x || centerX - fieldWidth * 0.48;
-        const rightEdge = orderedHubs[orderedHubs.length - 1]?.x || centerX + fieldWidth * 0.48;
+        const leftHub = orderedHubs[0];
+        const rightHub = orderedHubs[orderedHubs.length - 1];
+        const leftEdge = (leftHub && leftHub.x) || centerX - fieldWidth * 0.48;
+        const rightEdge = (rightHub && rightHub.x) || centerX + fieldWidth * 0.48;
         const flowHead = (time * 0.00036) % 1;
         const flowEcho = (flowHead + 0.42) % 1;
         const inputLeft = Math.max(10, leftEdge - fieldWidth * 0.18);
@@ -5313,11 +5409,16 @@
         if (document.visibilityState === "visible") start();
       });
 
-      reduceMotion.addEventListener("change", () => {
+      function configureIntroState(forceRestart = true) {
+        if (!forceRestart && (state.introActive || state.introComplete || state.booting)) {
+          resizeCanvas();
+          start();
+          return;
+        }
         state.introStart = 0;
         state.introHandoffReady = false;
         hideIntroThreeStorm();
-        state.introActive = !reduceMotion.matches && introChip.complete && introChip.naturalWidth;
+        state.introActive = !reduceMotion.matches;
         state.introComplete = reduceMotion.matches || !state.introActive;
         state.bootStart = 0;
         state.booting = !reduceMotion.matches && !state.introActive;
@@ -5327,22 +5428,19 @@
         document.body.classList.toggle("is-ambient-ready", !state.introActive && !state.booting);
         resizeCanvas();
         start();
+      }
+
+      watchMediaQuery(reduceMotion, () => configureIntroState(true));
+
+      const introKickTimer = window.setTimeout(() => configureIntroState(true), 180);
+
+      waitForImage(introChip).then(() => {
+        if (state.introActive) resizeCanvas();
       });
 
-      Promise.all([waitForImage(introChip), waitForIntroThree()]).then(() => {
-        state.introStart = 0;
-        state.introHandoffReady = false;
-        hideIntroThreeStorm();
-        state.introActive = !reduceMotion.matches && introChip.complete && introChip.naturalWidth;
-        state.introComplete = reduceMotion.matches || !state.introActive;
-        state.bootStart = 0;
-        state.booting = !reduceMotion.matches && !state.introActive;
-        state.bootComplete = reduceMotion.matches;
-        document.body.classList.toggle("is-intro-assembly", state.introActive);
-        document.body.classList.toggle("is-ambient-booting", state.introActive || state.booting);
-        document.body.classList.toggle("is-ambient-ready", !state.introActive && !state.booting);
-        resizeCanvas();
-        start();
+      waitForIntroThree().then(() => {
+        window.clearTimeout(introKickTimer);
+        configureIntroState(false);
       });
     }
 
@@ -5778,7 +5876,7 @@
         function updateHeroLeadWave(event) {
           if (prefersReducedMotion.matches) return;
           const lead = event.currentTarget;
-          if (!lead._waveMetrics?.length) refreshHeroLeadMetrics(lead);
+          if (!(lead._waveMetrics && lead._waveMetrics.length)) refreshHeroLeadMetrics(lead);
           const rect = lead._waveRect || lead.getBoundingClientRect();
           const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / Math.max(1, rect.width)));
           const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / Math.max(1, rect.height)));
@@ -5901,7 +5999,8 @@
           railDots.forEach((dot) => dot.classList.toggle("active", dot.dataset.target === id));
           const index = Math.max(0, sections.findIndex((section) => section.id === id));
           const lang = currentLang();
-          const meta = sectionMeta[id]?.[lang] || sectionMeta[id]?.en;
+          const metaGroup = sectionMeta[id] || {};
+          const meta = metaGroup[lang] || metaGroup.en;
           if (meta) {
             contextStep.textContent = String(index + 1).padStart(2, "0");
             contextTitle.textContent = meta[0];
@@ -5930,9 +6029,10 @@
         }
 
         function pulseCarousel() {
-          carouselShell?.classList.remove("is-shifting");
-          window.requestAnimationFrame(() => carouselShell?.classList.add("is-shifting"));
-          window.setTimeout(() => carouselShell?.classList.remove("is-shifting"), 620);
+          if (!carouselShell) return;
+          carouselShell.classList.remove("is-shifting");
+          window.requestAnimationFrame(() => carouselShell.classList.add("is-shifting"));
+          window.setTimeout(() => carouselShell.classList.remove("is-shifting"), 620);
         }
 
         function moveCarousel(direction) {
@@ -6151,13 +6251,17 @@
 
         carouselPrev.addEventListener("click", () => moveCarousel(-1));
         carouselNext.addEventListener("click", () => moveCarousel(1));
-        carouselShell?.addEventListener("pointermove", (event) => setCarouselPointer(event.clientX, event.clientY), { passive: true });
-        carouselShell?.addEventListener("pointerleave", resetCarouselPointer);
+        if (carouselShell) {
+          carouselShell.addEventListener("pointermove", (event) => setCarouselPointer(event.clientX, event.clientY), { passive: true });
+          carouselShell.addEventListener("pointerleave", resetCarouselPointer);
+        }
         carouselCards.forEach((card) => {
           card.addEventListener("pointermove", (event) => setCarouselPointer(event.clientX, event.clientY), { passive: true });
         });
-        profileCard?.addEventListener("pointermove", (event) => setProfileCardPointer(event.clientX, event.clientY), { passive: true });
-        profileCard?.addEventListener("pointerleave", resetProfileCardPointer);
+        if (profileCard) {
+          profileCard.addEventListener("pointermove", (event) => setProfileCardPointer(event.clientX, event.clientY), { passive: true });
+          profileCard.addEventListener("pointerleave", resetProfileCardPointer);
+        }
         paperCards.forEach((card) => {
           card.addEventListener("pointermove", (event) => setPaperCardPointer(card, event.clientX, event.clientY), { passive: true });
           card.addEventListener("pointerleave", () => resetPaperCardPointer(card));
@@ -6281,7 +6385,8 @@
             if (value) node.textContent = value;
           });
           initHeroLeadWave();
-          const activeId = document.querySelector(".nav-link.active")?.dataset.target || "hero";
+          const activeNavLink = document.querySelector(".nav-link.active");
+          const activeId = activeNavLink ? activeNavLink.dataset.target : "hero";
           setActive(activeId, true);
         });
 
@@ -6315,7 +6420,7 @@
             p.textContent = paragraph;
             modalBody.appendChild(p);
           });
-          if (data.links?.length) {
+          if (data.links && data.links.length) {
             const links = document.createElement("div");
             links.className = "detail-links";
             data.links.forEach((item) => {
@@ -6384,7 +6489,8 @@
             return;
           }
           if (event.target.closest("button, a")) return;
-          const currentIndex = sections.findIndex((section) => section.id === document.querySelector(".nav-link.active")?.dataset.target);
+          const activeNavLink = document.querySelector(".nav-link.active");
+          const currentIndex = sections.findIndex((section) => section.id === (activeNavLink ? activeNavLink.dataset.target : "hero"));
           if (event.key === "ArrowDown" && currentIndex < sections.length - 1) {
             goToSection(sections[currentIndex + 1].id);
           }
