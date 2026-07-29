@@ -3789,13 +3789,6 @@
       introChip.decoding = "async";
       const introChipOptimizedSrc = "assets/agentic-ai-chip-template.webp";
       const introChipFallbackSrc = "assets/agentic-ai-chip-template.png";
-      let introChipFallbackRequested = false;
-      introChip.addEventListener("error", () => {
-        if (introChipFallbackRequested) return;
-        introChipFallbackRequested = true;
-        introChip.src = introChipFallbackSrc;
-      });
-      introChip.src = introChipOptimizedSrc;
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const context = canvas.getContext("2d", { alpha: true });
       const bootContext = bootCanvas ? bootCanvas.getContext("2d", { alpha: true }) : null;
@@ -3827,6 +3820,7 @@
         introStart: 0,
         introActive: false,
         introComplete: false,
+        introChipReady: false,
         introHandoffReady: false,
         introHandoffX: 0,
         introHandoffY: 0,
@@ -3919,18 +3913,46 @@
         };
       }
 
-      function waitForImage(image) {
-        if (image.complete && image.naturalWidth) return Promise.resolve();
+      function decodeLoadedImage(image) {
+        if (!image.decode) return Promise.resolve(true);
+        try {
+          return image.decode().then(() => true, () => true);
+        } catch (error) {
+          return Promise.resolve(true);
+        }
+      }
+
+      function loadImageSource(image, src, timeout = 8500) {
         return new Promise((resolve) => {
           let settled = false;
-          const finish = () => {
+          let timer = 0;
+          const cleanup = () => {
+            image.removeEventListener("load", handleLoad);
+            image.removeEventListener("error", handleError);
+            window.clearTimeout(timer);
+          };
+          const finish = (loaded) => {
             if (settled) return;
             settled = true;
-            resolve();
+            cleanup();
+            resolve(loaded);
           };
-          image.addEventListener("load", finish, { once: true });
-          image.addEventListener("error", finish, { once: true });
-          window.setTimeout(finish, 3500);
+          const handleLoad = () => {
+            decodeLoadedImage(image).then(() => finish(!!image.naturalWidth));
+          };
+          const handleError = () => finish(false);
+          image.addEventListener("load", handleLoad);
+          image.addEventListener("error", handleError);
+          timer = window.setTimeout(() => finish(false), timeout);
+          image.src = src;
+          if (image.complete && image.naturalWidth) handleLoad();
+        });
+      }
+
+      function loadIntroChipAsset() {
+        return loadImageSource(introChip, introChipOptimizedSrc).then((loaded) => {
+          if (loaded) return true;
+          return loadImageSource(introChip, introChipFallbackSrc);
         });
       }
 
@@ -5417,20 +5439,27 @@
         if (document.visibilityState === "visible") start();
       });
 
-      function configureIntroState(forceRestart = true) {
+      function configureIntroState(forceRestart = true, allowIntro = state.introChipReady) {
         if (!forceRestart && (state.introActive || state.introComplete || state.booting)) {
           resizeCanvas();
           start();
           return;
         }
+        const canRunIntro = allowIntro && !reduceMotion.matches && !!introChip.naturalWidth;
         state.introStart = 0;
         state.introHandoffReady = false;
         hideIntroThreeStorm();
-        state.introActive = !reduceMotion.matches;
+        state.introActive = canRunIntro;
         state.introComplete = reduceMotion.matches || !state.introActive;
         state.bootStart = 0;
         state.booting = !reduceMotion.matches && !state.introActive;
         state.bootComplete = reduceMotion.matches;
+        if (state.booting) {
+          createBootParticles();
+        } else {
+          state.bootParticles = [];
+          state.templateTargets = [];
+        }
         document.body.classList.toggle("is-intro-assembly", state.introActive);
         document.body.classList.toggle("is-ambient-booting", state.introActive || state.booting);
         document.body.classList.toggle("is-ambient-ready", !state.introActive && !state.booting);
@@ -5438,18 +5467,27 @@
         start();
       }
 
-      watchMediaQuery(reduceMotion, () => configureIntroState(true));
+      let introStartupSettled = false;
+      function startIntroAfterAssets(chipReady) {
+        if (introStartupSettled) return;
+        introStartupSettled = true;
+        state.introChipReady = chipReady && !!introChip.naturalWidth;
+        configureIntroState(true, state.introChipReady);
+      }
 
-      const introKickTimer = window.setTimeout(() => configureIntroState(true), 180);
-
-      waitForImage(introChip).then(() => {
-        if (state.introActive) resizeCanvas();
+      watchMediaQuery(reduceMotion, () => {
+        if (introStartupSettled || reduceMotion.matches) {
+          configureIntroState(true, state.introChipReady);
+        }
       });
 
-      waitForIntroThree().then(() => {
-        window.clearTimeout(introKickTimer);
-        configureIntroState(false);
-      });
+      if (reduceMotion.matches) {
+        startIntroAfterAssets(false);
+      } else {
+        Promise.all([loadIntroChipAsset(), waitForIntroThree()]).then((results) => {
+          startIntroAfterAssets(results[0]);
+        });
+      }
     }
 
     async function readSectionPartials() {
