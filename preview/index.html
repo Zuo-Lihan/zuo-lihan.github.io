@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lihan Zuo | Academic Homepage</title>
-  <link rel="preload" href="assets/agentic-ai-chip-template.png" as="image" type="image/png">
+  <link rel="preload" href="assets/agentic-ai-chip-template.webp" as="image" type="image/webp">
   <style>
     :root {
       color-scheme: light;
@@ -3787,7 +3787,15 @@
       const templateImages = ambientAssets.map((asset) => asset.querySelector("img")).filter(Boolean);
       const introChip = new Image();
       introChip.decoding = "async";
-      introChip.src = "assets/agentic-ai-chip-template.png";
+      const introChipOptimizedSrc = "assets/agentic-ai-chip-template.webp";
+      const introChipFallbackSrc = "assets/agentic-ai-chip-template.png";
+      let introChipFallbackRequested = false;
+      introChip.addEventListener("error", () => {
+        if (introChipFallbackRequested) return;
+        introChipFallbackRequested = true;
+        introChip.src = introChipFallbackSrc;
+      });
+      introChip.src = introChipOptimizedSrc;
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const context = canvas.getContext("2d", { alpha: true });
       const bootContext = bootCanvas ? bootCanvas.getContext("2d", { alpha: true }) : null;
