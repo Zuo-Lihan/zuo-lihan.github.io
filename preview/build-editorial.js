@@ -90,7 +90,7 @@ fs.writeFileSync(path.join(root, 'editorial.html'), `<!doctype html>
 <meta name="robots" content="index,follow"><meta name="theme-color" content="#edf2f6">
 <title>Lihan Zuo — Research & Practice</title>
 <link rel="preload" as="image" href="assets/editorial-ocean.jpg">
-<link rel="stylesheet" href="editorial.css">
+<link rel="stylesheet" href="editorial.css?v=visitor-map-20261009">
 <script src="editorial-data.js" defer></script><script src="editorial.js" defer></script><script src="../visitor-counter.js" defer></script></head>
 <body data-lang="en">
 <a class="skip-link" href="#research">Skip to research</a>
