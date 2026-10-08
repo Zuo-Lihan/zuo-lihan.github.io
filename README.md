@@ -23,7 +23,7 @@
   - `preview/docs/docs-data.js`
 - 头像资源：`preview/assets/notion-profile.jpg`
 - 开场芯片动效资源：优先加载 `preview/assets/agentic-ai-chip-template.webp`，不支持 WebP 时回退到 `preview/assets/agentic-ai-chip-template.png`
-- 访客国家统计：线上 `index.html` 与现代预览 `preview/editorial.html` 底部使用 Supercounters Flag Counter；共享加载逻辑为 `visitor-counter.js`，独立统计 ID 为 `1739269`。
+- 访客来源地图：线上 `index.html` 与现代预览 `preview/editorial.html` 页尾使用用户提供的 MapMyVisitors 地图组件，记录来自访问 IP 的地理来源；加载入口为 `visitor-counter.js`，独立嵌入页为 `visitor-widget.html`。
 - 旧 Service Worker 清理脚本：`preview/sw.js`
 - 日常编辑分支：`develop`
 - 线上发布分支：`master`
@@ -332,21 +332,21 @@ echo $! > .run/preview-server.pid
 
 4. 确认没有敏感信息被发布。GitHub Pages 页面是公开网页，邮箱、照片、CV 链接、论文信息都会被互联网上的访问者看到。
 
-## Visitor Countries / 访客国家统计
+## Visitor Map / 访客来源地图
 
-当前页尾使用 [Supercounters Flag Counter](https://www.supercounters.com/flagcounter)，展示真实访问 IP 对应的国家国旗和累计次数，不使用模拟数据或浏览器本地计数。
+页尾采用用户提供的 [MapMyVisitors](https://mapmyvisitors.com/) 平面地图组件，保留蓝调页面布局；不使用模拟地点、模拟数字或浏览器本地计数。
 
-- 独立站点 ID：`1739269`。这是公开的组件标识，不是密钥。以后换布局、重构页面时保留这个 ID，服务端历史记录才能继续累计。
-- [国家统计](https://www.supercounters.com/countries/1739269) / [统计总览](https://www.supercounters.com/stats/1739269)。
-- `visitor-counter.js` 在页面解析完成后立即异步加载官方 HTTPS 组件。记录不依赖滚到页尾或点击组件；脚本或网络被拦截时则无法记录。
-- 只有 `zuo-lihan.github.io` 的正式页面加载组件。`localhost`、直接打开 HTML、本地 IP、其他域名和 `/preview/` 审查页面均不加载统计，避免污染线上数据。更换域名时须更新加载脚本的域名检查。
-- 依据[服务商隐私说明](https://www.supercounters.com/privacy)，按 IP 与组件 ID 的哈希过滤约一小时内的重复访问。不是每次刷新都 +1，也不是永久去重的独立人数；同一 IP 之后再次访问可能继续计数。
-- 国家定位来自 IP 地理数据库，VPN、代理、共享出口可能影响结果，不能等同于访客真实所在地或人数。页面仅展示汇总数据，不展示完整访客 IP。
-- 数据保存在第三方服务端，不依赖 localStorage，也不保存在 Git 仓库。第三方免费服务不提供永久保存保证；服务终止或更换 ID 可能导致数据无法继续使用。
-- 本次换用新服务后从新计数开始；旧 LiveTrafficFeed 数据不会自动迁移。接入验证产生了真实测试访问（包括不同网络出口），不是种入的样例数字。
-- 按[服务商使用要求](https://www.supercounters.com/faq)，官方组件必须保持可见、可点击并保留署名，否则可能被删除。不要拦截组件点击或隐藏组件；访问统计无需点击。
-- `visitor-footer` 不加入顶部导航或进度点，不加载 3D 地球或持续动画。加载失败只显示提示和统计链接，不补造数字。
-- 维护文案使用 `preview/sections/visitors.html`；`preview/build-editorial.js` 从此文件生成现代预览页，避免以后构建恢复旧地球组件。
+- 公开组件 ID：`URtgt4pcWftUoaWi4qeXOWetexS5a5I3xr09IjAhat8`，不是密码或密钥。后续重构保留此 ID，记录才能继续累计。
+- 本站的[真实统计页面](https://mapmyvisitors.com/web/1c8r6)。组件请求已验证返回本站域名和 Pageviews 数据；测试访问也会被服务商记录，不是人工填入的数字。
+- 同时提供的 Globe ID `72PbM9U9vRMk8BGTAXNhU7VBvxipgGoOXVM3Q17qwJw` 虽然能绘出地球，但其 `globe_call_home.js` 数据请求在验证浏览器中被 ORB 拦截。因此按备选要求只接入地图版，不同时加载两套组件。这两个 ID 对应的统计历史可能不同，不能假设互通。
+- `visitor-counter.js` 在页面解析完成后立即加载独立 iframe，官方脚本在 `visitor-widget.js` 中加载。记录不依赖点击或滚到页尾；加载被网络或内容拦截器阻断时则无法记录。
+- 嵌入页隔离第三方的全局 CSS、jQuery 与滚动监听，使用固定视口再按容器缩放，不因手机旋转而重新加载或重复请求统计。数据响应完成才取消加载提示；失败不补造数字。
+- 正式域名 `zuo-lihan.github.io` 默认加载统计。本地、直接打开 HTML、其他域名和 `/preview/` 审查页默认不加载。更换域名时更新两个加载脚本的域名检查。
+- 需要检视真实组件时，在本地页面地址加 `?visitor-review=1`，如 `http://127.0.0.1:4185/preview/editorial.html?visitor-review=1`。这是显式启用真实服务，不是 mock；该模式的测试访问可能进入统计。
+- 服务商按 IP 地理数据库定位，VPN、代理与共享出口会影响结果。无法定位的来源可能显示 unknown，不能手工替它补国家。Pageviews 是浏览统计，不等于永久去重的独立 IP 数量，具体口径以服务商后台为准。
+- 记录在第三方服务端，不依赖 localStorage 和 Git 文件；改布局不会清空同一 ID 的服务端记录。免费第三方服务不能保证永远存在；旧 LiveTrafficFeed、未上线的 Supercounters 数据不会自动迁入。
+- 保留服务商署名及[隐私说明](https://mapmyvisitors.com/b/policy)。本页面不自行公开访客原始 IP。
+- 页尾不加入导航或进度点。文案源文件为 `preview/sections/visitors.html`，构建器从它生成现代预览页面。
 
 ## 日常修改：先推送到 develop
 
