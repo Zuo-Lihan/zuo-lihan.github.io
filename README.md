@@ -23,7 +23,7 @@
   - `preview/docs/docs-data.js`
 - 头像资源：`preview/assets/notion-profile.jpg`
 - 开场芯片动效资源：优先加载 `preview/assets/agentic-ai-chip-template.webp`，不支持 WebP 时回退到 `preview/assets/agentic-ai-chip-template.png`
-- 访客地球统计：位于 `index.html` 与 `preview/index.html` 底部 `visitor-footer`，使用 LiveTrafficFeed 3D visitor map 脚本按域名记录国家级访客来源。
+- 访客国家统计：线上 `index.html` 与现代预览 `preview/editorial.html` 底部使用 Supercounters Flag Counter；共享加载逻辑为 `visitor-counter.js`，独立统计 ID 为 `1739269`。
 - 旧 Service Worker 清理脚本：`preview/sw.js`
 - 日常编辑分支：`develop`
 - 线上发布分支：`master`
@@ -69,7 +69,7 @@ preview/
 - 改 CV 时间线：编辑 `preview/sections/profile.html`
 - 改 Docs 入口卡片兜底内容：编辑 `preview/sections/docs.html`
 - 改联系方式：编辑 `preview/sections/contact.html`
-- 改页面底部访客地球样式或统计脚本：编辑 `preview/index.html` 中的 `visitor-footer`
+- 改当前页面底部访客统计：文案源文件为 `preview/sections/visitors.html`，同步到 `index.html` 和 `preview/editorial.html`；样式在 `editorial.css` 与 `preview/editorial.css`，加载逻辑在 `visitor-counter.js`。旧实验版 `preview/index.html` 不用于当前线上统计。
 - 改整体样式、背景、卡片 hover、轮播交互、弹窗逻辑：编辑 `preview/index.html`
 - 改或新增 Docs 正文：编辑或新增 `preview/docs/markdown/*.md`
 
@@ -332,21 +332,21 @@ echo $! > .run/preview-server.pid
 
 4. 确认没有敏感信息被发布。GitHub Pages 页面是公开网页，邮箱、照片、CV 链接、论文信息都会被互联网上的访问者看到。
 
-## Visitor Globe / 访客来源地图
+## Visitor Countries / 访客国家统计
 
-页面底部的访客地球使用 LiveTrafficFeed 的 3D visitor map widget：
+当前页尾使用 [Supercounters Flag Counter](https://www.supercounters.com/flagcounter)，展示真实访问 IP 对应的国家国旗和累计次数，不使用模拟数据或浏览器本地计数。
 
-```html
-https://cdn.livetrafficfeed.com/static/3d-maps/live.v2.js?o=eaf9ff&l=7eddbd&b=0b6b87&c=2fe2ff&n=c451a6&root=1&s=310
-```
-
-说明：
-
-- 这是静态 GitHub Pages 可用的第三方统计组件；访问者打开页面并加载脚本时就会按国家记录一次 page view，不需要点击地球。
-- 访客来源和次数记录保存在第三方服务端，不保存在本仓库里。
-- `root=1` 表示按根域名记录，后续调整页面布局、移动章节位置或重构 CSS，不会重置该域名下的历史访问来源。
-- 不要把 `visitor-footer` 加入顶部导航或右侧进度点；它只是页面最底部的独立统计区。
-- 如果未来更换统计服务或更换 widget URL，服务端历史记录可能从新服务重新开始。
+- 独立站点 ID：`1739269`。这是公开的组件标识，不是密钥。以后换布局、重构页面时保留这个 ID，服务端历史记录才能继续累计。
+- [国家统计](https://www.supercounters.com/countries/1739269) / [统计总览](https://www.supercounters.com/stats/1739269)。
+- `visitor-counter.js` 在页面解析完成后立即异步加载官方 HTTPS 组件。记录不依赖滚到页尾或点击组件；脚本或网络被拦截时则无法记录。
+- 只有 `zuo-lihan.github.io` 的正式页面加载组件。`localhost`、直接打开 HTML、本地 IP、其他域名和 `/preview/` 审查页面均不加载统计，避免污染线上数据。更换域名时须更新加载脚本的域名检查。
+- 依据[服务商隐私说明](https://www.supercounters.com/privacy)，按 IP 与组件 ID 的哈希过滤约一小时内的重复访问。不是每次刷新都 +1，也不是永久去重的独立人数；同一 IP 之后再次访问可能继续计数。
+- 国家定位来自 IP 地理数据库，VPN、代理、共享出口可能影响结果，不能等同于访客真实所在地或人数。页面仅展示汇总数据，不展示完整访客 IP。
+- 数据保存在第三方服务端，不依赖 localStorage，也不保存在 Git 仓库。第三方免费服务不提供永久保存保证；服务终止或更换 ID 可能导致数据无法继续使用。
+- 本次换用新服务后从新计数开始；旧 LiveTrafficFeed 数据不会自动迁移。接入验证产生了真实测试访问（包括不同网络出口），不是种入的样例数字。
+- 按[服务商使用要求](https://www.supercounters.com/faq)，官方组件必须保持可见、可点击并保留署名，否则可能被删除。不要拦截组件点击或隐藏组件；访问统计无需点击。
+- `visitor-footer` 不加入顶部导航或进度点，不加载 3D 地球或持续动画。加载失败只显示提示和统计链接，不补造数字。
+- 维护文案使用 `preview/sections/visitors.html`；`preview/build-editorial.js` 从此文件生成现代预览页，避免以后构建恢复旧地球组件。
 
 ## 日常修改：先推送到 develop
 

@@ -84,14 +84,14 @@ const docHtml = fs.readFileSync(path.join(root, 'docs/view.html'), 'utf8')
   .replace('</head>', '<link rel="stylesheet" href="../editorial-doc.css"></head>');
 fs.writeFileSync(path.join(root, 'docs/editorial.html'), docHtml);
 fs.writeFileSync(path.join(root, 'docs/editorial-renderer.js'), fs.readFileSync(path.join(root, 'docs/docs-renderer.js'), 'utf8').replaceAll('../index.html?section=docs', '../editorial.html#docs'));
-const footer = source.match(/<footer class="visitor-footer"[\s\S]*?<\/footer>/)[0];
+const footer = read('visitors');
 fs.writeFileSync(path.join(root, 'editorial.html'), `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="index,follow"><meta name="theme-color" content="#edf2f6">
 <title>Lihan Zuo — Research & Practice</title>
 <link rel="preload" as="image" href="assets/editorial-ocean.jpg">
 <link rel="stylesheet" href="editorial.css">
-<script src="editorial-data.js" defer></script><script src="editorial.js" defer></script></head>
+<script src="editorial-data.js" defer></script><script src="editorial.js" defer></script><script src="../visitor-counter.js" defer></script></head>
 <body data-lang="en">
 <a class="skip-link" href="#research">Skip to research</a>
 <header class="masthead"><a class="wordmark" href="#hero" aria-label="Lihan Zuo home">Lihan Zuo<span>Research & Practice</span></a>

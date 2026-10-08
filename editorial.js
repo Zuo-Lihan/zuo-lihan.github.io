@@ -138,13 +138,4 @@
     try {await navigator.clipboard.writeText('zuolihanstudy@gmail.com');e.target.textContent=document.body.dataset.lang==='zh'?'已复制':'Copied';}
     catch {location.href='mailto:zuolihanstudy@gmail.com';}
   });
-  // Keep the existing persistent provider; local review must not add test visits.
-  if (['localhost','127.0.0.1',''].includes(location.hostname)) {
-    document.querySelector('.visitor-footer').hidden=true;
-  } else {
-    const shell=document.querySelector('.visitor-widget-shell');
-    const load=()=>{const script=document.createElement('script');script.src=shell.dataset.visitorSrc;script.async=true;shell.append(script);};
-    if ('requestIdleCallback' in window) requestIdleCallback(load,{timeout:2000});else setTimeout(load,1500);
-    shell.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();},true);
-  }
 })();
