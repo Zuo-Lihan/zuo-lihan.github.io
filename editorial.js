@@ -83,24 +83,151 @@
   }
   initGlassCards();
   const language = document.getElementById('langToggle');
-  function linkInstitutions() {
-    const lead = document.querySelector('.hero-lead');
-    const text = lead.textContent;
-    const destinations = {'Southwest Jiaotong University (SWJTU)':'https://en.swjtu.edu.cn/','西南交通大学(SWJTU)':'https://en.swjtu.edu.cn/',ISTD:'https://www.sutd.edu.sg/istd/',SUTD:'https://www.sutd.edu.sg/'};
-    lead.replaceChildren();
-    text.split(/(Southwest Jiaotong University \(SWJTU\)|西南交通大学\(SWJTU\)|ISTD|SUTD)/).forEach(part=>{
-      if (!destinations[part]) {lead.append(document.createTextNode(part));return;}
-      const a=document.createElement('a');a.textContent=part;a.href=destinations[part];a.target='_blank';a.rel='noreferrer';lead.append(a);
+  function initTextWaves() {
+    const finePointer = matchMedia('(hover:hover) and (pointer:fine)');
+    const controllers = [...document.querySelectorAll('[data-wave-text]')].map(root => {
+      let units = [];
+      let animation = 0;
+      let previousTime = 0;
+      let inside = false;
+      let dirty = true;
+      let pointerX = 0;
+      let pointerY = 0;
+      let amplitude = 4;
+      const enabled = () => finePointer.matches && !reduced.matches;
+      function stop() {
+        if (!inside && !animation) return;
+        inside = false;
+        cancelAnimationFrame(animation);
+        animation = 0;
+        previousTime = 0;
+        units.forEach(unit => {
+          unit.y = unit.rotation = unit.light = 0;
+          unit.node.removeAttribute('style');
+        });
+      }
+      function refresh() {
+        stop();
+        root.querySelectorAll('.wave-word,.wave-unit').forEach(node => node.replaceWith(...node.childNodes));
+        root.normalize();
+        units = [];
+        dirty = true;
+        if (!enabled()) return;
+        const source = root.querySelector('[data-bio-lang]:not([hidden])') || root;
+        const walker = document.createTreeWalker(source, NodeFilter.SHOW_TEXT);
+        const textNodes = [];
+        while (walker.nextNode()) {
+          if (walker.currentNode.textContent.trim()) textNodes.push(walker.currentNode);
+        }
+        const letters = root.dataset.waveText === 'letters';
+        const locale = source.lang || document.documentElement.lang;
+        const segmenter = typeof Intl.Segmenter === 'function'
+          ? new Intl.Segmenter(locale, {granularity: letters ? 'grapheme' : 'word'})
+          : null;
+        function unit(text) {
+          const node = document.createElement('span');
+          node.className = 'wave-unit';
+          node.textContent = text;
+          units.push({node, x: 0, top: 0, y: 0, rotation: 0, light: 0});
+          return node;
+        }
+        textNodes.forEach(textNode => {
+          const fragment = document.createDocumentFragment();
+          const tokens = locale.startsWith('zh') && !letters && segmenter
+            ? [...segmenter.segment(textNode.textContent)].map(part => part.segment)
+            : textNode.textContent.match(/\s+|[^\s]+/gu);
+          tokens.forEach(token => {
+            if (!token.trim()) {fragment.append(document.createTextNode(token));return;}
+            if (!letters) {fragment.append(unit(token));return;}
+            const word = document.createElement('span');
+            word.className = 'wave-word';
+            const characters = segmenter ? [...segmenter.segment(token)].map(part => part.segment) : Array.from(token);
+            characters.forEach(character => word.append(unit(character)));
+            fragment.append(word);
+          });
+          textNode.replaceWith(fragment);
+        });
+        amplitude = Math.min(7, Math.max(3.5, parseFloat(getComputedStyle(root).fontSize) * .065));
+      }
+      function requestFrame() {
+        if (!animation) animation = requestAnimationFrame(paint);
+      }
+      function paint(time) {
+        animation = 0;
+        const amount = 1 - Math.exp(-Math.min(32, previousTime ? time - previousTime : 16) / 65);
+        previousTime = time;
+        const rect = root.getBoundingClientRect();
+        if (dirty) {
+          // Cache word centers once; pointer frames only change paint transforms.
+          units.forEach(unit => {
+            const bounds = unit.node.getBoundingClientRect();
+            unit.x = bounds.left - rect.left + bounds.width / 2;
+            unit.top = bounds.top - rect.top + bounds.height / 2;
+          });
+          dirty = false;
+        }
+        const x = pointerX - rect.left;
+        const y = pointerY - rect.top;
+        let settling = false;
+        units.forEach(unit => {
+          const dx = unit.x - x;
+          const dy = unit.top - y;
+          const distance = (dx / 150) ** 2 + (dy / 58) ** 2;
+          const influence = inside && distance < 4 ? Math.exp(-distance * 1.8) : 0;
+          const phase = dx / 32 + dy / 85;
+          const targetY = Math.sin(phase) * amplitude * influence;
+          const targetRotation = Math.cos(phase) * .6 * influence;
+          const targetLight = influence * .65;
+          const before = unit.y || unit.rotation || unit.light;
+          unit.y += (targetY - unit.y) * amount;
+          unit.rotation += (targetRotation - unit.rotation) * amount;
+          unit.light += (targetLight - unit.light) * amount;
+          if (Math.abs(targetY - unit.y) < .015) unit.y = targetY;else settling = true;
+          if (Math.abs(targetRotation - unit.rotation) < .015) unit.rotation = targetRotation;else settling = true;
+          if (Math.abs(targetLight - unit.light) < .003) unit.light = targetLight;else settling = true;
+          if (!before && !unit.y && !unit.rotation && !unit.light) return;
+          if (!unit.y && !unit.rotation && !unit.light) {unit.node.removeAttribute('style');return;}
+          unit.node.style.transform = `translateY(${unit.y.toFixed(2)}px) rotate(${unit.rotation.toFixed(2)}deg)`;
+          unit.node.style.color = `rgb(${Math.round(25 + unit.light * 27)},${Math.round(46 + unit.light * 44)},${Math.round(66 + unit.light * 57)})`;
+        });
+        if (settling) requestFrame();else previousTime = 0;
+      }
+      root.addEventListener('pointerenter', () => {dirty = true;}, {passive: true});
+      root.addEventListener('pointermove', event => {
+        if (!enabled() || event.pointerType !== 'mouse' || event.buttons || window.getSelection()?.isCollapsed === false) {stop();return;}
+        inside = true;
+        pointerX = event.clientX;
+        pointerY = event.clientY;
+        requestFrame();
+      }, {passive: true});
+      root.addEventListener('pointerleave', () => {if (inside) {inside = false;requestFrame();}}, {passive: true});
+      root.addEventListener('pointerdown', stop, {passive: true});
+      new ResizeObserver(() => {stop();dirty = true;}).observe(root);
+      new IntersectionObserver(entries => {if (!entries[0].isIntersecting) stop();}).observe(root);
+      window.addEventListener('scroll', stop, {passive: true});
+      document.addEventListener('visibilitychange', () => {if (document.hidden) stop();});
+      refresh();
+      return {refresh};
     });
+    const refresh = () => controllers.forEach(controller => controller.refresh());
+    finePointer.addEventListener('change', refresh);
+    reduced.addEventListener('change', refresh);
+    return {refresh};
   }
-  linkInstitutions();
+  function setBiographyLanguage() {
+    const current = document.body.dataset.lang || 'en';
+    document.querySelectorAll('[data-bio-lang]').forEach(node => {node.hidden = node.dataset.bioLang !== current;});
+  }
+  setBiographyLanguage();
+  const textWaves = initTextWaves();
   language.addEventListener('click', () => {
     const zh = document.body.dataset.lang !== 'zh';
     document.body.dataset.lang = zh ? 'zh' : 'en';
     document.documentElement.lang = zh ? 'zh-CN' : 'en';
     language.textContent = zh ? 'EN' : '中文';
     document.querySelectorAll('[data-i18n-en]').forEach(node => {node.textContent = node.dataset[zh ? 'i18nZh' : 'i18nEn'] || node.dataset.i18nEn;});
-    linkInstitutions();
+    setBiographyLanguage();
+    textWaves.refresh();
   });
   const dialog = document.getElementById('detailDialog');
   const body = document.getElementById('detailBody');

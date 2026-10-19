@@ -63,6 +63,8 @@ preview/
 编辑建议：
 
 - 改首页简介、头像旁边的 Links：编辑 `preview/sections/hero.html`
+- 当前海洋版的个人简介单独编辑 `preview/sections/biography.html`，保留其中的中英文段落和机构链接；同步到 `index.html` 与 `preview/editorial.html` 后本地审查。文字波动逻辑在 `editorial.js` 与 `preview/editorial.js`，支持减少动态效果设置，触屏默认关闭。
+- 资料卡内的瓦力：组件源文件 `preview/sections/research-companion.html`，按需加载入口 `research-companion.js`，Three.js 模型和交互在 `walle-scene.js`。使用仓库已有的本地 Three.js，自建几何与纹理，不请求外部模型或 CDN。履带行驶、转向返回、鼠标注视、点击挥手，间歇阅读、电脑工作、游戏和休息；只在组件可见时以约 30 fps 渲染，像素比上限 1.5，减少动态效果时静止，WebGL 不可用时隐藏组件，不影响正文和链接。
 - 改研究方向轮播：编辑 `preview/sections/research.html`
 - 改论文列表：编辑 `preview/sections/publications.html`
 - 改项目作品：编辑 `preview/sections/projects.html`

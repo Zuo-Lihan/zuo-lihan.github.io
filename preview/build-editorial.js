@@ -30,7 +30,7 @@ detailRecords = detailRecords.replace(
 fs.writeFileSync(path.join(root, 'editorial-data.js'), detailRecords);
 const originalHero = read('hero');
 let profile = originalHero.match(/<article class="profile-card"[\s\S]*?<\/article>/)[0];
-let biography = originalHero.match(/<p class="lead hero-lead"[\s\S]*?<\/p>/)[0];
+const biography = read('biography');
 const profileReplacements = [
   ['AI researcher focused on medical multimodal systems.', 'AI researcher focused on LLM systems and efficient inference.'],
   ['关注医学多模态系统的 AI 研究者。', '聚焦大模型系统与高效推理的 AI 研究者。'],
@@ -40,11 +40,7 @@ const profileReplacements = [
   ['医学 AI、多模态学习、大模型可靠性', '大语言模型、推理系统、模型可靠性']
 ];
 for (const [from, to] of profileReplacements) profile = profile.split(from).join(to);
-const biographyReplacements = [
-  ['I earned my B.Eng. in Artificial Intelligence from Southwest Jiaotong University (SWJTU) in 2023, previously worked as a Visiting Researcher at ISTD, SUTD, and now work as an Algorithm Engineer at LexinFintech in Shenzhen.', 'I earned my B.Eng. in Artificial Intelligence from Southwest Jiaotong University (SWJTU) in 2023, conducted research as a Visiting Researcher at ISTD, SUTD, and worked as an Algorithm Engineer at LexinFintech in Shenzhen from June 2025 to August 2026.'],
-  ['我于 2023 年获得西南交通大学(SWJTU)人工智能专业工学学士学位，曾在 SUTD ISTD 担任访问研究员，目前在深圳 LexinFintech 担任算法工程师。', '我于 2023 年获得西南交通大学（SWJTU）人工智能专业工学学士学位，曾在 SUTD ISTD 担任访问研究员，并于 2025 年 6 月至 2026 年 8 月在深圳 LexinFintech 担任算法工程师。']
-];
-for (const [from, to] of biographyReplacements) biography = biography.split(from).join(to);
+profile = profile.replace('<div class="signal-list">', read('research-companion') + '\n<div class="signal-list">');
 const names = ['research', 'publications', 'projects', 'profile', 'docs', 'contact'];
 const labels = ['Research', 'Publications', 'Projects', 'CV', 'Docs', 'Contact'];
 let sections = names.map(read).join('\n');
@@ -90,8 +86,8 @@ fs.writeFileSync(path.join(root, 'editorial.html'), `<!doctype html>
 <meta name="robots" content="index,follow"><meta name="theme-color" content="#edf2f6">
 <title>Lihan Zuo — Research & Practice</title>
 <link rel="preload" as="image" href="assets/editorial-ocean.jpg">
-<link rel="stylesheet" href="editorial.css?v=visitor-map-20261009">
-<script src="editorial-data.js" defer></script><script src="editorial.js" defer></script><script src="../visitor-counter.js" defer></script></head>
+<link rel="stylesheet" href="editorial.css?v=bio-wave-20261019">
+<script src="editorial-data.js" defer></script><script src="editorial.js?v=bio-wave-20261019" defer></script><script src="../visitor-counter.js" defer></script><script src="../research-companion.js?v=walle-20261020" defer></script></head>
 <body data-lang="en">
 <a class="skip-link" href="#research">Skip to research</a>
 <header class="masthead"><a class="wordmark" href="#hero" aria-label="Lihan Zuo home">Lihan Zuo<span>Research & Practice</span></a>
@@ -104,7 +100,7 @@ fs.writeFileSync(path.join(root, 'editorial.html'), `<!doctype html>
 <img class="underwater-image" src="assets/editorial-underwater.jpg" width="1536" height="1024" alt="" decoding="async">
 <div class="ocean-shade"></div><div class="hero-copy">
 <p class="eyebrow" data-i18n-en="LLM RESEARCH · INFERENCE SYSTEMS" data-i18n-zh="大模型研究 · 推理系统">LLM RESEARCH · INFERENCE SYSTEMS</p>
-<h1 data-i18n-en="Lihan Zuo" data-i18n-zh="左力晗">Lihan Zuo</h1>
+<h1 data-wave-text="letters" data-i18n-en="Lihan Zuo" data-i18n-zh="左力晗">Lihan Zuo</h1>
 <p class="hero-statement" data-i18n-en="Building capable models.\nMaking inference dependable." data-i18n-zh="构建更强的模型，\n让推理更可靠。">Building capable models.<br>Making inference dependable.</p>
 <a class="text-link" href="#research" data-i18n-en="Explore my research ↗" data-i18n-zh="探索我的研究 ↗">Explore my research ↗</a>
 </div><div class="hero-foot"><span>LLM systems / Inference / Reliability</span><a href="#overview" data-i18n-en="A closer look ↓" data-i18n-zh="进一步了解 ↓">A closer look ↓</a></div>
