@@ -1,11 +1,13 @@
 # Zuo-Lihan.github.io CV / Personal Page 发布说明
 
-这个仓库是 `Zuo-Lihan/zuo-lihan.github.io` 的 GitHub Pages 个人主页仓库。新的学术 CV / 个人主页已经作为根目录静态页面发布；后续内容维护仍建议先在 `develop` 分支和 `preview/` 目录中修改、预览和审查，再同步到根目录并发布到 `master`。
+这个仓库是 `Zuo-Lihan/zuo-lihan.github.io` 的 GitHub Pages 个人主页仓库。正式主页入口为根目录 `index.html`。文档的唯一线上内容源是 `docs/markdown/`；每次提交到 `master`，GitHub Actions 自动生成文档目录、正文数据和首页卡片，并部署 `_site/`，不需要后端。`preview/` 保留旧实验页和本地设计原型，不是线上文档的编辑位置。
 
 ## 当前状态
 
 - 线上发布入口：`index.html`
-- 维护预览入口：`preview/index.html`
+- 正式发布构建：`node scripts/build-site.js` → `_site/`
+- 部署流水线：`.github/workflows/pages.yml`
+- 现代设计预览入口：`preview/editorial.html`；旧实验页：`preview/index.html`
 - 分章节内容文件：
   - `preview/sections/hero.html`
   - `preview/sections/research.html`
@@ -14,13 +16,12 @@
   - `preview/sections/profile.html`
   - `preview/sections/docs.html`
   - `preview/sections/contact.html`
-- Markdown 文档系统：
-  - `preview/docs/markdown/*.md`
-  - `preview/docs/docs-renderer.js`
-  - `preview/docs/docs.css`
-  - `preview/docs/build-docs.js`
-  - `preview/docs/docs-manifest.json`
-  - `preview/docs/docs-data.js`
+- 正式 Markdown 文档系统：
+  - `docs/markdown/*.md`：新增和编辑正文
+  - `docs/markdown/imgs/<文档文件名>.jpg`：同名背景图片
+  - `docs/editorial-renderer.js`：正文与背景渲染
+  - `docs/build-docs.js`：自动生成目录和首页卡片
+  - `docs/docs-manifest.json`、`docs/docs-data.js`：生成结果，不手工维护
 - 头像资源：`preview/assets/notion-profile.jpg`
 - 开场芯片动效资源：优先加载 `preview/assets/agentic-ai-chip-template.webp`，不支持 WebP 时回退到 `preview/assets/agentic-ai-chip-template.png`
 - 访客来源地图：线上 `index.html` 与现代预览 `preview/editorial.html` 页尾使用用户提供的 MapMyVisitors 地图组件，记录来自访问 IP 的地理来源；加载入口为 `visitor-counter.js`，独立嵌入页为 `visitor-widget.html`。
@@ -69,11 +70,11 @@ preview/
 - 改论文列表：编辑 `preview/sections/publications.html`
 - 改项目作品：编辑 `preview/sections/projects.html`
 - 改 CV 时间线：编辑 `preview/sections/profile.html`
-- 改 Docs 入口卡片兜底内容：编辑 `preview/sections/docs.html`
+- 正式 Docs 卡片由 `docs/markdown/*.md` 自动生成，不要在首页手动添加卡片。
 - 改联系方式：编辑 `preview/sections/contact.html`
 - 改当前页面底部访客统计：文案源文件为 `preview/sections/visitors.html`，同步到 `index.html` 和 `preview/editorial.html`；样式在 `editorial.css` 与 `preview/editorial.css`，加载逻辑在 `visitor-counter.js`。旧实验版 `preview/index.html` 不用于当前线上统计。
 - 改整体样式、背景、卡片 hover、轮播交互、弹窗逻辑：编辑 `preview/index.html`
-- 改或新增 Docs 正文：编辑或新增 `preview/docs/markdown/*.md`
+- 改或新增正式 Docs 正文：编辑或新增 **`docs/markdown/*.md`**；背景放在 **`docs/markdown/imgs/`**。
 
 注意：`preview/sections/*.html` 是方便编辑的章节源文件。通过本地开发服务器打开 `preview/index.html` 时，页面会自动读取这些章节文件；保存章节文件后，开发服务器会用 Server-Sent Events 通知浏览器刷新，平时不会反复轮询文件。
 
@@ -126,50 +127,84 @@ python3 -m http.server 4173 --bind 127.0.0.1
 http://127.0.0.1:4173/index.html
 ```
 
-## Docs / Markdown 文档写法
+## 在 GitHub 网页编辑 / 上传 Docs
 
-Docs 已经拆成一个轻量的本地 Markdown 渲染系统。后续写文档时，正文主要写 Markdown，不需要为每篇文档重新写 HTML 页面。
+完整模板与语法规范见 [Markdown 文档写作与发布规范](docs/markdown/markdown-guide.md)，发布后也会出现在首页 Docs 列表中。
 
-新增一篇文档：
+直接编辑 **master 分支的 `docs/markdown/`**，不要改 `preview/docs/markdown/`、生成的 JSON/JS，或手动复制整个 `docs/` 文件夹覆盖线上内容。
 
-1. 在 `preview/docs/markdown/` 新建 Markdown 文件，例如：
+1. 打开 [文档正文目录](https://github.com/Zuo-Lihan/zuo-lihan.github.io/tree/master/docs/markdown)。
+2. 编辑已有文档：点击 `.md` 文件 → 铅笔图标 → Edit，使用 Preview 检查 Markdown。
+3. 新增文档：Add file → Create new file，文件名如 `my-note.md`；或在该目录选择 Add file → Upload files 上传 Markdown。
+4. 点击 Commit changes 提交到 `master`。如果选择新建分支，需要把 PR 合并到 `master` 后才会发布。
+5. 在 [Actions](https://github.com/Zuo-Lihan/zuo-lihan.github.io/actions) 查看 **Build and deploy academic website**。必须等 `build` 和 `deploy` 都成功，才是新版本上线；编辑器里的 Preview 只是内容预览。
+6. 访问 [首页 Docs](https://zuo-lihan.github.io/#docs)。例如 `test.md` 对应 `https://zuo-lihan.github.io/docs/editorial.html?doc=test`。
 
-   ```text
-   preview/docs/markdown/my-note.md
-   ```
+最简单的文件就可以是：
 
-2. 在文件顶部写 front matter：
+```markdown
+# My Research Note
 
-   ```markdown
-   ---
-   slug: my-note
-   title: My Research Note
-   eyebrow: Docs / Research
-   summary: One-sentence summary shown on the Docs card and document hero.
-   image: img/post-TMUX_usages.jpg
-   tags: Tag One, Tag Two, Tag Three
-   sourceLabel: Optional source label
-   sourceHref: _posts/source-file.md
-   ---
-   ```
+正文直接用 Markdown 写。
 
-3. 用普通 Markdown 写正文，支持标题、段落、列表、引用、表格、链接、行内代码和 fenced code block。
+## Experiments
 
-4. 运行：
+- First result
+- Second result
+```
 
-   ```bash
-   node preview/build.js
-   ```
+不写 front matter 也会被收录：文件名作为链接标识，首个 `# 标题` 作为标题，没有标题就用文件名。建议文件名使用小写英文、数字和短横线；文件平放在 `docs/markdown/`，不再嵌套子目录。
 
-   这个命令会扫描 `preview/docs/markdown/*.md`，生成 `preview/docs/docs-manifest.json` 和 `preview/docs/docs-data.js`，并同步 `preview/index.html` 的兜底内容。`docs-data.js` 会内嵌 Markdown 内容，让直接从本地 `index.html` 打开时也能渲染文档页。
+需要标签或摘要时，可以加可选元信息：
 
-5. 预览单篇文档：
+```markdown
+---
+slug: my-note
+title: My Research Note
+eyebrow: Docs / LLM
+summary: Notes on efficient inference.
+tags: LLM, Inference
+---
 
-   ```text
-   http://127.0.0.1:4173/preview/docs/view.html?doc=my-note
-   ```
+## Experiments
 
-使用 `node preview/dev-server.js` 本地开发时，修改 `preview/docs/markdown/*.md` 后开发服务器会自动重新生成 manifest 并刷新浏览器。
+正文……
+```
+
+`slug` 不能与其他文档重复，已发布的 slug 尽量不要修改，避免原链接失效。代码块、表格、链接、图片、引用、列表和一级至六级标题均可渲染；原始 HTML 不会直接执行。
+
+### 文档背景图
+
+图片放在 [`docs/markdown/imgs/`](https://github.com/Zuo-Lihan/zuo-lihan.github.io/tree/master/docs/markdown/imgs)，**图片文件名与 Markdown 文件名相同，仅扩展名不同**：
+
+```text
+docs/markdown/
+├── test.md
+├── tmux-nscc.md
+└── imgs/
+    ├── test.webp
+    └── tmux-nscc.jpg
+```
+
+- `test.md` 自动使用 `imgs/test.webp` 为背景，不需要在 Markdown 里配置背景字段。
+- 支持 AVIF、WebP、JPG、JPEG、PNG；若上传多种同名格式，按以上顺序选择一个。建议只保留一个。
+- 同名指**文件名**，即使 front matter 中设置了不同的 `slug`，仍按照 Markdown 文件名匹配。
+- 没有同名图片，或图片加载失败时，使用默认浅色背景板，不显示破损图片。
+- 上传、替换、删除图片并提交后，也会自动重新构建和部署。TMUX 的背景已经迁移到此目录。
+- 正文插图也可以放这里，用 `![Caption](imgs/figure.jpg)` 引用。插图文件名不需要与文档同名。
+- 所有发布的文档和图片都是公开的，不要上传密码、Token、内部数据或敏感截图。
+
+### 本地检查正式发布结果
+
+```bash
+node --test tests/docs-build.test.cjs
+node scripts/build-site.js
+python3 -m http.server 4186 --bind 127.0.0.1 --directory _site
+```
+
+打开 `http://127.0.0.1:4186/#docs`。修改文件后重新运行构建并刷新；停止服务器在终端按 Ctrl+C。这里 Node 只用于本地构建，网页编辑时由 GitHub Actions 运行，不要求你电脑安装 Node。
+
+`_site/` 是独立生成的发布结果。自动构建不会把生成文件提交回仓库，也不会覆盖你的 Markdown 源文件；不要手动修改这个目录。
 
 ## 本地 / 全网热更新预览服务
 
@@ -372,45 +407,17 @@ git push origin develop
 - `preview/docs/*`
 - `README.md`
 
-## 同步为正式主页
+## 构建正式主页
 
-等你确认 `preview/` 中的页面就是最终版本后，再把预览页面同步到根目录首页。GitHub Pages 的个人主页默认从仓库发布源的根目录读取 `index.html`，所以正式发布需要让根目录的 `index.html`、`sections/`、`docs/` 和 `assets/` 与预览版本保持一致。
+当前主页是海洋编辑版。修改页面布局时，在 `develop` 审查后，再将实际需要的布局、样式和脚本变更合并到 `master`。**不要再执行把整个 `preview/index.html`、`preview/docs/` 覆盖到根目录的旧操作**，那会恢复旧版页面或丢失在 GitHub 网页新增的文档。
 
-推荐在 `develop` 上完成这一步：
-
-```bash
-git switch develop
-git pull origin develop
-node preview/build.js
-mkdir -p assets
-rm -rf sections
-cp preview/index.html index.html
-cp preview/assets/notion-profile.jpg assets/notion-profile.jpg
-cp -R preview/sections sections
-rm -rf docs
-cp -R preview/docs docs
-git status
-```
-
-然后再次本地检查正式路径：
+正式构建只需：
 
 ```bash
-python3 -m http.server 4173 --bind 127.0.0.1
+node scripts/build-site.js
 ```
 
-打开：
-
-```text
-http://127.0.0.1:4173/index.html
-```
-
-如果正式路径检查无误，再提交：
-
-```bash
-git add index.html assets/notion-profile.jpg sections docs README.md preview/build.js preview/dev-server.js preview/index.html preview/assets/notion-profile.jpg preview/sections preview/docs
-git commit -m "Promote academic CV homepage"
-git push origin develop
-```
+构建会读取根目录 `index.html` 和 `docs/markdown/`，将需要公开的页面及资源复制到 `_site/`，再生成最新的 Docs 卡片、目录、正文数据和缓存版本号。不会发布本地 `output/`、测试文件、预览实验或仓库配置。
 
 ## 发布到 master
 
@@ -445,11 +452,15 @@ Settings -> Pages -> Build and deployment
 
 推荐设置：
 
-- Source: `Deploy from a branch`
-- Branch: `master`
-- Folder: `/(root)`
+- Source: **GitHub Actions**
+- 工作流：`.github/workflows/pages.yml`
+- 触发：推送 `master`，或在 Actions 中手动 Run workflow
+- 构建：运行测试，再执行 `node scripts/build-site.js`
+- 发布内容：`_site/`，环境为 `github-pages`
 
-保存后，GitHub Pages 会在 `master` 的根目录发布页面。根据 GitHub 官方文档，GitHub Pages 可以配置为从指定分支和根目录或 `/docs` 目录发布；个人或组织主页仓库需要使用 `<owner>.github.io` 这种仓库名。
+不要选 `Deploy from a branch`：它只会原样发布文件，不运行文档生成步骤，新增 `.md` 就可能再次没有卡片。工作流仅具有读取源码与部署 Pages 所需权限，不需要个人 Token、OAuth App 或独立后端。
+
+`Back to Docs` 返回 `index.html#docs`；旧的 `/editorial.html#docs` 地址会兼容跳转到首页。构建按内容更新脚本缓存版本，避免旧的 `docs-data.js` 隐藏新增文档。
 
 参考文档：
 
@@ -493,7 +504,7 @@ git push origin master
 1. 在 `develop` 修改对应的 `preview/sections/*.html`；如果是整体样式或交互，再修改 `preview/index.html`。
 2. 本地 HTTP 预览会自动刷新，确认页面显示无误。
 3. 发布或提交前运行 `node preview/build.js`，把章节源文件同步进 `preview/index.html` 的兜底内容。
-4. 把确认后的内容同步到根目录 `index.html`、`sections/`、`docs/` 和 `assets/`。
+4. 将审查过的页面变更同步到对应根目录文件；不要整目录覆盖 `docs/`。Docs 始终编辑根目录 `docs/markdown/`。
 5. 推送 `develop`。
 6. PR 合并到 `master`。
 7. 等待 GitHub Pages 自动部署。

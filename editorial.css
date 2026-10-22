@@ -90,6 +90,8 @@ dialog{border:1px solid var(--line);border-radius:4px;background:var(--paper);co
 .walle-stage{position:absolute;inset:0;display:block;overflow:hidden;opacity:0;transition:opacity .25s}
 .is-loaded .walle-stage{opacity:1}
 .walle-stage canvas{display:block;width:100%;height:100%;pointer-events:none}
+#docs{scroll-margin-top:100px}
+@media(max-width:700px){#docs{scroll-margin-top:84px}}
 .research-card.interactive-glass{padding:22px;height:100%}.research-card.interactive-glass:hover{transform:perspective(1100px) rotateX(var(--glass-rx)) rotateY(var(--glass-ry)) translate3d(0,var(--glass-lift),0)}
 .interactive-glass .glass-media,.interactive-glass .project-thumb{border-radius:16px}
 .paper-card.interactive-glass{padding:34px;border-top-color:rgba(154,181,204,.48)}

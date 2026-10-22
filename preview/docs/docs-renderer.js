@@ -18,9 +18,21 @@
     return "#";
   }
 
+  let imageBase = new URL("markdown/", location.href);
+
   function inlineMarkdown(text) {
     const linkTokens = [];
-    let working = String(text).replace(/\[([^\]]+)]\(([^)]+)\)/g, (_match, label, href) => {
+    const imageTokens = [];
+    let working = String(text).replace(/!\[([^\]]*)]\(([^)]+)\)/g, (_match, alt, href) => {
+      const token = `@@IMAGE_${imageTokens.length}@@`;
+      try {
+        const url = new URL(href, imageBase);
+        if (!['https:', 'http:', 'file:'].includes(url.protocol)) return escapeHtml(alt);
+        imageTokens.push(`<img src="${escapeHtml(url.href)}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async">`);
+        return token;
+      } catch { return escapeHtml(alt); }
+    });
+    working = working.replace(/\[([^\]]+)]\(([^)]+)\)/g, (_match, label, href) => {
       const token = `@@LINK_${linkTokens.length}@@`;
       linkTokens.push({
         label: escapeHtml(label),
@@ -43,10 +55,12 @@
       );
     });
 
+    imageTokens.forEach((html, index) => {working = working.replaceAll(`@@IMAGE_${index}@@`, html);});
     return working;
   }
 
   function parseFrontMatter(markdown) {
+    markdown = markdown.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
     if (!markdown.startsWith("---\n")) {
       return { meta: {}, body: markdown };
     }
@@ -54,7 +68,7 @@
     if (end === -1) {
       return { meta: {}, body: markdown };
     }
-    const meta = {};
+    const meta = Object.create(null);
     const rawMeta = markdown.slice(4, end).trim();
     rawMeta.split(/\n/).forEach((line) => {
       const match = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
@@ -164,7 +178,7 @@
         continue;
       }
 
-      const heading = trimmed.match(/^(#{2,4})\s+(.+)$/);
+      const heading = trimmed.match(/^(#{1,6})\s+(.+)$/);
       if (heading) {
         flushParagraph();
         flushList();
@@ -216,6 +230,20 @@
   }
 
   function renderDoc(doc, markdown) {
+    imageBase = new URL(doc.markdown || 'markdown/', location.href);
+    document.body.style.removeProperty('--doc-background');
+    document.body.classList.remove('has-doc-background');
+    if (doc.background) {
+      const background = new URL(doc.background, location.href);
+      if (background.origin === location.origin && ['https:', 'http:', 'file:'].includes(background.protocol)) {
+        const image = new Image();
+        image.onload = () => {
+          document.body.style.setProperty('--doc-background', `url(${JSON.stringify(background.href)})`);
+          document.body.classList.add('has-doc-background');
+        };
+        image.src = background.href;
+      }
+    }
     const { meta, body } = parseFrontMatter(markdown);
     const merged = { ...doc, ...meta };
     const tags = Array.isArray(merged.tags) ? merged.tags : [];
@@ -231,13 +259,13 @@
           ${tagItems ? `<div class="tag-panel"><span class="tag-label">Tag</span><div class="meta-row">${tagItems}</div></div>` : ""}
         </div>
 
-        <aside class="hero-card">
+        ${merged.image && !doc.background ? `<aside class="hero-card">
           <img src="${escapeHtml(resolveRepoPath(merged.image))}" alt="${escapeHtml(merged.title || "Document image")}">
           <div class="mini">
             <h3>Markdown-rendered note</h3>
             <p>This document is loaded from a Markdown source file and rendered through the local docs package.</p>
           </div>
-        </aside>
+        </aside>` : ""}
       </section>
 
       <section class="content-grid single-column">
@@ -247,12 +275,13 @@
   }
 
   function renderError(error) {
+    const homeHref = document.body.dataset.homeHref || "../index.html#docs";
     root.innerHTML = `
       <section class="doc-error">
         <div class="eyebrow">Docs</div>
         <h1>Document unavailable</h1>
         <p class="lead">${escapeHtml(error.message || "The requested document could not be loaded.")}</p>
-        <a class="ghost-button" href="../index.html?section=docs">Back to Docs</a>
+        <a class="ghost-button" href="${escapeHtml(homeHref)}">Back to Docs</a>
       </section>
     `;
   }

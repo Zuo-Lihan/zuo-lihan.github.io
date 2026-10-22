@@ -1,7 +1,7 @@
 :root{--bg:#f8fafc;--text:#192e42;--muted:#627282;--cyan:#32638c;--line:#d8e1e9}
 html{background:#e9f1f7}
 body{position:relative;isolation:isolate;background:transparent;color:#192e42;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body:before{content:"";display:block;position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(248,250,252,.78),rgba(238,246,250,.7)),url("../img/post-TMUX_usages.jpg") center/cover no-repeat;opacity:.94;pointer-events:none}
+body:before{content:"";display:block;position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(248,250,252,.78),rgba(238,246,250,.7)),var(--doc-background,none) center/cover no-repeat;opacity:.94;pointer-events:none}
 body:after{content:"";display:block;position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at 76% 22%,rgba(255,255,255,.48),transparent 34%),linear-gradient(180deg,rgba(248,250,252,.18),rgba(231,241,248,.36));pointer-events:none}
 .topbar{background:rgba(248,250,252,.68);box-shadow:0 10px 30px rgba(41,74,98,.06);border-bottom:1px solid rgba(216,225,233,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
 h1,h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:0}
@@ -9,3 +9,5 @@ h1,h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing
 .ghost-button{border-radius:2px;background:transparent;box-shadow:none}
 .hero-card{display:none}.doc-hero{display:block}.doc-hero h1{font-size:52px;max-width:900px}.doc-content h2{font-size:28px}.doc-content p{font-size:16px}.tag-panel{box-shadow:0 10px 28px rgba(41,74,98,.06);border-radius:3px;background:rgba(238,242,246,.66);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 @media(max-width:700px){.doc-hero h1{font-size:34px}}
+.doc-content img{display:block;max-width:100%;height:auto;margin:24px auto;border-radius:4px}
+.doc-content h1{font-size:32px;line-height:1.3}
