@@ -62,6 +62,25 @@ test('catalog replacement escapes metadata and preserves all other sections', ()
   assert.throws(()=>updateDocsList('<main></main>', []), /mount is missing/);
 });
 
+test('unlisted documents keep their content and URLs but have no homepage card', t => {
+  const root = fixture(t);
+  fs.writeFileSync(path.join(root, 'markdown', 'guide.md'), '---\nlisted: false\n---\n# Guide');
+  fs.writeFileSync(path.join(root, 'markdown', 'note.md'), '# Research note');
+  const docs = buildDocs({docsRoot: root});
+  assert.equal(docs.length, 2);
+  assert.equal(docs.find(doc => doc.slug === 'guide').listed, false);
+  assert.equal(docs.find(doc => doc.slug === 'note').listed, true);
+  const catalog = updateDocsList('<div class="docs-layout" data-docs-list></div>', docs);
+  assert.equal((catalog.match(/class="doc-card"/g) || []).length, 1);
+  assert.ok(!catalog.includes('?doc=guide'));
+  assert.ok(catalog.includes('?doc=note'));
+  assert.ok(catalog.includes('<span>01</span>'));
+  const data = {window: {}};
+  vm.runInNewContext(fs.readFileSync(path.join(root, 'docs-data.js'), 'utf8'), data);
+  assert.ok(data.window.LIHAN_DOCS.find(doc => doc.slug === 'guide').content.includes('# Guide'));
+  assert.ok(JSON.parse(fs.readFileSync(path.join(root, 'docs-manifest.json'))).find(doc => doc.slug === 'guide'));
+});
+
 test('production build generates all root Docs, correct return paths, and versioned assets without touching source', t => {
   const temp = fixture(t), target = path.join(temp, '_site');
   const root = path.resolve(__dirname, '..');
@@ -71,8 +90,10 @@ test('production build generates all root Docs, correct return paths, and versio
   assert.equal(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), before);
   assert.equal(fs.readFileSync(path.join(root, 'docs/docs-data.js'), 'utf8'), sourceData);
   const html = fs.readFileSync(path.join(target, 'index.html'), 'utf8');
-  assert.equal((html.match(/class="doc-card"/g)||[]).length, docs.length);
-  for (const doc of docs) assert.ok(html.includes(`?doc=${encodeURIComponent(doc.slug)}`));
+  assert.equal((html.match(/class="doc-card"/g)||[]).length, docs.filter(doc => doc.listed !== false).length);
+  for (const doc of docs) assert.equal(html.includes(`?doc=${encodeURIComponent(doc.slug)}`), doc.listed !== false);
+  const guide = docs.find(doc => doc.slug === 'markdown-guide');
+  assert.ok(guide && guide.listed === false, 'Writing guide stays published but unlisted');
   const view = fs.readFileSync(path.join(target, 'docs/editorial.html'), 'utf8');
   assert.ok(view.includes('href="../index.html#docs"'));
   assert.ok(!view.includes('href="../editorial.html#docs"'));

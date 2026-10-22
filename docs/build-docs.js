@@ -55,6 +55,7 @@ function collectDocs(docsRoot = __dirname) {
       image: backgroundFile ? `docs/markdown/imgs/${backgroundFile}` : meta.image || "",
       background: backgroundFile ? `markdown/imgs/${encodeURIComponent(backgroundFile)}?v=${backgroundVersion}` : "",
       tags: meta.tags || [],
+      listed: meta.listed?.toLowerCase() !== "false",
       sourceLabel: meta.sourceLabel || "",
       sourceHref: meta.sourceHref || "",
       markdown: `markdown/${file}`,
@@ -80,7 +81,7 @@ function escapeHtml(value) {
 }
 
 function renderDocsList(docs) {
-  return docs.map((doc, index) => `
+  return docs.filter((doc) => doc.listed !== false).map((doc, index) => `
       <a class="doc-card" href="docs/editorial.html?doc=${encodeURIComponent(doc.slug)}" aria-label="Open ${escapeHtml(doc.title)}">
         <div>
           <div class="doc-index"><span>${String(index + 1).padStart(2, "0")}</span><span>${escapeHtml(doc.eyebrow)}</span></div>

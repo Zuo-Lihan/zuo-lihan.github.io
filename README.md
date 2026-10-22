@@ -129,7 +129,7 @@ http://127.0.0.1:4173/index.html
 
 ## 在 GitHub 网页编辑 / 上传 Docs
 
-完整模板与语法规范见 [Markdown 文档写作与发布规范](docs/markdown/markdown-guide.md)，发布后也会出现在首页 Docs 列表中。
+完整模板与语法规范见 [Markdown 文档写作与发布规范](docs/markdown/markdown-guide.md)，也可通过[文档页](https://zuo-lihan.github.io/docs/editorial.html?doc=markdown-guide)访问。指南设置了 `listed: false`，保留在 Docs 中，但不显示在主页卡片列表。
 
 直接编辑 **master 分支的 `docs/markdown/`**，不要改 `preview/docs/markdown/`、生成的 JSON/JS，或手动复制整个 `docs/` 文件夹覆盖线上内容。
 
@@ -172,6 +172,8 @@ tags: LLM, Inference
 ```
 
 `slug` 不能与其他文档重复，已发布的 slug 尽量不要修改，避免原链接失效。代码块、表格、链接、图片、引用、列表和一级至六级标题均可渲染；原始 HTML 不会直接执行。
+
+可在元信息中添加 `listed: false`，只隐藏这篇文档的首页卡片，保留文档页和原链接。省略此字段则正常展示；这不是隐私或权限设置。
 
 ### 文档背景图
 

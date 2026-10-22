@@ -4,6 +4,7 @@ title: Markdown 文档写作与发布规范
 eyebrow: Docs / Authoring
 summary: 文档目录、可复制的 Markdown 模板、同名背景图规则，以及通过 GitHub 网页编辑和发布的完整流程。
 tags: Markdown, Writing, Publishing
+listed: false
 ---
 
 ## 文件放在哪里
@@ -96,10 +97,13 @@ tags: LLM, Inference, Experiments
 | eyebrow | 否 | 分类说明，例如 Docs / LLM |
 | summary | 否 | 文档标题下的简短摘要；保持单行 |
 | tags | 否 | 英文逗号分隔，例如 LLM, Inference；首页最多展示前三个 |
+| listed | 否 | 默认显示主页 Docs 卡片；设置 listed: false 后隐藏卡片，但文档仍可通过原链接访问 |
 
 当前元信息使用简单的单行 `key: value` 格式。不要添加 YAML 数组、嵌套对象、多行字符串或包裹整行值的引号。标签请写成 `tags: LLM, Inference`，不要写成 `tags: [LLM, Inference]`。
 
 已有文档的 `slug` 尽量保持不变，否则原先分享出去的链接会失效。同一个 `slug` 出现在两篇文档中时，构建会报错，避免误打开另一篇文档。
+
+本规范设置了 `listed: false`，保留在 Docs 中，不在主页显示卡片。此选项只控制首页展示，不是访问权限；文档及其源文件仍是公开的。
 
 设置了 `title` 后，正文可直接从二级标题 `## Overview` 开始，避免在页面上重复显示同一个大标题。
 
