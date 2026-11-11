@@ -4,6 +4,7 @@
   const sea = document.querySelector('.ocean-image');
   const copy = document.querySelector('.hero-copy');
   const underwater = document.querySelector('.underwater-image');
+  const oceanQuote = document.querySelector('.ocean-quote');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let frame = 0;
   let stageHeight = stage.offsetHeight;
@@ -16,20 +17,38 @@
       copy.style.transform = '';
       copy.style.opacity = '';
       underwater.style.opacity = '0';
+      if (oceanQuote) oceanQuote.style.opacity = '0';
       return;
     }
-    const progress = Math.min(1, y / stageHeight);
+    const progress = Math.max(0, Math.min(1, y / Math.max(1, stageHeight - stage.querySelector('.ocean-stage').offsetHeight)));
     sea.style.transform = `translate3d(0,${-progress * 90}px,0) scale(${1 + progress * .065})`;
     copy.style.transform = `translate3d(0,${-progress * 85}px,0)`;
     copy.style.opacity = String(Math.max(0, 1 - progress * 1.65));
     underwater.style.opacity = String(Math.min(1, Math.max(0, (progress - .04) * 2.8)));
     underwater.style.transform = `translate3d(0,${-progress * 40}px,0)`;
+    if (oceanQuote) oceanQuote.style.opacity = String(Math.min(1, Math.max(0, (progress - .55) * 4)));
   }
   function requestPaint() { if (!frame) frame = requestAnimationFrame(paintScroll); }
   window.addEventListener('scroll', requestPaint, {passive:true});
   window.addEventListener('resize', () => {stageHeight = stage.offsetHeight;requestPaint();});
   reduced.addEventListener('change', requestPaint);
   paintScroll();
+  if (oceanQuote) {
+    const measure = document.createElement('canvas').getContext('2d');
+    function fitQuote() {
+      if (!measure) return;
+      let size = 25;
+      while (size > 7) {
+        measure.font = `${size}px Georgia`;
+        if (measure.measureText(oceanQuote.textContent).width <= oceanQuote.clientWidth) break;
+        size -= 1;
+      }
+      oceanQuote.style.fontSize = size + 'px';
+    }
+    new ResizeObserver(fitQuote).observe(oceanQuote);
+    document.fonts?.ready.then(fitQuote);
+    fitQuote();
+  }
   const links = [...document.querySelectorAll('.masthead nav a')];
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
