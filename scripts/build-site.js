@@ -8,6 +8,7 @@ const root = path.resolve(__dirname, '..');
 const publicFiles = [
   '.nojekyll', 'index.html', 'editorial.html', 'editorial.css', 'editorial.js',
   'editorial-data.js', 'editorial-doc.css', 'research-companion.js', 'walle-scene.js', 'ocean-motion.js',
+  'ocean-simulation.js', 'ocean-shaders.js', 'ocean-models.js', 'ocean-reef.js', 'ocean-collisions.js', 'ocean-bubbles.js',
   'sw.js', 'visitor-counter.js', 'visitor-widget.html', 'visitor-widget.js'
 ];
 const publicDirectories = ['assets', 'img', 'vendor', 'docs'];

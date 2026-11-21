@@ -1,36 +1,36 @@
 (() => {
   const header = document.querySelector('.masthead');
   const stage = document.querySelector('.ocean-runway');
-  const sea = document.querySelector('.ocean-image');
+  const ocean = document.querySelector('.ocean-stage');
   const copy = document.querySelector('.hero-copy');
-  const underwater = document.querySelector('.underwater-image');
   const oceanQuote = document.querySelector('.ocean-quote');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let frame = 0;
-  let stageHeight = stage.offsetHeight;
+  let diveLength = Math.max(1, stage.offsetHeight - ocean.offsetHeight);
   function paintScroll() {
     frame = 0;
     const y = window.scrollY;
     header.classList.toggle('scrolled', y > 60);
     if (reduced.matches) {
-      sea.style.transform = '';
       copy.style.transform = '';
       copy.style.opacity = '';
-      underwater.style.opacity = '0';
+      copy.inert = false;
+      ocean.style.removeProperty('--dive');
       if (oceanQuote) oceanQuote.style.opacity = '0';
       return;
     }
-    const progress = Math.max(0, Math.min(1, y / Math.max(1, stageHeight - stage.querySelector('.ocean-stage').offsetHeight)));
-    sea.style.transform = `translate3d(0,${-progress * 90}px,0) scale(${1 + progress * .065})`;
+    const progress = Math.max(0, Math.min(1, y / diveLength));
     copy.style.transform = `translate3d(0,${-progress * 85}px,0)`;
-    copy.style.opacity = String(Math.max(0, 1 - progress * 1.65));
-    underwater.style.opacity = String(Math.min(1, Math.max(0, (progress - .04) * 2.8)));
-    underwater.style.transform = `translate3d(0,${-progress * 40}px,0)`;
+    copy.style.opacity = String(Math.max(0, 1 - progress * 3.3));
+    copy.inert = progress >= .31;
+    ocean.style.setProperty('--dive', String(Math.min(1, Math.max(0, (progress - .17) * 4))));
     if (oceanQuote) oceanQuote.style.opacity = String(Math.min(1, Math.max(0, (progress - .55) * 4)));
   }
   function requestPaint() { if (!frame) frame = requestAnimationFrame(paintScroll); }
   window.addEventListener('scroll', requestPaint, {passive:true});
-  window.addEventListener('resize', () => {stageHeight = stage.offsetHeight;requestPaint();});
+  const oceanResize = new ResizeObserver(() => {diveLength = Math.max(1, stage.offsetHeight - ocean.offsetHeight);requestPaint();});
+  oceanResize.observe(ocean);
+  oceanResize.observe(stage);
   reduced.addEventListener('change', requestPaint);
   paintScroll();
   if (oceanQuote) {

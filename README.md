@@ -127,6 +127,14 @@ python3 -m http.server 4173 --bind 127.0.0.1
 http://127.0.0.1:4173/index.html
 ```
 
+## 实时海岸首屏
+
+首屏使用 Three.js 实时渲染，不播放视频，也不使用整张背景图。`ocean-motion.js` 管理镜头和交互，`ocean-simulation.js` 计算波纹、鱼群、飞行和沙面痕迹，`ocean-shaders.js` 和 `ocean-models.js` 分别负责渲染与场景模型。
+
+沙滩颜色、法线和粗糙度贴图来自 Rob Tuytel 的 [Aerial Beach 01](https://polyhaven.com/a/aerial_beach_01)（Poly Haven，CC0）。
+
+水下礁石使用 Dimitrios Savva、Rico Cilliers 的 [Rock Boulder Dry](https://polyhaven.com/a/rock_boulder_dry) 摄影纹理（CC0），潜水时从本站加载。礁区模型与鱼群在 `ocean-reef.js`；`ocean-collisions.js` 使用随站分发的 cannon-es 0.20.0（MIT，见 `vendor/cannon-es.LICENSE`），以固定时间步计算鱼体、珊瑚和海床之间的接触。`ocean-bubbles.js` 处理水下点击和触摸，按当前画面折射气泡后的景物。潜入水下后相机只随滚动移动。
+
 ## 在 GitHub 网页编辑 / 上传 Docs
 
 完整模板与语法规范见 [Markdown 文档写作与发布规范](docs/markdown/markdown-guide.md)，也可通过[文档页](https://zuo-lihan.github.io/docs/editorial.html?doc=markdown-guide)访问。指南设置了 `listed: false`，保留在 Docs 中，但不显示在主页卡片列表。
